@@ -1,3 +1,27 @@
 <resources>
     <string name="app_name">Voice</string>
+    <string name="sign_in_button">Sign-in</string>
+    <string name="register_button">Register Here</string>
+    <string name="username_hint">Username</string>
+    <string name="password_hint">Password</string>
+    <string name="email_hint">E-mail</string>
+    <string name="cities_lived_in_hint">Cities lived in &#8230;</string>
+    <string name="new_user_registration_text">Don\'t have an account with us?</string>
+    <string name="invalid_user_pass_message">Invalid username/password entered. Please try again.</string>
+    <string name="reset_pass_button">Click here to reset your password.</string>
+
+    <string name="create_account_title">Create an account</string>
+    <string name="create_account_message">Register to see where the locals hang out</string>
+    <string name="register">Register</string>
+
+    <!--TODO: Add this list to the DB, since it will grow.-->
+    <string-array name="cities_array">
+        <item>Weimar</item>
+        <item>Mexico City</item>
+        <item>Dubai</item>
+        <item>Muscat</item>
+        <item>New York</item>
+        <item>Karachi</item>
+        <item>Erfurt</item>
+    </string-array>
 </resources>
