@@ -15,11 +15,13 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 public class HomeScreenActivity extends FragmentActivity implements OnMapReadyCallback
 {
     private GoogleMap mMap;
     private static final int finePermissionLocation = 101;
+    FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
