@@ -8,11 +8,13 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 
+import android.view.View;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -30,6 +32,7 @@ public class HomeScreenActivity extends FragmentActivity implements OnMapReadyCa
         setContentView(R.layout.activity_home_screen);
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
     }
 
     @Override
@@ -54,7 +57,8 @@ public class HomeScreenActivity extends FragmentActivity implements OnMapReadyCa
             @Override
             public void onMapLongClick(LatLng latLng) {
                 mMap.addMarker(new MarkerOptions()
-                        .position(latLng));
+                        .position(latLng)
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_voice_marker)));
             }
         });
     }
@@ -74,5 +78,10 @@ public class HomeScreenActivity extends FragmentActivity implements OnMapReadyCa
                 }
                 break;
         }
+    }
+
+    public void checkIn(View view)
+    {
+
     }
 }
