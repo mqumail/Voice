@@ -14,6 +14,8 @@
     <string name="create_account_message">Register to see where the locals hang out</string>
     <string name="register">Register</string>
 
+    <string name="check_in_button">Check-in</string>
+
     <!--TODO: Add this list to the DB, since it will grow.-->
     <string-array name="cities_array">
         <item>Weimar</item>
