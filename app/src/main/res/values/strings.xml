@@ -10,11 +10,14 @@
     <string name="invalid_user_pass_message">Invalid username/password entered. Please try again.</string>
     <string name="reset_pass_button">Click here to reset your password.</string>
 
-    <string name="create_account_title">Create an account</string>
-    <string name="create_account_message">Register to see where the locals hang out</string>
-    <string name="register">Register</string>
+    <string name="create_account_title">Local cities</string>
+    <!--Your visits in these cities will be anonymously marked "Local Visit".-->
+    <string name="create_account_message">Tell us the cities where you have lived.</string>
+    <string name="register">Continue</string>
 
     <string name="check_in_button">Check-in</string>
+
+    <string name="voice_logo">Voice</string>
 
     <!--TODO: Add this list to the DB, since it will grow.-->
     <string-array name="cities_array">

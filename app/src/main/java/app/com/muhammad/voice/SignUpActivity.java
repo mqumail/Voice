@@ -1,7 +1,9 @@
 package app.com.muhammad.voice;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
@@ -19,5 +21,11 @@ public class SignUpActivity extends AppCompatActivity
                 android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);*/
+    }
+
+    public void continueHome(View view)
+    {
+        Intent intent = new Intent(this, HomeScreenActivity.class);
+        this.startActivity(intent);
     }
 }
