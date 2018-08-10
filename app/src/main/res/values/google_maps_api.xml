@@ -1,4 +1,5 @@
 <resources>
     <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false"></string>
+    <string name="geocode_api_key" ></string>
 </resources>
     <!--Insert your personal API Key from: https://console.developers.google.com-->

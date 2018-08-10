@@ -14,6 +14,7 @@
     <!--Your visits in these cities will be anonymously marked "Local Visit".-->
     <string name="create_account_message">Tell us the cities where you have lived.</string>
     <string name="register">Continue</string>
+    <string name="skip">Skip</string>
 
     <string name="check_in_button">Check-in</string>
 
@@ -21,12 +22,12 @@
 
     <!--TODO: Add this list to the DB, since it will grow.-->
     <string-array name="cities_array">
-        <item>Weimar</item>
-        <item>Mexico City</item>
-        <item>Dubai</item>
-        <item>Muscat</item>
-        <item>New York</item>
-        <item>Karachi</item>
-        <item>Erfurt</item>
+        <item>Weimar, Germany</item>
+        <item>Mexico City, Mexico</item>
+        <item>Dubai, UAE</item>
+        <item>Muscat, Oman</item>
+        <item>New York City, USA</item>
+        <item>Karachi, Pakistan</item>
+        <item>Spartanburg, USA</item>
     </string-array>
 </resources>
