@@ -35,12 +35,23 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class HomeScreenActivity extends FragmentActivity implements OnMapReadyCallback, GoogleApiClient.OnConnectionFailedListener
 {
@@ -56,7 +67,7 @@ public class HomeScreenActivity extends FragmentActivity implements OnMapReadyCa
     private GoogleApiClient mGoogleApiClient;
 
     private static final int finePermissionLocation = 101;
-    FirebaseFirestore db = FirebaseFirestore.getInstance();
+    FirebaseFirestore db;
 
     String address = "16 Caroline Drive, Dix Hills, New York, 11746";
     String textCoordinates = "";
@@ -66,6 +77,8 @@ public class HomeScreenActivity extends FragmentActivity implements OnMapReadyCa
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_screen);
+
+        db = FirebaseFirestore.getInstance();
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
@@ -104,14 +117,14 @@ public class HomeScreenActivity extends FragmentActivity implements OnMapReadyCa
             }
         }
 
-        mMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
+        /*mMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
             @Override
             public void onMapLongClick(LatLng latLng) {
                 mMap.addMarker(new MarkerOptions()
                         .position(latLng)
                         .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_voice_marker)));
             }
-        });
+        });*/
     }
 
     @Override
@@ -144,7 +157,9 @@ public class HomeScreenActivity extends FragmentActivity implements OnMapReadyCa
         }
 
         //new GetCoordinates().execute(address.replace(" ","+"));
-        //Log.i("Geocode", textCoordinates);
+        Log.i(TAG, "startActivityForResult finished");
+
+
     }
 
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -156,8 +171,8 @@ public class HomeScreenActivity extends FragmentActivity implements OnMapReadyCa
                         .getPlaceById(mGoogleApiClient, place.getId());
                 placeResult.setResultCallback(mUpdatePlaceDetailsCallback);
 
-                //String toastMsg = String.format("Place: %s", place.getName());
-                //Toast.makeText(this, toastMsg, Toast.LENGTH_LONG).show();
+                String toastMsg = String.format("Place: %s", place.getName());
+                Toast.makeText(this, toastMsg, Toast.LENGTH_LONG).show();
             }
         }
     }
@@ -197,12 +212,46 @@ public class HomeScreenActivity extends FragmentActivity implements OnMapReadyCa
                 Log.e(TAG, "onResult: NullPointerException: " + e.getMessage() );
             }
 
+            SavePlaceInfo();
+
             moveCamera(new LatLng(place.getViewport().getCenter().latitude,
                     place.getViewport().getCenter().longitude), DEFAULT_ZOOM, mPlace);
 
             places.release();
         }
     };
+
+    private void SavePlaceInfo()
+    {
+        // TODO: Fix the Uri and LatLng break. Its breaking when sending it to the DB
+        // Store the place info in the DB
+        Map<String, Object> placeCollection = new HashMap<>();
+        placeCollection.put("name", mPlace.getName());
+        placeCollection.put("address", mPlace.getAddress());
+        placeCollection.put("id", mPlace.getId());
+        //placeCollection.put("LatLng", mPlace.getLatlng());
+        placeCollection.put("rating", mPlace.getRating());
+        placeCollection.put("phone", mPlace.getPhoneNumber());
+        //placeCollection.put("website", mPlace.getWebsiteUri());
+
+        CollectionReference placesCollection = db.collection("placesCollection");
+
+        // Add a new document with a generated ID
+        placesCollection
+            .add(placeCollection)
+            .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                @Override
+                public void onSuccess(DocumentReference documentReference) {
+                    Log.d("MainActivity", "DocumentSnapshot added with ID: " + documentReference.getId());
+                }
+            })
+            .addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Log.w("MainActivity", "Error adding document", e);
+                }
+            });
+    }
 
     private void moveCamera(LatLng latLng, float zoom, PlaceInfo placeInfo){
         Log.d(TAG, "moveCamera: moving the camera to: lat: " + latLng.latitude + ", lng: " + latLng.longitude );
