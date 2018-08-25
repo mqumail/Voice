@@ -42,6 +42,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.GeoPoint;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
@@ -229,10 +230,10 @@ public class HomeScreenActivity extends FragmentActivity implements OnMapReadyCa
         placeCollection.put("name", mPlace.getName());
         placeCollection.put("address", mPlace.getAddress());
         placeCollection.put("id", mPlace.getId());
-        //placeCollection.put("LatLng", mPlace.getLatlng());
+        placeCollection.put("LatLng", new GeoPoint(mPlace.getLatlng().latitude, mPlace.getLatlng().longitude));
         placeCollection.put("rating", mPlace.getRating());
         placeCollection.put("phone", mPlace.getPhoneNumber());
-        //placeCollection.put("website", mPlace.getWebsiteUri());
+        placeCollection.put("website", mPlace.getWebsiteUri().toString());
 
         CollectionReference placesCollection = db.collection("placesCollection");
 
