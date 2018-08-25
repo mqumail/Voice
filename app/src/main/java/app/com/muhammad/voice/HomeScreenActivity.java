@@ -224,7 +224,6 @@ public class HomeScreenActivity extends FragmentActivity implements OnMapReadyCa
 
     private void SavePlaceInfo()
     {
-        // TODO: Fix the Uri and LatLng break. Its breaking when sending it to the DB
         // Store the place info in the DB
         Map<String, Object> placeCollection = new HashMap<>();
         placeCollection.put("name", mPlace.getName());
