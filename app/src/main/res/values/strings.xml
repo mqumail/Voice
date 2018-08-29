@@ -17,8 +17,10 @@
     <string name="skip">Skip</string>
 
     <string name="check_in_button">Check-in</string>
+    <string name="profile_button">Profile</string>
 
     <string name="voice_logo">Voice</string>
+    <string name="local_cities_title">Local cities</string>
 
     <!--TODO: Add this list to the DB, since it will grow.-->
     <string-array name="cities_array">

@@ -8,12 +8,20 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.StringRes;
+import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 
+import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.Button;
+import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -39,6 +47,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -70,14 +79,49 @@ public class HomeScreenActivity extends FragmentActivity implements OnMapReadyCa
     private static final int finePermissionLocation = 101;
     FirebaseFirestore db;
 
-    String address = "16 Caroline Drive, Dix Hills, New York, 11746";
+    DrawerLayout mDrawerLayout;
+
     String textCoordinates = "";
+
+    private FirebaseAuth mAuth;
+    private TextView email;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_screen);
+
+        mDrawerLayout = findViewById(R.id.drawer_layout);
+        mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+
+        NavigationView navigationView = findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(
+                new NavigationView.OnNavigationItemSelectedListener() {
+                    @Override
+                    public boolean onNavigationItemSelected(MenuItem menuItem) {
+
+                        int id = menuItem.getItemId();
+
+                        // set item as selected to persist highlight
+                        menuItem.setChecked(true);
+                        // close drawer when item is tapped
+                        mDrawerLayout.closeDrawers();
+
+                        // Add code here to update the UI based on the item selected
+                        // For example, swap UI fragments here
+                        if (id == R.id.local_cities)
+                        {
+                            //Toast.makeText(getApplicationContext(), "Local Cities clicked", Toast.LENGTH_LONG).show();
+                            Intent intent = new Intent(HomeScreenActivity.this, SignUpActivity.class);
+                            intent.putExtra("caller", TAG);
+                            startActivity(intent);
+                        }
+
+                        return true;
+                    }
+                });
 
         db = FirebaseFirestore.getInstance();
 
@@ -226,13 +270,29 @@ public class HomeScreenActivity extends FragmentActivity implements OnMapReadyCa
     {
         // Store the place info in the DB
         Map<String, Object> placeCollection = new HashMap<>();
-        placeCollection.put("name", mPlace.getName());
-        placeCollection.put("address", mPlace.getAddress());
-        placeCollection.put("id", mPlace.getId());
+        if (mPlace.getName() != null)
+        {
+            placeCollection.put("name", mPlace.getName());
+        }
+        if (mPlace.getAddress() != null)
+        {
+            placeCollection.put("address", mPlace.getAddress());
+        }
+        if (mPlace.getId() != null)
+        {
+            placeCollection.put("id", mPlace.getId());
+        }
+        if (mPlace.getPhoneNumber() != null)
+        {
+            placeCollection.put("phone", mPlace.getPhoneNumber());
+        }
+        if (mPlace.getWebsiteUri() != null)
+        {
+            placeCollection.put("website", mPlace.getWebsiteUri().toString());
+        }
+
         placeCollection.put("LatLng", new GeoPoint(mPlace.getLatlng().latitude, mPlace.getLatlng().longitude));
         placeCollection.put("rating", mPlace.getRating());
-        placeCollection.put("phone", mPlace.getPhoneNumber());
-        placeCollection.put("website", mPlace.getWebsiteUri().toString());
 
         CollectionReference placesCollection = db.collection("placesCollection");
 
@@ -310,6 +370,23 @@ public class HomeScreenActivity extends FragmentActivity implements OnMapReadyCa
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult)
     {
 
+    }
+
+    public void profile(View view)
+    {
+        // TODO: Find a better way (or location) to place the get user code since this is expensive. Everytime this method executes, the db is called
+        // Get current user info before drawer is opened
+        email = findViewById(R.id.navigationHeaderTextView);
+        if (email.getText() != null)
+        {
+            mAuth = FirebaseAuth.getInstance();
+            if (mAuth.getCurrentUser() != null)
+            {
+                email.setText(mAuth.getCurrentUser().getEmail());
+            }
+        }
+
+        mDrawerLayout.openDrawer(Gravity.START);
     }
 
     private class GetCoordinates extends AsyncTask<String,Void,String>
