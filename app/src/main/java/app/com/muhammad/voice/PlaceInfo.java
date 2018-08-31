@@ -12,7 +12,7 @@ public class PlaceInfo
     private String id;
     private Uri websiteUri;
     private LatLng latlng;
-    private float rating;
+    private double rating;
     private String attributions;
 
     public PlaceInfo(String name, String address, String phoneNumber, String id, Uri websiteUri,
@@ -79,11 +79,11 @@ public class PlaceInfo
         this.latlng = latlng;
     }
 
-    public float getRating() {
+    public double getRating() {
         return rating;
     }
 
-    public void setRating(float rating) {
+    public void setRating(double rating) {
         this.rating = rating;
     }
 

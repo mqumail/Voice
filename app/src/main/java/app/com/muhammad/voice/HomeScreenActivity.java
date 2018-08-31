@@ -4,10 +4,12 @@ import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
@@ -42,6 +44,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -50,7 +53,10 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.GeoPoint;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -60,7 +66,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class HomeScreenActivity extends FragmentActivity implements OnMapReadyCallback, GoogleApiClient.OnConnectionFailedListener
@@ -134,7 +142,6 @@ public class HomeScreenActivity extends FragmentActivity implements OnMapReadyCa
         // Construct a PlaceDetectionClient.
         mPlaceDetectionClient = Places.getPlaceDetectionClient(this, null);
 
-        // TODO: Start using the Places API.
         mGoogleApiClient = new GoogleApiClient
                 .Builder(this)
                 .addApi(Places.GEO_DATA_API)
@@ -153,6 +160,85 @@ public class HomeScreenActivity extends FragmentActivity implements OnMapReadyCa
                 PackageManager.PERMISSION_GRANTED)
         {
             mMap.setMyLocationEnabled(true);
+
+            // code to load raw map without default markers
+            mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this, R.raw.style_json));
+
+            // load the user check ins
+            db.collection("placesCollection")
+                    .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                        @Override
+                        public void onEvent(@Nullable QuerySnapshot value,
+                                            @Nullable FirebaseFirestoreException e) {
+                            if (e != null) {
+                                Log.w(TAG, "Listen failed.", e);
+                                return;
+                            }
+
+
+                            List<PlaceInfo> userCheckIns = new ArrayList<>();
+                            for (QueryDocumentSnapshot doc : value)
+                            {
+                                // Create a new placeInfo object for each check in user has made
+                                PlaceInfo userCheckIn = new PlaceInfo();
+
+                                if (doc.get("name") != null)
+                                {
+                                    userCheckIn.setName(doc.getString("name"));
+                                }
+                                if (doc.get("address") != null)
+                                {
+                                    userCheckIn.setAddress(doc.getString("address"));
+                                }
+                                if (doc.get("id") != null)
+                                {
+                                    userCheckIn.setId(doc.getString("id"));
+                                }
+                                if (doc.get("phone") != null)
+                                {
+                                    userCheckIn.setPhoneNumber(doc.getString("phone"));
+                                }
+                                if (doc.get("website") != null)
+                                {
+                                    userCheckIn.setWebsiteUri(Uri.parse(doc.getString("website")));
+                                }
+
+                                userCheckIn.setLatlng(new LatLng(doc.getGeoPoint("LatLng").getLatitude(),
+                                        doc.getGeoPoint("LatLng").getLongitude()));
+
+                                userCheckIn.setRating(doc.getDouble("rating"));
+
+                                // Add the individual check in to the collection
+                                userCheckIns.add(userCheckIn);
+                            }
+
+                            // Add the markers on the map
+                            for (PlaceInfo checkIn: userCheckIns)
+                            {
+                                MarkerOptions markerOptions = new MarkerOptions();
+                                markerOptions.position(checkIn.getLatlng())
+                                        .title(checkIn.getName())
+                                        //.snippet("Snoqualmie Falls is located 25 miles east of Seattle.")
+                                        // use Voice Icon here. TODO: the current icons are too large. Ask Luis to make it smaller
+                                        .icon(BitmapDescriptorFactory.defaultMarker( BitmapDescriptorFactory.HUE_BLUE));
+
+                                PlaceInfo info = new PlaceInfo();
+                                info.setName(checkIn.getName());
+                                info.setAddress(checkIn.getAddress());
+                                info.setPhoneNumber(checkIn.getPhoneNumber());
+                                info.setWebsiteUri(checkIn.getWebsiteUri());
+                                info.setRating(checkIn.getRating());
+
+                                CustomInfoWindowGoogleMap customInfoWindow = new CustomInfoWindowGoogleMap(HomeScreenActivity.this);
+                                mMap.setInfoWindowAdapter(customInfoWindow);
+
+                                com.google.android.gms.maps.model.Marker marker = mMap.addMarker(markerOptions);
+                                marker.setTag(info);
+                            }
+
+                            Log.d(TAG, "Current check ins: " + userCheckIns);
+                        }
+                    });
         }
         else
         {
@@ -327,12 +413,6 @@ public class HomeScreenActivity extends FragmentActivity implements OnMapReadyCa
                         "Phone Number: " + placeInfo.getPhoneNumber() + "\n" +
                         "Website: " + placeInfo.getWebsiteUri() + "\n" +
                         "Price Rating: " + placeInfo.getRating() + "\n";
-
-                MarkerOptions options = new MarkerOptions()
-                        .position(latLng)
-                        .title(placeInfo.getName())
-                        .snippet(snippet);
-                mMarker = mMap.addMarker(options);
 
             }catch (NullPointerException e){
                 Log.e(TAG, "moveCamera: NullPointerException: " + e.getMessage() );
