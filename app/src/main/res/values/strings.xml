@@ -21,6 +21,7 @@
 
     <string name="voice_logo">Voice</string>
     <string name="local_cities_title">Local cities</string>
+    <string name="log_out">Log Out</string>
 
     <!--TODO: Add this list to the DB, since it will grow.-->
     <string-array name="cities_array">

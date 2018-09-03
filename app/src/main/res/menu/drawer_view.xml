@@ -4,5 +4,8 @@
         <item
             android:id="@+id/local_cities"
             android:title="@string/local_cities_title" />
+        <item
+            android:id="@+id/log_out"
+            android:title="@string/log_out" />
     </group>
 </menu>

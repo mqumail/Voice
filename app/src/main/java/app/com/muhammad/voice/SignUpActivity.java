@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.CheckBox;
@@ -31,59 +32,13 @@ public class SignUpActivity extends AppCompatActivity
         city5 = findViewById(R.id.city5);
         city6 = findViewById(R.id.city6);
         city7 = findViewById(R.id.city7);
-        loadPreferences();
-
-        // only run this method when user clicks on Local cities from Nav menu
-        // String caller = getIntent().getStringExtra("caller");
-
-        // if (caller != null && caller.equals("HomeScreenActivity"))
-        // {
-        //    updatePreferences();
-        //}
+        loadPreferences("localCities", getApplicationContext());
     }
 
-    private void updatePreferences()
-    {
-        preferences = SignUpActivity.this.getPreferences(Context.MODE_PRIVATE);
-        String savedCities = preferences.getString("localCities", "empty");
-        Toast.makeText(this, savedCities, Toast.LENGTH_SHORT).show();
-
-        String[] citiesArray = savedCities.split("/");
-        for (String aCitiesArray : citiesArray) {
-            switch (aCitiesArray) {
-                case "Weimar":
-                    city1.setChecked(true);
-                    break;
-                case "Mexico City":
-                    city2.setChecked(true);
-                    break;
-                case "Dubai":
-                    city3.setChecked(true);
-                    break;
-                case "Muscat":
-                    city4.setChecked(true);
-                    break;
-                case "New York City":
-                    city5.setChecked(true);
-                    break;
-                case "Karachi":
-                    city6.setChecked(true);
-                    break;
-                case "Spartanburg":
-                    city7.setChecked(true);
-                    break;
-                default:
-                    break;
-            }
-
-            Toast.makeText(getApplicationContext(), "Local Cities Loaded", Toast.LENGTH_LONG).show();
-            skipPreferences();
-        }
-    }
 
     public void continueHome(View view)
     {
-        savedPreferences();
+        setPreferences("localCities", getApplicationContext());
         Intent intent = new Intent(this, HomeScreenActivity.class);
         this.startActivity(intent);
 
@@ -101,8 +56,8 @@ public class SignUpActivity extends AppCompatActivity
         this.startActivity(intent);
     }
 
-    private void savedPreferences(){
-        preferences =  SignUpActivity.this.getPreferences(Context.MODE_PRIVATE);
+    private void setPreferences(String key, Context context){
+        preferences = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor editor = preferences.edit();
         String citiesInfo = "";
         citiesInfo = (city1.isChecked()) ? citiesInfo + "Weimar" + "/" : citiesInfo + "" ;
@@ -112,23 +67,15 @@ public class SignUpActivity extends AppCompatActivity
         citiesInfo = (city5.isChecked()) ? citiesInfo + "New York City" + "/" : citiesInfo + "" ;
         citiesInfo = (city6.isChecked()) ? citiesInfo + "Karachi" + "/" : citiesInfo + "" ;
         citiesInfo = (city7.isChecked()) ? citiesInfo + "Spartanburg" + "/" : citiesInfo + "" ;
-        editor.putString("localCities", citiesInfo);
+        editor.putString(key, citiesInfo);
         editor.commit();
         Toast.makeText(getApplicationContext(), "Cities Saved Successfully", Toast.LENGTH_LONG).show();
     }
 
-    private void loadPreferences(){
-        preferences =  SignUpActivity.this.getPreferences(Context.MODE_PRIVATE);
-        String savedCities = preferences.getString("localCities", "empty" );
+    private void loadPreferences(String key, Context context){
+        preferences =  PreferenceManager.getDefaultSharedPreferences(context);
+        String savedCities = preferences.getString(key, "empty" );
         Toast.makeText(this, savedCities, Toast.LENGTH_SHORT).show();
-
-        /* TODO: Currently every time the app launches, user is presented with the cities selection screen.
-                 The reason why the below if statements, to check if the cities list is empty or not, commented
-                 was because the current flow when the user clicks the Local cities on the Navigational menu is
-                 the it starts this activity. Come up with a better plan so its more user friendly. Show the list
-                 of local cities when the user launches the app for the first time. Then only show it if user never
-                 picked a city or user actually navigates to this list by going to Local cities by Navigation menu.
-        */
 
         //if(savedCities.equals("empty")) {
             String[] citiesArray = savedCities.split("/");
@@ -159,10 +106,6 @@ public class SignUpActivity extends AppCompatActivity
                         break;
                 }
             }
-            Toast.makeText(getApplicationContext(), "Local Cities Loaded", Toast.LENGTH_LONG).show();
-        //} else if (!savedCities.equals("empty")){
-        //    skipPreferences();
-        //}
     }
 
     private void clearPreferences() {
