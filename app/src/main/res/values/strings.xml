@@ -1,4 +1,7 @@
 <resources>
+    <!--Activities label-->
+    <string name="settings_label">Profile Settings</string>
+
     <string name="app_name">Voice</string>
     <string name="sign_in_button">Sign-in</string>
     <string name="register_button">Register Here</string>
@@ -12,7 +15,9 @@
 
     <string name="create_account_title">Local cities</string>
     <!--Your visits in these cities will be anonymously marked "Local Visit".-->
-    <string name="create_account_message">Tell us the cities where you have lived.</string>
+    <string name="create_account_message">Select the cities where you have lived or currently living.</string>
+    <string name="create_username_title">User name</string>
+    <string name="create_username_message">This user name will be displayed in your check-ins where you have revealed yourself.</string>
     <string name="register">Continue</string>
     <string name="skip">Skip</string>
 
@@ -20,7 +25,7 @@
     <string name="profile_button">Profile</string>
 
     <string name="voice_logo">Voice</string>
-    <string name="local_cities_title">Local cities</string>
+    <string name="local_cities_title">Profile Settings</string>
     <string name="log_out">Log Out</string>
 
     <!--TODO: Add this list to the DB, since it will grow.-->

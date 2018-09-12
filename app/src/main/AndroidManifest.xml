@@ -19,20 +19,29 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
 
-        <activity android:name=".MainActivity"
-                  android:screenOrientation="portrait">
+        <activity
+            android:name=".MainActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/SplashTheme" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
-
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity android:name=".SignUpActivity"
-                  android:screenOrientation="portrait">
+
+        <activity
+            android:name=".SignUpActivity"
+            android:screenOrientation="portrait"
+            android:label="@string/settings_label"
+            android:theme="@style/CitiesTheme"
+            android:windowSoftInputMode="adjustPan|stateVisible">
         </activity>
-        <activity android:name=".HomeScreenActivity"
-                  android:screenOrientation="portrait">
+
+        <activity
+            android:name=".HomeScreenActivity"
+            android:screenOrientation="portrait">
         </activity>
+
     </application>
 
 </manifest>

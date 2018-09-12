@@ -1,18 +1,20 @@
 package app.com.muhammad.voice;
 
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.Toast;
 
-public class SignUpActivity extends AppCompatActivity
-{
-    private SharedPreferences preferences;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+
+import app.com.muhammad.voice.utils.SharedPreferencesManagement;
+
+public class SignUpActivity extends AppCompatActivity {
+
     private CheckBox city1;
     private CheckBox city2;
     private CheckBox city3;
@@ -20,11 +22,18 @@ public class SignUpActivity extends AppCompatActivity
     private CheckBox city5;
     private CheckBox city6;
     private CheckBox city7;
+    private EditText tUserName;
+    private FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+    private String mUID = user.getUid();
+    private SharedPreferencesManagement spCities = new SharedPreferencesManagement(mUID + "-LocalCities", this);
+    private SharedPreferencesManagement spUserInfo = new SharedPreferencesManagement(mUID + "-UserInfo", this);
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_up);
+
         city1 = findViewById(R.id.city1);
         city2 = findViewById(R.id.city2);
         city3 = findViewById(R.id.city3);
@@ -32,33 +41,56 @@ public class SignUpActivity extends AppCompatActivity
         city5 = findViewById(R.id.city5);
         city6 = findViewById(R.id.city6);
         city7 = findViewById(R.id.city7);
-        loadPreferences("localCities", getApplicationContext());
+        tUserName = findViewById(R.id.tUserName);
+        getUserName();
+        loadCities();
     }
-
 
     public void continueHome(View view)
     {
-        setPreferences("localCities", getApplicationContext());
+        setCities();
+        setUserInfo();
         Intent intent = new Intent(this, HomeScreenActivity.class);
         this.startActivity(intent);
-
+        finish();
     }
 
     public void skipHome(View view)
     {
-        clearPreferences();
+        spCities.clearSP();
+        spUserInfo.clearSP();
         Intent intent = new Intent(this, HomeScreenActivity.class);
         this.startActivity(intent);
+        finish();
     }
 
-    private void skipPreferences(){
-        Intent intent = new Intent(getApplicationContext(), HomeScreenActivity.class);
-        this.startActivity(intent);
+    private void getUserName(){
+        if(user != null)
+        {
+            String mName = user.getDisplayName();
+            String savedUserInfo = spUserInfo.loadSPInfo();
+
+            if(savedUserInfo == "empty") {
+                if (mName == ""){
+                    tUserName.setText("Anonymous");
+                }else{
+                    tUserName.setText(mName);
+                }
+            } else {
+                String[] userArray = savedUserInfo.split("/");
+                if(userArray.length > 2){
+                    tUserName.setText(userArray[1]);
+                }
+            }
+        }
     }
 
-    private void setPreferences(String key, Context context){
-        preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        SharedPreferences.Editor editor = preferences.edit();
+    private void setUserInfo(){
+        String userInfo = mUID + "/" + tUserName.getText() + "/" + user.getEmail();
+        spUserInfo.setSPInfo(userInfo);
+    }
+
+    private void setCities(){
         String citiesInfo = "";
         citiesInfo = (city1.isChecked()) ? citiesInfo + "Weimar" + "/" : citiesInfo + "" ;
         citiesInfo = (city2.isChecked()) ? citiesInfo + "Mexico City" + "/" : citiesInfo + "" ;
@@ -67,50 +99,39 @@ public class SignUpActivity extends AppCompatActivity
         citiesInfo = (city5.isChecked()) ? citiesInfo + "New York City" + "/" : citiesInfo + "" ;
         citiesInfo = (city6.isChecked()) ? citiesInfo + "Karachi" + "/" : citiesInfo + "" ;
         citiesInfo = (city7.isChecked()) ? citiesInfo + "Spartanburg" + "/" : citiesInfo + "" ;
-        editor.putString(key, citiesInfo);
-        editor.commit();
-        Toast.makeText(getApplicationContext(), "Cities Saved Successfully", Toast.LENGTH_LONG).show();
+        spCities.setSPInfo(citiesInfo);
     }
 
-    private void loadPreferences(String key, Context context){
-        preferences =  PreferenceManager.getDefaultSharedPreferences(context);
-        String savedCities = preferences.getString(key, "empty" );
-        Toast.makeText(this, savedCities, Toast.LENGTH_SHORT).show();
+    private void loadCities(){
+        String savedCities = spCities.loadSPInfo();
 
-        //if(savedCities.equals("empty")) {
-            String[] citiesArray = savedCities.split("/");
-            for (String aCitiesArray : citiesArray) {
-                switch (aCitiesArray) {
-                    case "Weimar":
-                        city1.setChecked(true);
-                        break;
-                    case "Mexico City":
-                        city2.setChecked(true);
-                        break;
-                    case "Dubai":
-                        city3.setChecked(true);
-                        break;
-                    case "Muscat":
-                        city4.setChecked(true);
-                        break;
-                    case "New York City":
-                        city5.setChecked(true);
-                        break;
-                    case "Karachi":
-                        city6.setChecked(true);
-                        break;
-                    case "Spartanburg":
-                        city7.setChecked(true);
-                        break;
-                    default:
-                        break;
-                }
+        String[] citiesArray = savedCities.split("/");
+        for (String aCitiesArray : citiesArray) {
+            switch (aCitiesArray) {
+                case "Weimar":
+                    city1.setChecked(true);
+                    break;
+                case "Mexico City":
+                    city2.setChecked(true);
+                    break;
+                case "Dubai":
+                    city3.setChecked(true);
+                    break;
+                case "Muscat":
+                    city4.setChecked(true);
+                    break;
+                case "New York City":
+                    city5.setChecked(true);
+                    break;
+                case "Karachi":
+                    city6.setChecked(true);
+                    break;
+                case "Spartanburg":
+                    city7.setChecked(true);
+                    break;
+                default:
+                    break;
             }
+        }
     }
-
-    private void clearPreferences() {
-        preferences =  SignUpActivity.this.getPreferences(Context.MODE_PRIVATE);
-        preferences.edit().clear().commit();
-    }
-
 }

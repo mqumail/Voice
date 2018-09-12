@@ -26,6 +26,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
@@ -51,6 +52,7 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -70,6 +72,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import app.com.muhammad.voice.utils.SharedPreferencesManagement;
 
 public class HomeScreenActivity extends FragmentActivity implements OnMapReadyCallback, GoogleApiClient.OnConnectionFailedListener
 {
@@ -93,6 +97,12 @@ public class HomeScreenActivity extends FragmentActivity implements OnMapReadyCa
 
     private FirebaseAuth mAuth;
     private TextView email;
+    private TextView userName;
+
+    private FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+    private String mUID = user.getUid();
+    //private SharedPreferencesManagement spCities = new SharedPreferencesManagement(mUID + "-LocalCities", this);
+    private SharedPreferencesManagement spUserInfo = new SharedPreferencesManagement(mUID + "-UserInfo", this);
 
 
     @Override
@@ -119,15 +129,23 @@ public class HomeScreenActivity extends FragmentActivity implements OnMapReadyCa
 
                         // Add code here to update the UI based on the item selected
                         // For example, swap UI fragments here
-                        if (id == R.id.local_cities)
-                        {
-                            //Toast.makeText(getApplicationContext(), "Local Cities clicked", Toast.LENGTH_LONG).show();
-                            Intent intent = new Intent(HomeScreenActivity.this, SignUpActivity.class);
-                            intent.putExtra("caller", TAG);
-                            startActivity(intent);
-                        }
+                        switch (id){
+                            case R.id.local_cities:
+                                //Toast.makeText(getApplicationContext(), "Local Cities clicked", Toast.LENGTH_LONG).show();
+                                Intent intent = new Intent(HomeScreenActivity.this, SignUpActivity.class);
+                                intent.putExtra("caller", TAG);
+                                startActivity(intent);
+                            return true;
 
-                        return true;
+                            case R.id.log_out:
+                                AuthUI.getInstance().signOut(getApplicationContext());
+                                finish();
+                                startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                            return true;
+
+                            default:
+                                return HomeScreenActivity.super.onOptionsItemSelected(menuItem);
+                        }
                     }
                 });
 
@@ -456,17 +474,29 @@ public class HomeScreenActivity extends FragmentActivity implements OnMapReadyCa
     {
         // TODO: Find a better way (or location) to place the get user code since this is expensive. Everytime this method executes, the db is called
         // Get current user info before drawer is opened
+
         email = findViewById(R.id.navigationHeaderTextView);
-        if (email.getText() != null)
-        {
-            mAuth = FirebaseAuth.getInstance();
-            if (mAuth.getCurrentUser() != null)
-            {
-                email.setText(mAuth.getCurrentUser().getEmail());
-            }
-        }
+        userName = findViewById(R.id.navigationHeaderTextUSerName);
+        assignProfileView();
 
         mDrawerLayout.openDrawer(Gravity.START);
+    }
+
+    private void assignProfileView(){
+        String mUserInfo = spUserInfo.loadSPInfo();
+        if(mUserInfo == "empty"){
+            email.setText("Mail not available");
+            userName.setText("User Name not available");
+        } else{
+            String[] userArray = mUserInfo.split("/");
+            if(userArray.length > 2){
+                email.setText(userArray[2]);
+                userName.setText(userArray[1]);
+            } else {
+                email.setText("Mail not available");
+                userName.setText("User Name not available");
+            }
+        }
     }
 
     private class GetCoordinates extends AsyncTask<String,Void,String>

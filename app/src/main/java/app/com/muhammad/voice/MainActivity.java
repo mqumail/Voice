@@ -1,10 +1,7 @@
 package app.com.muhammad.voice;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -16,38 +13,32 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import app.com.muhammad.voice.utils.SharedPreferencesManagement;
+
 public class MainActivity extends AppCompatActivity
 {
 
-    public static final String ANONYMOUS = "anonymous";
-
+    private SharedPreferencesManagement spCities;
     //Firebase
     private FirebaseDatabase mFirebaseDatabase;
     private DatabaseReference mDatabaseReference;
     private ChildEventListener mChildEventListener;
     private FirebaseAuth mFirebaseAuth;
     private FirebaseAuth.AuthStateListener mAuthStateListener;
-    private SharedPreferences preferences;
 
     private static final int RC_SIGN_IN = 1;
-
-    private String mUsername;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        mUsername = ANONYMOUS;
 
         //Initialize Firebase
         mFirebaseDatabase = FirebaseDatabase.getInstance();
@@ -62,17 +53,13 @@ public class MainActivity extends AppCompatActivity
                         new AuthUI.IdpConfig.EmailBuilder().build());
 
                 if(user != null){
-                    //Toast.makeText(MainActivity.this, "You are now signed in", Toast.LENGTH_SHORT).show();
-                    onSignedInInitialize(user.getDisplayName());
                     //function to change screen automatically
-                    if (readPreferences("localCities", getApplicationContext())){
-                        redirect(new HomeScreenActivity());
-                    } else if (!readPreferences("localCities", getApplicationContext())){
-                        redirect(new SignUpActivity());
+                    if (readPreferences(user.getUid())){
+                        redirect(new HomeScreenActivity(), 2000);
+                    } else if (!readPreferences(user.getUid())){
+                        redirect(new SignUpActivity(), 2000);
                     }
-
                 }else{
-                    onSignedOutCleanup();
                     startActivityForResult(
                             AuthUI.getInstance()
                                     .createSignInIntentBuilder()
@@ -92,31 +79,26 @@ public class MainActivity extends AppCompatActivity
         super.onActivityResult(requestCode, resultCode, data);
         if(requestCode == RC_SIGN_IN){
             if(resultCode == RESULT_OK){
-                //Toast.makeText(this, "Signed in", Toast.LENGTH_SHORT).show();
-                //function to change screen automatically
-                if(readPreferences("localCities", getApplicationContext())){
-                    redirect(new HomeScreenActivity());
-                } else if (!readPreferences("localCities", getApplicationContext())){
-                    redirect(new SignUpActivity());
-                }
+                //The user is signed in
             }else if(resultCode == RESULT_CANCELED){
-                //Toast.makeText(this, "Sign in canceled", Toast.LENGTH_SHORT).show();
+                //The sign in process is canceled
                 finish();
             }
         }
     }
 
-    private void redirect(final Activity activity){
+    private void redirect(final Activity activity, int time){
         new Timer().schedule(new TimerTask() {
             @Override
             public void run() {
                 startActivity(new Intent(getApplicationContext(), activity.getClass()));
+                finish();
             }
-        },2000);
+        },time);
     }
 
     @Override
-    protected  void onResume()
+    protected void onResume()
     {
         super.onResume();
         mFirebaseAuth.addAuthStateListener(mAuthStateListener);
@@ -131,24 +113,15 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    private void onSignedInInitialize(String username){
-        mUsername = username;
-    }
-
-    private void onSignedOutCleanup()
-    {
-        mUsername = ANONYMOUS;
-    }
-
-    private boolean readPreferences(String key, Context context) {
+    private boolean readPreferences(String UID) {
         boolean isData;
-        preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        String savedCities = preferences.getString(key, "empty");
-        Toast.makeText(this, savedCities, Toast.LENGTH_SHORT).show();
-        if(savedCities.equals("empty") || !savedCities.equals("")){
-            isData = true; }
+        String mUser = UID;
+        spCities = new SharedPreferencesManagement(mUser + "-LocalCities", this);
+        String savedCities = spCities.loadSPInfo();
+        if(savedCities.equals("empty") || savedCities.equals("")){
+            isData = false; }
             else{
-            isData = false;
+            isData = true;
         }
         return isData;
     }

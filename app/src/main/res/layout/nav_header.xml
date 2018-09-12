@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:layout_width="match_parent"
-              android:layout_height="192dp"
+              android:layout_height="150dp"
               android:background="@color/colorPrimaryDark"
               android:padding="16dp"
               android:theme="@style/ThemeOverlay.AppCompat.Dark"
@@ -9,9 +9,20 @@
               android:gravity="bottom">
 
     <TextView
+        android:id="@+id/navigationHeaderTextUSerName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/titleTextSize"
+        android:textColor="#ffffff"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"/>
+
+    <TextView
         android:id="@+id/navigationHeaderTextView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textAppearance="@style/TextAppearance.AppCompat.Body1"/>
+        android:textColor="#ffffff"
+        android:textSize="@dimen/bodyTextSize"/>
+
+
 
 </LinearLayout>

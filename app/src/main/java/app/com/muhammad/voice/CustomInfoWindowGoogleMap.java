@@ -32,9 +32,9 @@ public class CustomInfoWindowGoogleMap implements GoogleMap.InfoWindowAdapter
 
         TextView nameTextView = view.findViewById(R.id.name);
         TextView addressTextView = view.findViewById(R.id.address);
-        TextView phoneNumberTextView = view.findViewById(R.id.phone_number);
+        /*TextView phoneNumberTextView = view.findViewById(R.id.phone_number);
         TextView websiteUrlTextView = view.findViewById(R.id.website_url);
-        TextView ratingTextView = view.findViewById(R.id.rating);
+        TextView ratingTextView = view.findViewById(R.id.rating);*/
 
         nameTextView.setText(marker.getTitle());
         //addressTextView.setText(marker.getSnippet());
@@ -46,12 +46,12 @@ public class CustomInfoWindowGoogleMap implements GoogleMap.InfoWindowAdapter
         //img.setImageResource(imageId);
 
         addressTextView.setText(infoWindowData.getAddress() == null ? "" : infoWindowData.getAddress());
-        phoneNumberTextView.setText(infoWindowData.getPhoneNumber() == null ? "" : infoWindowData.getPhoneNumber());
+        /*phoneNumberTextView.setText(infoWindowData.getPhoneNumber() == null ? "" : infoWindowData.getPhoneNumber());
         websiteUrlTextView.setText(infoWindowData.getWebsiteUri() == null ? "" : infoWindowData.getWebsiteUri().toString());
         if (infoWindowData.getRating() >= 0)
         {
             ratingTextView.setText(("" + MathmeticalOperations.round(infoWindowData.getRating(), 1)));
-        }
+        }*/
 
         return view;
     }
