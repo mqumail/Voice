@@ -24,9 +24,18 @@
     <string name="check_in_button">Check-in</string>
     <string name="profile_button">Profile</string>
 
+
+
     <string name="voice_logo">Voice</string>
     <string name="local_cities_title">Profile Settings</string>
     <string name="log_out">Log Out</string>
+
+    <string name="comment_tittle">Add a comment?</string>
+    <string name="comment_hint">Leave a review to tell others more about this place!</string>
+    <string name="comment_send">Apply</string>
+    <string name="check_in_up_vote">Up-voted</string>
+    <string name="check_in_down_vote">Down-voted</string>
+    <string name="user_visibility">Reveal yourself?</string>
 
     <!--TODO: Add this list to the DB, since it will grow.-->
     <string-array name="cities_array">
