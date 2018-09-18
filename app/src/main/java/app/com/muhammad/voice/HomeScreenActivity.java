@@ -18,11 +18,14 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -75,6 +78,8 @@ import java.util.Map;
 
 import app.com.muhammad.voice.utils.SharedPreferencesManagement;
 
+import static android.icu.lang.UCharacter.GraphemeClusterBreak.L;
+
 public class HomeScreenActivity extends FragmentActivity implements OnMapReadyCallback, GoogleApiClient.OnConnectionFailedListener
 {
     private static final int PLACE_PICKER_REQUEST = 1;
@@ -103,6 +108,8 @@ public class HomeScreenActivity extends FragmentActivity implements OnMapReadyCa
     private String mUID = user.getUid();
     //private SharedPreferencesManagement spCities = new SharedPreferencesManagement(mUID + "-LocalCities", this);
     private SharedPreferencesManagement spUserInfo = new SharedPreferencesManagement(mUID + "-UserInfo", this);
+
+    private PopupWindow commentAndVotesPopup;
 
 
     @Override
@@ -442,6 +449,35 @@ public class HomeScreenActivity extends FragmentActivity implements OnMapReadyCa
         }
 
         hideSoftKeyboard();
+
+        // show a popup which will allow the user to pass a comment and upvotes
+        LayoutInflater inflater = (LayoutInflater) this.getSystemService(LAYOUT_INFLATER_SERVICE);
+        View customView = inflater.inflate(R.layout.comments_and_votes_popup_window, null);
+
+        commentAndVotesPopup = new PopupWindow(
+                customView,
+                1000,
+                1000);
+
+        // Set an elevation value for popup window
+        // Call requires API level 21
+        if(Build.VERSION.SDK_INT>=21){
+            commentAndVotesPopup.setElevation(5.0f);
+        }
+
+        Button sendButton = customView.findViewById(R.id.commentSendButton);
+        sendButton.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View view)
+            {
+                // Dismiss the popup window
+                commentAndVotesPopup.dismiss();
+            }
+        });
+
+        // Finally, show the popup window at the center location of root relative layout
+        commentAndVotesPopup.showAtLocation(mDrawerLayout, Gravity.CENTER,0,0);
     }
 
     private void moveCamera(LatLng latLng, float zoom, String title){
