@@ -55,9 +55,9 @@ public class MainActivity extends AppCompatActivity
                 if(user != null){
                     //function to change screen automatically
                     if (readPreferences(user.getUid())){
-                        redirect(new HomeScreenActivity(), 2000);
+                        redirect(new HomeScreenActivity(), 1000);
                     } else if (!readPreferences(user.getUid())){
-                        redirect(new SignUpActivity(), 2000);
+                        redirect(new SignUpActivity(), 1000);
                     }
                 }else{
                     startActivityForResult(

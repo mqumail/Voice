@@ -34,7 +34,7 @@
             android:screenOrientation="portrait"
             android:label="@string/settings_label"
             android:theme="@style/CitiesTheme"
-            android:windowSoftInputMode="adjustPan|stateVisible">
+            android:windowSoftInputMode="adjustPan|stateVisible|stateHidden">
         </activity>
 
         <activity

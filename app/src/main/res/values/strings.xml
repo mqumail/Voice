@@ -5,7 +5,7 @@
     <string name="app_name">Voice</string>
     <string name="sign_in_button">Sign-in</string>
     <string name="register_button">Register Here</string>
-    <string name="username_hint">Username</string>
+    <string name="username_hint">Your name</string>
     <string name="password_hint">Password</string>
     <string name="email_hint">E-mail</string>
     <string name="cities_lived_in_hint">Cities lived in &#8230;</string>
@@ -15,11 +15,11 @@
 
     <string name="create_account_title">Local cities</string>
     <!--Your visits in these cities will be anonymously marked "Local Visit".-->
-    <string name="create_account_message">Select the cities where you have lived or currently living.</string>
-    <string name="create_username_title">User name</string>
-    <string name="create_username_message">This user name will be displayed in your check-ins where you have revealed yourself.</string>
+    <string name="create_account_message">Type the cities where you have lived or currently living.</string>
+    <string name="create_username_title">Name</string>
+    <string name="create_username_message">Your name will only be displayed in the check-ins where you have revealed yourself.</string>
     <string name="register">Continue</string>
-    <string name="skip">Skip</string>
+    <string name="skip">Clear Shared Preferences</string>
 
     <string name="check_in_button">Check-in</string>
     <string name="profile_button">Profile</string>
@@ -30,21 +30,14 @@
     <string name="local_cities_title">Profile Settings</string>
     <string name="log_out">Log Out</string>
 
-    <string name="comment_tittle">Add a comment?</string>
-    <string name="comment_hint">Leave a review to tell others more about this place!</string>
+    <string name="switch_reveal_title">Reveal Name</string>
+    <string name="switch_reveal_desc">Your name will be displayed in the guests list</string>
+    <string name="upvote_reveal_title">Like the place</string>
+    <string name="upvote_reveal_desc">Tell the community you liked this place</string>
+    <string name="comment_tittle">Leave a review for this place (optional)</string>
+    <string name="comment_hint">Comment...</string>
     <string name="comment_send">Apply</string>
     <string name="check_in_up_vote">Up-voted</string>
     <string name="check_in_down_vote">Down-voted</string>
-    <string name="user_visibility">Reveal yourself?</string>
 
-    <!--TODO: Add this list to the DB, since it will grow.-->
-    <string-array name="cities_array">
-        <item>Weimar, Germany</item>
-        <item>Mexico City, Mexico</item>
-        <item>Dubai, UAE</item>
-        <item>Muscat, Oman</item>
-        <item>New York City, USA</item>
-        <item>Karachi, Pakistan</item>
-        <item>Spartanburg, USA</item>
-    </string-array>
 </resources>
