@@ -4,13 +4,14 @@ import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Geocoder;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.annotation.StringRes;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
@@ -24,10 +25,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.ListView;
 import android.widget.PopupWindow;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.common.ConnectionResult;
@@ -56,7 +58,6 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
@@ -66,19 +67,19 @@ import com.google.firebase.firestore.GeoPoint;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
+import app.com.muhammad.voice.utils.MyCallBack;
 import app.com.muhammad.voice.utils.SharedPreferencesManagement;
-
-import static android.icu.lang.UCharacter.GraphemeClusterBreak.L;
 
 public class HomeScreenActivity extends FragmentActivity implements OnMapReadyCallback, GoogleApiClient.OnConnectionFailedListener
 {
@@ -106,11 +107,14 @@ public class HomeScreenActivity extends FragmentActivity implements OnMapReadyCa
 
     private FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
     private String mUID = user.getUid();
-    //private SharedPreferencesManagement spCities = new SharedPreferencesManagement(mUID + "-LocalCities", this);
+    private SharedPreferencesManagement spCities = new SharedPreferencesManagement(mUID + "-LocalCities", this);
     private SharedPreferencesManagement spUserInfo = new SharedPreferencesManagement(mUID + "-UserInfo", this);
 
     private PopupWindow commentAndVotesPopup;
 
+    PendingResult<PlaceBuffer> placeResult;
+
+    //private CollectionReference placesCollectionReference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -157,6 +161,7 @@ public class HomeScreenActivity extends FragmentActivity implements OnMapReadyCa
                 });
 
         db = FirebaseFirestore.getInstance();
+        //placesCollectionReference = db.collection("placesCollection");
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
@@ -231,7 +236,14 @@ public class HomeScreenActivity extends FragmentActivity implements OnMapReadyCa
                                 userCheckIn.setLatlng(new LatLng(doc.getGeoPoint("LatLng").getLatitude(),
                                         doc.getGeoPoint("LatLng").getLongitude()));
 
-                                userCheckIn.setRating(doc.getDouble("rating"));
+                                try
+                                {
+                                    userCheckIn.setRating(doc.getDouble("rating"));
+                                }
+                                catch (NullPointerException ex)
+                                {
+                                    Log.e(TAG, "Null exception");
+                                }
 
                                 // Add the individual check in to the collection
                                 userCheckIns.add(userCheckIn);
@@ -314,8 +326,6 @@ public class HomeScreenActivity extends FragmentActivity implements OnMapReadyCa
 
         //new GetCoordinates().execute(address.replace(" ","+"));
         Log.i(TAG, "startActivityForResult finished");
-
-
     }
 
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -323,9 +333,53 @@ public class HomeScreenActivity extends FragmentActivity implements OnMapReadyCa
             if (resultCode == RESULT_OK) {
                 Place place = PlacePicker.getPlace(this, data);
 
-                PendingResult<PlaceBuffer> placeResult = Places.GeoDataApi
+                placeResult = Places.GeoDataApi
                         .getPlaceById(mGoogleApiClient, place.getId());
-                placeResult.setResultCallback(mUpdatePlaceDetailsCallback);
+
+                ///////////////////////////////////////////////////////
+                mPlace = new PlaceInfo();
+
+                // show a popup which will allow the user to pass a comment and upvotes
+                LayoutInflater inflater = (LayoutInflater) this.getSystemService(LAYOUT_INFLATER_SERVICE);
+                final View customView = inflater.inflate(R.layout.comments_and_votes_popup_window, null);
+
+                commentAndVotesPopup = new PopupWindow(
+                        customView,
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.MATCH_PARENT);
+
+                // Set an elevation value for popup window
+                // Call requires API level 21
+                if(Build.VERSION.SDK_INT>=21){
+                    commentAndVotesPopup.setElevation(5.0f);
+                }
+
+                Button sendButton = customView.findViewById(R.id.commentSendButton);
+                sendButton.setOnClickListener(new View.OnClickListener()
+                {
+                    @Override
+                    public void onClick(View view)
+                    {
+                        // Dismiss the popup window
+                        commentAndVotesPopup.dismiss();
+
+                        // Store the user comment, checkin as anonymous and upvote to PlaceInfo
+                        //EditText commentEditText = customView.findViewById(R.id.commentEditText);
+                        Switch switchButton = customView.findViewById(R.id.userVisibilitySwitchButton);
+                        ToggleButton upvoteToggleButton = customView.findViewById(R.id.upVoteToggleButton);
+
+                        //mPlace.setComment(commentEditText.getText().toString());
+                        mPlace.setIdentifiedCheckIn(switchButton.isChecked());
+                        mPlace.setIsHearted(upvoteToggleButton.isChecked());
+
+                        // Place this call in the onCLick of popup:
+                        placeResult.setResultCallback(mUpdatePlaceDetailsCallback);
+                    }
+                });
+
+                // Finally, show the popup window at the center location of root relative layout
+                commentAndVotesPopup.showAtLocation(mDrawerLayout, Gravity.CENTER,0,0);
+                ///////////////////////////////////////////////////////
 
                 String toastMsg = String.format("Place: %s", place.getName());
                 Toast.makeText(this, toastMsg, Toast.LENGTH_LONG).show();
@@ -345,30 +399,53 @@ public class HomeScreenActivity extends FragmentActivity implements OnMapReadyCa
             final Place place = places.get(0);
 
             try{
-                mPlace = new PlaceInfo();
                 mPlace.setName(place.getName().toString());
-                Log.d(TAG, "onResult: name: " + place.getName());
                 mPlace.setAddress(place.getAddress().toString());
-                Log.d(TAG, "onResult: address: " + place.getAddress());
 //                mPlace.setAttributions(place.getAttributions().toString());
 //                Log.d(TAG, "onResult: attributions: " + place.getAttributions());
                 mPlace.setId(place.getId());
-                Log.d(TAG, "onResult: id:" + place.getId());
                 mPlace.setLatlng(place.getLatLng());
-                Log.d(TAG, "onResult: latlng: " + place.getLatLng());
                 mPlace.setRating(place.getRating());
-                Log.d(TAG, "onResult: rating: " + place.getRating());
                 mPlace.setPhoneNumber(place.getPhoneNumber().toString());
-                Log.d(TAG, "onResult: phone number: " + place.getPhoneNumber());
                 mPlace.setWebsiteUri(place.getWebsiteUri());
-                Log.d(TAG, "onResult: website uri: " + place.getWebsiteUri());
 
-                Log.d(TAG, "onResult: place: " + mPlace.toString());
+                MyCallBack myCallBackIfLocalCheckIn = new MyCallBack()
+                {
+                    @Override
+                    public void onCallback(boolean localCheckIn)
+                    {
+                        mPlace.setLocalCheckIn(localCheckIn);
+                    }
+                };
+
+                CheckIfLocalCheckIn(place, myCallBackIfLocalCheckIn);
+
             }catch (NullPointerException e){
                 Log.e(TAG, "onResult: NullPointerException: " + e.getMessage() );
             }
 
-            SavePlaceInfo();
+            // check if the place is already exist in the firebase, if it does,
+            // just increment the check in counter, otherwise create a new entry
+            final String id = place.getId();
+            final CharSequence name = place.getName();
+
+            MyCallBack myCallBack = new MyCallBack()
+            {
+                @Override
+                public void onCallback(boolean alreadyExists)
+                {
+                    if (alreadyExists)
+                    {
+                        UpdatePlaceInfo(id, name);
+                    }
+                    else
+                    {
+                        SavePlaceInfo();
+                    }
+                }
+            };
+
+            PlaceExistsInDB(myCallBack, place.getId(), place.getName());
 
             moveCamera(new LatLng(place.getViewport().getCenter().latitude,
                     place.getViewport().getCenter().longitude), DEFAULT_ZOOM, mPlace);
@@ -377,9 +454,227 @@ public class HomeScreenActivity extends FragmentActivity implements OnMapReadyCa
         }
     };
 
+    private void CheckIfLocalCheckIn(Place place, final MyCallBack myCallBackIfLocalCheckIn)
+    {
+        // TODO: Instead of just checking the names of the cities, also check the cities ID
+        // for example, there is Weimar in Germany and Also in Texas USA
+
+        String savedCities = spCities.loadSPInfo();
+        final LatLng placeLatLng = place.getLatLng();
+
+        final List<String> cityNames = new ArrayList<>();
+
+        if (!savedCities.equals("empty"))
+        {
+            try {
+                String[] citiesArray = savedCities.split("/");
+                String[] cityInfo;
+
+                for (String aCitiesArray : citiesArray) {
+                    cityInfo = aCitiesArray.split("-");
+                    cityNames.add(cityInfo[1]);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        Places.GeoDataApi.getPlaceById(mGoogleApiClient, place.getId())
+                .setResultCallback(new ResultCallback<PlaceBuffer>()
+                {
+                    @Override
+                    public void onResult(@NonNull PlaceBuffer places)
+                    {
+                        if (!places.getStatus().isSuccess())
+                        {
+                            // Request did not complete successfully
+                            return;
+                        }
+
+                        // Setup Geocoder
+                        Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
+                        List<Address> addresses;
+
+                        try
+                        {
+                            addresses = geocoder.getFromLocation(
+                                    placeLatLng.latitude,
+                                    placeLatLng.longitude,
+                                    1);
+
+                            if (addresses.size() > 0)
+                            {
+                                // Here are some results you can geocode
+                                String ZIP;
+                                String city;
+                                String state;
+                                String country;
+
+                                if (addresses.get(0).getPostalCode() != null) {
+                                    ZIP = addresses.get(0).getPostalCode();
+                                    Log.d("ZIP", ZIP);
+                                }
+
+                                if (addresses.get(0).getLocality() != null) {
+                                    city = addresses.get(0).getLocality();
+                                    Log.d("city", city);
+
+                                    if (cityNames.contains(city))
+                                    {
+                                        myCallBackIfLocalCheckIn.onCallback(true);
+                                    }
+                                    else
+                                    {
+                                        myCallBackIfLocalCheckIn.onCallback(false);
+                                    }
+                                }
+
+                                if (addresses.get(0).getAdminArea() != null) {
+                                    state = addresses.get(0).getAdminArea();
+                                    Log.d("state", state);
+                                }
+
+                                if (addresses.get(0).getCountryName() != null) {
+                                    country = addresses.get(0).getCountryName();
+                                    Log.d("country", country);
+                                }
+                            }
+                        }
+                        catch (IOException e)
+                        {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+    }
+
+    private void PlaceExistsInDB(final MyCallBack myCallBack, String id, CharSequence name)
+    {
+        db.collection("placesCollection")
+                .whereEqualTo("id", id)
+                .whereEqualTo("name", name)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>()
+                {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task)
+                    {
+                        if (task.isSuccessful())
+                        {
+                            for (QueryDocumentSnapshot document : task.getResult())
+                            {
+                                Log.d(TAG, document.getId() + " => " + document.getData());
+                            }
+
+                            if (task.getResult().isEmpty())
+                            {
+                                // return false
+                                myCallBack.onCallback(false);
+                            }
+                            else
+                            {
+                                // return true
+                                myCallBack.onCallback(true);
+                            }
+                        }
+                        else
+                        {
+                            // Log that the call to DB failed.
+                        }
+                    }
+                });
+    }
+
+    private void UpdatePlaceInfo(String id, CharSequence name)
+    {
+        // Increment the # of check ins and append the user name to the variable if not anonymous.
+        db.collection("placesCollection")
+                .whereEqualTo("id", id)
+                .whereEqualTo("name", name)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>()
+                {
+                     @Override
+                     public void onComplete(@NonNull Task<QuerySnapshot> task)
+                     {
+                         for (DocumentSnapshot document : task.getResult().getDocuments())
+                         {
+                             DocumentReference docReference = document.getReference();
+                             Map<String, Object> updateFields = new HashMap<>();
+
+                             Long numberOfCheckIns = (Long) document.get("NumberOfCheckIns");
+                             Long numberOfLocalCheckins = (Long) document.get("NumberOfLocalCheckIns");
+                             Long numberOfTouristCheckIns = (Long) document.get("NumberOfTouristCheckIns");
+
+                             if (mPlace.isLocalCheckIn())
+                             {
+                                 updateFields.put("NumberOfLocalCheckIns", numberOfLocalCheckins + 1);
+                             }
+                             else
+                             {
+                                 updateFields.put("NumberOfTouristCheckIns", numberOfTouristCheckIns + 1);
+                             }
+
+                             updateFields.put("NumberOfCheckIns", numberOfCheckIns + 1);
+
+                             if (mPlace.isHearted())
+                             {
+                                 Long numberOfHearts = (Long) document.get("NumberOfHearts");
+                                 updateFields.put("NumberOfHearts", numberOfHearts + 1);
+                             }
+
+                             if (mPlace.isIdentifiedCheckIn())
+                             {
+                                 // Get the username from the SP
+                                 FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                                 String mUID = user.getUid();
+                                 SharedPreferencesManagement spUserInfo = new SharedPreferencesManagement(mUID + "-UserInfo", HomeScreenActivity.this);
+
+                                 String mUserInfo = spUserInfo.loadSPInfo();
+                                 String oldUserName = (String)document.get("UserName");
+
+                                 if(mUserInfo == "empty")
+                                 {
+                                     // DO Nothing
+                                 }
+                                 else
+                                 {
+                                     String[] userArray = mUserInfo.split("/");
+
+                                     if(userArray.length > 2)
+                                     {
+                                         // Append the username to the old name
+                                         updateFields.put("UserName", oldUserName + "/" + userArray[1]);
+                                     }
+                                 }
+                             }
+
+                             docReference
+                                     .update(updateFields)
+                                     .addOnSuccessListener(new OnSuccessListener<Void>()
+                                     {
+                                         @Override
+                                         public void onSuccess(Void aVoid)
+                                         {
+                                             Log.d(TAG, "DocumentSnapshot successfully updated!");
+                                         }
+                                     })
+                                     .addOnFailureListener(new OnFailureListener()
+                                     {
+                                         @Override
+                                         public void onFailure(@NonNull Exception e)
+                                         {
+                                             Log.w(TAG, "Error updating document", e);
+                                         }
+                                     });
+                         }
+                     }
+                });
+    }
+
+    // Store the place info in the FireStore
     private void SavePlaceInfo()
     {
-        // Store the place info in the DB
         Map<String, Object> placeCollection = new HashMap<>();
         if (mPlace.getName() != null)
         {
@@ -401,14 +696,68 @@ public class HomeScreenActivity extends FragmentActivity implements OnMapReadyCa
         {
             placeCollection.put("website", mPlace.getWebsiteUri().toString());
         }
+        /*if (mPlace.getComment() != null)
+        {
+            placeCollection.put("review", mPlace.getComment());
+        }*/
+
+        if (mPlace.isIdentifiedCheckIn())
+        {
+            // Get the username from the SP
+            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+            String mUID = user.getUid();
+            SharedPreferencesManagement spUserInfo = new SharedPreferencesManagement(mUID + "-UserInfo", this);
+
+            String mUserInfo = spUserInfo.loadSPInfo();
+            if(mUserInfo == "empty")
+            {
+                placeCollection.put("UserName", "Anonymous");
+            }
+            else
+            {
+                String[] userArray = mUserInfo.split("/");
+
+                if(userArray.length > 2)
+                {
+                    placeCollection.put("UserName", userArray[1]);
+                }
+                else
+                {
+                    placeCollection.put("UserName", "Anonymous");
+                }
+            }
+        }
+        else
+        {
+            placeCollection.put("UserName", "Anonymous");
+        }
+
+        if (mPlace.isHearted())
+        {
+            placeCollection.put("NumberOfHearts", 1);
+        }
+        else
+        {
+            placeCollection.put("NumberOfHearts", 0);
+        }
+
+        if (mPlace.isLocalCheckIn())
+        {
+            placeCollection.put("NumberOfLocalCheckIns", 1);
+            placeCollection.put("NumberOfTouristCheckIns", 0);
+        }
+        else
+        {
+            placeCollection.put("NumberOfLocalCheckIns", 0);
+            placeCollection.put("NumberOfTouristCheckIns", 1);
+        }
 
         placeCollection.put("LatLng", new GeoPoint(mPlace.getLatlng().latitude, mPlace.getLatlng().longitude));
-        placeCollection.put("rating", mPlace.getRating());
-
-        CollectionReference placesCollection = db.collection("placesCollection");
+        placeCollection.put("Rating", mPlace.getRating());
+        placeCollection.put("NumberOfCheckIns", 1);
 
         // Add a new document with a generated ID
-        placesCollection
+        db.collection("placesCollection")
             .add(placeCollection)
             .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                 @Override
@@ -449,35 +798,6 @@ public class HomeScreenActivity extends FragmentActivity implements OnMapReadyCa
         }
 
         hideSoftKeyboard();
-
-        // show a popup which will allow the user to pass a comment and upvotes
-        LayoutInflater inflater = (LayoutInflater) this.getSystemService(LAYOUT_INFLATER_SERVICE);
-        View customView = inflater.inflate(R.layout.comments_and_votes_popup_window, null);
-
-        commentAndVotesPopup = new PopupWindow(
-                customView,
-                1000,
-                1000);
-
-        // Set an elevation value for popup window
-        // Call requires API level 21
-        if(Build.VERSION.SDK_INT>=21){
-            commentAndVotesPopup.setElevation(5.0f);
-        }
-
-        Button sendButton = customView.findViewById(R.id.commentSendButton);
-        sendButton.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View view)
-            {
-                // Dismiss the popup window
-                commentAndVotesPopup.dismiss();
-            }
-        });
-
-        // Finally, show the popup window at the center location of root relative layout
-        commentAndVotesPopup.showAtLocation(mDrawerLayout, Gravity.CENTER,0,0);
     }
 
     private void moveCamera(LatLng latLng, float zoom, String title){
@@ -494,7 +814,6 @@ public class HomeScreenActivity extends FragmentActivity implements OnMapReadyCa
 
         hideSoftKeyboard();
     }
-
 
     private void hideSoftKeyboard(){
         this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
@@ -519,6 +838,7 @@ public class HomeScreenActivity extends FragmentActivity implements OnMapReadyCa
     }
 
     private void assignProfileView(){
+        // TODO: Refactor this code to a utility class as its needed multiple places.
         String mUserInfo = spUserInfo.loadSPInfo();
         if(mUserInfo == "empty"){
             email.setText("Mail not available");
