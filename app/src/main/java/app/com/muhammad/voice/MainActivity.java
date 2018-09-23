@@ -19,12 +19,13 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import app.com.muhammad.voice.utils.LocalCity;
 import app.com.muhammad.voice.utils.SharedPreferencesManagement;
+import app.com.muhammad.voice.utils.UserInformation;
 
 public class MainActivity extends AppCompatActivity
 {
 
-    private SharedPreferencesManagement spCities;
     //Firebase
     private FirebaseDatabase mFirebaseDatabase;
     private DatabaseReference mDatabaseReference;
@@ -116,9 +117,9 @@ public class MainActivity extends AppCompatActivity
     private boolean readPreferences(String UID) {
         boolean isData;
         String mUser = UID;
-        spCities = new SharedPreferencesManagement(mUser + "-LocalCities", this);
-        String savedCities = spCities.loadSPInfo();
-        if(savedCities.equals("empty") || savedCities.equals("")){
+        LocalCity localCities = new LocalCity(mUser, this);
+        String savedCities = localCities.getCitiesString();
+        if(savedCities.equals("NA") || savedCities.equals("")){
             isData = false; }
             else{
             isData = true;

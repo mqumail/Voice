@@ -24,7 +24,8 @@ import com.google.android.gms.location.places.PlaceDetectionClient;
 
 import java.util.ArrayList;
 
-import app.com.muhammad.voice.utils.SharedPreferencesManagement;
+import app.com.muhammad.voice.utils.LocalCity;
+import app.com.muhammad.voice.utils.UserInformation;
 
 public class SignUpActivity extends AppCompatActivity  {
 
@@ -37,8 +38,8 @@ public class SignUpActivity extends AppCompatActivity  {
     private ArrayAdapter<String> arrayAdapter;
     private FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
     private String mUID = user.getUid();
-    private SharedPreferencesManagement spCities = new SharedPreferencesManagement(mUID + "-LocalCities", this);
-    private SharedPreferencesManagement spUserInfo = new SharedPreferencesManagement(mUID + "-UserInfo", this);
+    private LocalCity localCities = new LocalCity(mUID, this);
+    private UserInformation userInformation = new UserInformation(mUID, this);
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -54,7 +55,7 @@ public class SignUpActivity extends AppCompatActivity  {
         arrayAdapter = new ArrayAdapter<>(SignUpActivity.this, android.R.layout.simple_list_item_1, aCityListView);
         mListView.setAdapter(arrayAdapter);
 
-        getUserName();
+        loadUserName();
         loadCities();
 
         // Construct a GeoDataClient.
@@ -68,7 +69,7 @@ public class SignUpActivity extends AppCompatActivity  {
                 getFragmentManager().findFragmentById(R.id.search_city);
         autocompleteFragment.setFilter(typeFilter);
         autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
-            public static final String TAG = "AutoComplete";
+            private static final String TAG = "AutoComplete";
             @Override
             public void onPlaceSelected(Place place) {
                 Log.i(TAG, "Place: " + place.getName());
@@ -89,7 +90,7 @@ public class SignUpActivity extends AppCompatActivity  {
     public void continueHome(View view)
     {
         saveCities();
-        setUserInfo();
+        saveUserInfo();
         Intent intent = new Intent(this, HomeScreenActivity.class);
         this.startActivity(intent);
         finish();
@@ -97,74 +98,64 @@ public class SignUpActivity extends AppCompatActivity  {
 
     public void skipHome(View view)
     {
-        spCities.clearSP();
-        spUserInfo.clearSP();
+        localCities.clearSharedPreferences();
+        userInformation.clearSharedPreferences();
         Intent intent = new Intent(this, HomeScreenActivity.class);
         this.startActivity(intent);
         finish();
     }
 
-    private void getUserName(){
+    private void loadUserName(){
         if(user != null)
         {
             String mName = user.getDisplayName();
-            String savedUserInfo = spUserInfo.loadSPInfo();
 
-            if(savedUserInfo == "empty") {
+            if(userInformation.getUserName() == "NA") {
                 if (mName == ""){
                     tUserName.setText("Anonymous");
                 }else{
                     tUserName.setText(mName);
                 }
             } else {
-                String[] userArray = savedUserInfo.split("/");
-                if(userArray.length > 2){
-                    if (userArray[1].length() > 2){
-                        tUserName.setText(userArray[1]);
-                    } else tUserName.setText("Anonymous");
-
-                }
+                tUserName.setText(userInformation.getUserName());
             }
         }
     }
 
-    private void setUserInfo(){
+    private void saveUserInfo(){
         String userInfo;
         if(tUserName.getText().length() > 2){
             userInfo = mUID + "/" + tUserName.getText() + "/" + user.getEmail();
         }else userInfo = mUID + "/" + "Anonymous" + "/" + user.getEmail();
-        spUserInfo.setSPInfo(userInfo);
+        userInformation.setUserInformation(userInfo);
     }
 
     private void saveCities(){
         String citiesInfo = "";
-
         for (String aCitiesArray : aCityList) {
             citiesInfo = aCitiesArray + "/" + citiesInfo;
         }
-        spCities.setSPInfo(citiesInfo);
+        localCities.setCities(citiesInfo);
     }
 
     private void loadCities(){
-        String savedCities = spCities.loadSPInfo();
-        if (!savedCities.equals("empty")){
+        String[] citiesAddressArray = localCities.getCitiesAddress();
+        String[] citiesArray = localCities.getCities();
+        if (citiesArray[0] != "NA"){
+            int i = 0;
             try{
-                String[] citiesArray = savedCities.split("/");
-                String[] cityInfo;
                 for (String aCitiesArray : citiesArray) {
                     aCityList.add(0, aCitiesArray);
-                    cityInfo = aCitiesArray.split("-");
-                    aCityListView.add(0, cityInfo[2]);
+                    aCityListView.add(0, citiesAddressArray[i]);
                     arrayAdapter.notifyDataSetChanged();
+                    i++;
                 }
             }catch(Exception e) {
                 System.err.println("Error while retrieving cities from Shared Preferences");
                 e.printStackTrace();
-                spCities.clearSP();
+                localCities.clearSharedPreferences();
                 Toast.makeText(this, "Error Loading Cities", Toast.LENGTH_SHORT).show();
             }
-
-
 
         }
     }

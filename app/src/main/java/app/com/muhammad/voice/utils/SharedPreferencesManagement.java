@@ -5,14 +5,13 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.widget.Toast;
 
-public class SharedPreferencesManagement {
-    private SharedPreferences preferences;
-    private String key;
-    private Context context;
+public abstract class SharedPreferencesManagement {
+    protected SharedPreferences preferences;
+    protected String uid;
+    protected Context context;
+    protected String key;
 
-    public SharedPreferencesManagement(String key, Context context){
-        this.context = context;
-        this.key = key;
+    public SharedPreferencesManagement(){
     }
 
     public String loadSPInfo(){
@@ -22,17 +21,6 @@ public class SharedPreferencesManagement {
         return savedSP;
     }
 
-    public void setSPInfo(String info){
-        preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putString(key, info);
-        editor.commit();
-        //Toast.makeText(context, "Information Saved Successfully", Toast.LENGTH_SHORT).show();
-    }
-
-    public void clearSP(){
-        preferences =  PreferenceManager.getDefaultSharedPreferences(context);
-        preferences.edit().clear().commit();
-    }
+    public abstract void clearSharedPreferences();
 
 }
