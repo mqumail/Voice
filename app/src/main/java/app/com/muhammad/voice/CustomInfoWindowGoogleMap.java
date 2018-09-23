@@ -3,14 +3,12 @@ package app.com.muhammad.voice;
 import android.app.Activity;
 import android.content.Context;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.Marker;
 
-import app.com.muhammad.voice.R;
-import app.com.muhammad.voice.utils.MathmeticalOperations;
+import app.com.muhammad.voice.DTO.PlaceInfo;
 
 public class CustomInfoWindowGoogleMap implements GoogleMap.InfoWindowAdapter
 {

@@ -1,4 +1,4 @@
-package app.com.muhammad.voice;
+package app.com.muhammad.voice.DTO;
 
 import android.net.Uri;
 
@@ -21,9 +21,13 @@ public class PlaceInfo
     private double rating;
     private String attributions;
     private String comment;
-    private boolean IsIdentifiedCheckIn;
-    private boolean IsHearted;
-    private boolean IsLocalCheckIn;
+
+    private CheckinInfo checkinInfo;
+
+    // Delete the bottom ones
+    //private boolean IsIdentifiedCheckIn;
+    //private boolean IsHearted;
+    //private boolean IsLocalCheckIn;
 
     public PlaceInfo(String name, String address,
                      String phoneNumber, String id,
@@ -40,9 +44,9 @@ public class PlaceInfo
         this.rating = rating;
         this.attributions = attributions;
         this.comment = comment;
-        this.IsIdentifiedCheckIn = IsIdentifiedCheckIn;
-        this.IsHearted = IsHearted;
-        this.IsLocalCheckIn = IsLocalCheckIn;
+        //this.IsIdentifiedCheckIn = IsIdentifiedCheckIn;
+        //this.IsHearted = IsHearted;
+        //this.IsLocalCheckIn = IsLocalCheckIn;
     }
 
     public PlaceInfo() {
@@ -123,7 +127,17 @@ public class PlaceInfo
         this.comment = comment;
     }
 
-    public boolean isIdentifiedCheckIn()
+    public CheckinInfo getCheckinInfo()
+    {
+        return checkinInfo;
+    }
+
+    public void setCheckinInfo(CheckinInfo checkinInfo)
+    {
+        this.checkinInfo = checkinInfo;
+    }
+
+    /*public boolean isIdentifiedCheckIn()
     {
         return IsIdentifiedCheckIn;
     }
@@ -142,7 +156,7 @@ public class PlaceInfo
 
     public boolean isLocalCheckIn() { return IsLocalCheckIn; }
 
-    public void setLocalCheckIn(boolean localCheckIn) { IsLocalCheckIn = localCheckIn; }
+    public void setLocalCheckIn(boolean localCheckIn) { IsLocalCheckIn = localCheckIn; }*/
 
     @Override
     public String toString() {

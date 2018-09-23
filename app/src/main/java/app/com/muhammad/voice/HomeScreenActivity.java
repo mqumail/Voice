@@ -25,6 +25,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.PopupWindow;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -56,8 +57,13 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.ServerValue;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
@@ -72,14 +78,20 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import app.com.muhammad.voice.DTO.CheckinInfo;
+import app.com.muhammad.voice.DTO.PlaceInfo;
+import app.com.muhammad.voice.utils.LocalCity;
 import app.com.muhammad.voice.utils.MyCallBack;
 import app.com.muhammad.voice.utils.SharedPreferencesManagement;
+import app.com.muhammad.voice.utils.UserInformation;
 
 public class HomeScreenActivity extends FragmentActivity implements OnMapReadyCallback, GoogleApiClient.OnConnectionFailedListener
 {
@@ -107,14 +119,13 @@ public class HomeScreenActivity extends FragmentActivity implements OnMapReadyCa
 
     private FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
     private String mUID = user.getUid();
-    private SharedPreferencesManagement spCities = new SharedPreferencesManagement(mUID + "-LocalCities", this);
-    private SharedPreferencesManagement spUserInfo = new SharedPreferencesManagement(mUID + "-UserInfo", this);
+
+    private LocalCity localCities = new LocalCity(mUID, this);
+    private UserInformation userInformation = new UserInformation(mUID, this);
 
     private PopupWindow commentAndVotesPopup;
 
     PendingResult<PlaceBuffer> placeResult;
-
-    //private CollectionReference placesCollectionReference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -196,15 +207,17 @@ public class HomeScreenActivity extends FragmentActivity implements OnMapReadyCa
 
             // load the user check ins
             db.collection("placesCollection")
-                    .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                    .addSnapshotListener(new EventListener<QuerySnapshot>()
+                    {
                         @Override
                         public void onEvent(@Nullable QuerySnapshot value,
-                                            @Nullable FirebaseFirestoreException e) {
-                            if (e != null) {
+                                            @Nullable FirebaseFirestoreException e)
+                        {
+                            if (e != null)
+                            {
                                 Log.w(TAG, "Listen failed.", e);
                                 return;
                             }
-
 
                             List<PlaceInfo> userCheckIns = new ArrayList<>();
                             for (QueryDocumentSnapshot doc : value)
@@ -249,13 +262,14 @@ public class HomeScreenActivity extends FragmentActivity implements OnMapReadyCa
                                 userCheckIns.add(userCheckIn);
                             }
 
-                            // Add the markers on the map
+                            mMap.clear();
+
+                            // Add the markers, including the new ones on the map
                             for (PlaceInfo checkIn: userCheckIns)
                             {
                                 MarkerOptions markerOptions = new MarkerOptions();
                                 markerOptions.position(checkIn.getLatlng())
                                         .title(checkIn.getName())
-                                        //.snippet("Snoqualmie Falls is located 25 miles east of Seattle.")
                                         // use Voice Icon here. TODO: the current icons are too large. Ask Luis to make it smaller
                                         .icon(BitmapDescriptorFactory.defaultMarker( BitmapDescriptorFactory.HUE_BLUE));
 
@@ -284,15 +298,6 @@ public class HomeScreenActivity extends FragmentActivity implements OnMapReadyCa
                 requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, finePermissionLocation);
             }
         }
-
-        /*mMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
-            @Override
-            public void onMapLongClick(LatLng latLng) {
-                mMap.addMarker(new MarkerOptions()
-                        .position(latLng)
-                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_voice_marker)));
-            }
-        });*/
     }
 
     @Override
@@ -338,6 +343,7 @@ public class HomeScreenActivity extends FragmentActivity implements OnMapReadyCa
 
                 ///////////////////////////////////////////////////////
                 mPlace = new PlaceInfo();
+                mPlace.setCheckinInfo(new CheckinInfo());
 
                 // show a popup which will allow the user to pass a comment and upvotes
                 LayoutInflater inflater = (LayoutInflater) this.getSystemService(LAYOUT_INFLATER_SERVICE);
@@ -364,13 +370,14 @@ public class HomeScreenActivity extends FragmentActivity implements OnMapReadyCa
                         commentAndVotesPopup.dismiss();
 
                         // Store the user comment, checkin as anonymous and upvote to PlaceInfo
-                        //EditText commentEditText = customView.findViewById(R.id.commentEditText);
+                        EditText commentEditText = customView.findViewById(R.id.commentEditText);
                         Switch switchButton = customView.findViewById(R.id.userVisibilitySwitchButton);
                         ToggleButton upvoteToggleButton = customView.findViewById(R.id.upVoteToggleButton);
 
-                        //mPlace.setComment(commentEditText.getText().toString());
-                        mPlace.setIdentifiedCheckIn(switchButton.isChecked());
-                        mPlace.setIsHearted(upvoteToggleButton.isChecked());
+                        mPlace.getCheckinInfo().setReview(commentEditText.getText().toString());
+                        mPlace.getCheckinInfo().setIdentifiedCheckIn(switchButton.isChecked());
+                        mPlace.getCheckinInfo().setHearted(upvoteToggleButton.isChecked());
+                        mPlace.getCheckinInfo().setCheckInTime(new Timestamp(new Date()));
 
                         // Place this call in the onCLick of popup:
                         placeResult.setResultCallback(mUpdatePlaceDetailsCallback);
@@ -414,7 +421,7 @@ public class HomeScreenActivity extends FragmentActivity implements OnMapReadyCa
                     @Override
                     public void onCallback(boolean localCheckIn)
                     {
-                        mPlace.setLocalCheckIn(localCheckIn);
+                        mPlace.getCheckinInfo().setLocal(localCheckIn);
                     }
                 };
 
@@ -459,7 +466,7 @@ public class HomeScreenActivity extends FragmentActivity implements OnMapReadyCa
         // TODO: Instead of just checking the names of the cities, also check the cities ID
         // for example, there is Weimar in Germany and Also in Texas USA
 
-        String savedCities = spCities.loadSPInfo();
+        String savedCities = localCities.loadSPInfo();
         final LatLng placeLatLng = place.getLatLng();
 
         final List<String> cityNames = new ArrayList<>();
@@ -587,7 +594,6 @@ public class HomeScreenActivity extends FragmentActivity implements OnMapReadyCa
 
     private void UpdatePlaceInfo(String id, CharSequence name)
     {
-        // Increment the # of check ins and append the user name to the variable if not anonymous.
         db.collection("placesCollection")
                 .whereEqualTo("id", id)
                 .whereEqualTo("name", name)
@@ -600,38 +606,22 @@ public class HomeScreenActivity extends FragmentActivity implements OnMapReadyCa
                          for (DocumentSnapshot document : task.getResult().getDocuments())
                          {
                              DocumentReference docReference = document.getReference();
-                             Map<String, Object> updateFields = new HashMap<>();
+                             final Map<String, Object> CheckInsCollection = new HashMap<>();
 
-                             Long numberOfCheckIns = (Long) document.get("NumberOfCheckIns");
-                             Long numberOfLocalCheckins = (Long) document.get("NumberOfLocalCheckIns");
-                             Long numberOfTouristCheckIns = (Long) document.get("NumberOfTouristCheckIns");
+                             CheckInsCollection.put("IsLocal", mPlace.getCheckinInfo().isLocal());
+                             CheckInsCollection.put("IsHearted", mPlace.getCheckinInfo().isHearted());
+                             CheckInsCollection.put("IsIdentifiedCheckin", mPlace.getCheckinInfo().isIdentifiedCheckIn());
+                             CheckInsCollection.put("Review", mPlace.getCheckinInfo().getReview());
+                             CheckInsCollection.put("CheckInTime", mPlace.getCheckinInfo().getCheckInTime());
 
-                             if (mPlace.isLocalCheckIn())
-                             {
-                                 updateFields.put("NumberOfLocalCheckIns", numberOfLocalCheckins + 1);
-                             }
-                             else
-                             {
-                                 updateFields.put("NumberOfTouristCheckIns", numberOfTouristCheckIns + 1);
-                             }
-
-                             updateFields.put("NumberOfCheckIns", numberOfCheckIns + 1);
-
-                             if (mPlace.isHearted())
-                             {
-                                 Long numberOfHearts = (Long) document.get("NumberOfHearts");
-                                 updateFields.put("NumberOfHearts", numberOfHearts + 1);
-                             }
-
-                             if (mPlace.isIdentifiedCheckIn())
+                             if (mPlace.getCheckinInfo().isIdentifiedCheckIn())
                              {
                                  // Get the username from the SP
                                  FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
                                  String mUID = user.getUid();
-                                 SharedPreferencesManagement spUserInfo = new SharedPreferencesManagement(mUID + "-UserInfo", HomeScreenActivity.this);
+                                 SharedPreferencesManagement spUserInfo = userInformation;
 
                                  String mUserInfo = spUserInfo.loadSPInfo();
-                                 String oldUserName = (String)document.get("UserName");
 
                                  if(mUserInfo == "empty")
                                  {
@@ -644,19 +634,20 @@ public class HomeScreenActivity extends FragmentActivity implements OnMapReadyCa
                                      if(userArray.length > 2)
                                      {
                                          // Append the username to the old name
-                                         updateFields.put("UserName", oldUserName + "/" + userArray[1]);
+                                         CheckInsCollection.put("UserName", userArray[1]);
                                      }
                                  }
                              }
 
                              docReference
-                                     .update(updateFields)
-                                     .addOnSuccessListener(new OnSuccessListener<Void>()
+                                     .collection("CheckInsCollection")
+                                     .add(CheckInsCollection)
+                                     .addOnSuccessListener(new OnSuccessListener<DocumentReference>()
                                      {
                                          @Override
-                                         public void onSuccess(Void aVoid)
+                                         public void onSuccess(DocumentReference documentReference)
                                          {
-                                             Log.d(TAG, "DocumentSnapshot successfully updated!");
+                                             Log.d(TAG, "DocumentSnapshot added with ID: " + documentReference.getId());
                                          }
                                      })
                                      .addOnFailureListener(new OnFailureListener()
@@ -664,7 +655,7 @@ public class HomeScreenActivity extends FragmentActivity implements OnMapReadyCa
                                          @Override
                                          public void onFailure(@NonNull Exception e)
                                          {
-                                             Log.w(TAG, "Error updating document", e);
+                                             Log.w(TAG, "Error adding document", e);
                                          }
                                      });
                          }
@@ -696,22 +687,34 @@ public class HomeScreenActivity extends FragmentActivity implements OnMapReadyCa
         {
             placeCollection.put("website", mPlace.getWebsiteUri().toString());
         }
-        /*if (mPlace.getComment() != null)
+        if (mPlace.getComment() != null)
         {
-            placeCollection.put("review", mPlace.getComment());
-        }*/
+            placeCollection.put("review", mPlace.getCheckinInfo().getReview());
+        }
 
-        if (mPlace.isIdentifiedCheckIn())
+        placeCollection.put("LatLng", new GeoPoint(mPlace.getLatlng().latitude, mPlace.getLatlng().longitude));
+        placeCollection.put("Rating", mPlace.getRating());
+
+        final Map<String, Object> checkInsCollection = new HashMap<>();
+
+        checkInsCollection.put("IsLocal", mPlace.getCheckinInfo().isLocal());
+        checkInsCollection.put("IsHearted", mPlace.getCheckinInfo().isHearted());
+        checkInsCollection.put("IsIdentifiedCheckin", mPlace.getCheckinInfo().isIdentifiedCheckIn());
+        checkInsCollection.put("Review", mPlace.getCheckinInfo().getReview());
+        checkInsCollection.put("CheckInTime", mPlace.getCheckinInfo().getCheckInTime());
+
+
+        if (mPlace.getCheckinInfo().isIdentifiedCheckIn())
         {
             // Get the username from the SP
             FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
             String mUID = user.getUid();
-            SharedPreferencesManagement spUserInfo = new SharedPreferencesManagement(mUID + "-UserInfo", this);
+            SharedPreferencesManagement spUserInfo = userInformation;
 
             String mUserInfo = spUserInfo.loadSPInfo();
             if(mUserInfo == "empty")
             {
-                placeCollection.put("UserName", "Anonymous");
+                //checkInsCollection.put("UserName", "Anonymous");
             }
             else
             {
@@ -719,42 +722,18 @@ public class HomeScreenActivity extends FragmentActivity implements OnMapReadyCa
 
                 if(userArray.length > 2)
                 {
-                    placeCollection.put("UserName", userArray[1]);
+                    checkInsCollection.put("UserName", userArray[1]);
                 }
                 else
                 {
-                    placeCollection.put("UserName", "Anonymous");
+                    //checkInsCollection.put("UserName", "Anonymous");
                 }
             }
         }
         else
         {
-            placeCollection.put("UserName", "Anonymous");
+            //checkInsCollection.put("UserName", "Anonymous");
         }
-
-        if (mPlace.isHearted())
-        {
-            placeCollection.put("NumberOfHearts", 1);
-        }
-        else
-        {
-            placeCollection.put("NumberOfHearts", 0);
-        }
-
-        if (mPlace.isLocalCheckIn())
-        {
-            placeCollection.put("NumberOfLocalCheckIns", 1);
-            placeCollection.put("NumberOfTouristCheckIns", 0);
-        }
-        else
-        {
-            placeCollection.put("NumberOfLocalCheckIns", 0);
-            placeCollection.put("NumberOfTouristCheckIns", 1);
-        }
-
-        placeCollection.put("LatLng", new GeoPoint(mPlace.getLatlng().latitude, mPlace.getLatlng().longitude));
-        placeCollection.put("Rating", mPlace.getRating());
-        placeCollection.put("NumberOfCheckIns", 1);
 
         // Add a new document with a generated ID
         db.collection("placesCollection")
@@ -762,13 +741,32 @@ public class HomeScreenActivity extends FragmentActivity implements OnMapReadyCa
             .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                 @Override
                 public void onSuccess(DocumentReference documentReference) {
-                    Log.d("MainActivity", "DocumentSnapshot added with ID: " + documentReference.getId());
+                    Log.d(TAG, "DocumentSnapshot added with ID: " + documentReference.getId());
+
+                    db.collection("placesCollection")
+                            .document(documentReference.getId())
+                            .collection("CheckInsCollection")
+                            .add(checkInsCollection).addOnSuccessListener(new OnSuccessListener<DocumentReference>()
+                    {
+                        @Override
+                        public void onSuccess(DocumentReference documentReference)
+                        {
+                            Log.d(TAG, "DocumentSnapshot added with ID: " + documentReference.getId());
+                        }
+                    }).addOnFailureListener(new OnFailureListener()
+                    {
+                        @Override
+                        public void onFailure(@NonNull Exception e)
+                        {
+                            Log.w(TAG, "Error adding document", e);
+                        }
+                    });
                 }
             })
             .addOnFailureListener(new OnFailureListener() {
                 @Override
                 public void onFailure(@NonNull Exception e) {
-                    Log.w("MainActivity", "Error adding document", e);
+                    Log.w(TAG, "Error adding document", e);
                 }
             });
     }
@@ -777,9 +775,7 @@ public class HomeScreenActivity extends FragmentActivity implements OnMapReadyCa
         Log.d(TAG, "moveCamera: moving the camera to: lat: " + latLng.latitude + ", lng: " + latLng.longitude );
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom));
 
-        mMap.clear();
-
-        mMap.setInfoWindowAdapter(new CustomInfoWindowAdapter(HomeScreenActivity.this));
+        mMap.setInfoWindowAdapter(new CustomInfoWindowGoogleMap(HomeScreenActivity.this));
 
         if(placeInfo != null){
             try{
@@ -839,7 +835,7 @@ public class HomeScreenActivity extends FragmentActivity implements OnMapReadyCa
 
     private void assignProfileView(){
         // TODO: Refactor this code to a utility class as its needed multiple places.
-        String mUserInfo = spUserInfo.loadSPInfo();
+        String mUserInfo = userInformation.loadSPInfo();
         if(mUserInfo == "empty"){
             email.setText("Mail not available");
             userName.setText("User Name not available");
