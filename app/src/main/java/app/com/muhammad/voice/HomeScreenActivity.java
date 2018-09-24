@@ -122,7 +122,7 @@ public class HomeScreenActivity extends FragmentActivity implements OnMapReadyCa
     private UserInformation userInformation = new UserInformation(mUID, this);
 
     private PopupWindow commentAndVotesPopup;
-    private PopupWindow placeDetailPopupWindow, revealedUserPopupWindow;
+    private PopupWindow placeDetailPopupWindow, revealedUserPopupWindow, reviewsPopupWindow;
 
     PendingResult<PlaceBuffer> placeResult;
 
@@ -292,7 +292,8 @@ public class HomeScreenActivity extends FragmentActivity implements OnMapReadyCa
 
                                 private Button placeDetailPopupWindowCloseButton,
                                         placeDetailPopupWindowRevealedUserButton,
-                                        revealedUserPopupWindowCloseButton;
+                                        revealedUserPopupWindowCloseButton,
+                                        reviewsButton, reviewsCloseButton;
 
 
                                 private int numberOfLocalVisitors, numberOfTouristVisitors,
@@ -305,6 +306,7 @@ public class HomeScreenActivity extends FragmentActivity implements OnMapReadyCa
                                     LayoutInflater inflater = (LayoutInflater) HomeScreenActivity.this.getSystemService(LAYOUT_INFLATER_SERVICE);
                                     final View customViewPlaceDetail = inflater.inflate(R.layout.place_details_popup_window, null);
                                     final View customViewRevealedUser = inflater.inflate(R.layout.place_reveal_list_popup_window, null);
+                                    final View customViewCommentList = inflater.inflate(R.layout.comments_list_popup_window, null);
 
                                     //*************************************************** placeDetailPopupWindow ***************************************************
                                     // Reset the variables on each click so accurate number is shown
@@ -322,6 +324,11 @@ public class HomeScreenActivity extends FragmentActivity implements OnMapReadyCa
                                             ViewGroup.LayoutParams.MATCH_PARENT,
                                             ViewGroup.LayoutParams.MATCH_PARENT);
 
+                                    reviewsPopupWindow = new PopupWindow(
+                                            customViewCommentList,
+                                            ViewGroup.LayoutParams.MATCH_PARENT,
+                                            ViewGroup.LayoutParams.MATCH_PARENT);
+
                                     placeDetailPopupWindowCloseButton = customViewPlaceDetail.findViewById(R.id.closePopupButton);
                                     placeDetailPopupWindowCloseButton.setOnClickListener(new View.OnClickListener()
                                     {
@@ -330,6 +337,22 @@ public class HomeScreenActivity extends FragmentActivity implements OnMapReadyCa
                                         {
                                             // Dismiss the popup window
                                             placeDetailPopupWindow.dismiss();
+                                        }
+                                    });
+
+                                    reviewsButton = customViewPlaceDetail.findViewById(R.id.reviews_button);
+                                    reviewsButton.setOnClickListener(new View.OnClickListener()
+                                    {
+                                        @Override
+                                        public void onClick(View view)
+                                        {
+                                            // Set an elevation value for popup window
+                                            // Call requires API level 21
+                                            if(Build.VERSION.SDK_INT>=21){
+                                                reviewsPopupWindow.setElevation(5.0f);
+                                            }
+
+                                            reviewsPopupWindow.showAtLocation(mDrawerLayout, Gravity.CENTER,0,0);
                                         }
                                     });
 
@@ -363,9 +386,6 @@ public class HomeScreenActivity extends FragmentActivity implements OnMapReadyCa
                                             }
 
                                             revealedUserPopupWindow.showAtLocation(mDrawerLayout, Gravity.CENTER,0,0);
-
-                                            // Dismiss the popup window
-                                            placeDetailPopupWindow.dismiss();
                                         }
                                     });
 
@@ -454,7 +474,6 @@ public class HomeScreenActivity extends FragmentActivity implements OnMapReadyCa
 
                                     //*************************************************** revealedUserPopupWindow ***************************************************
 
-
                                     revealedUserPopupWindow = new PopupWindow(
                                             customViewRevealedUser,
                                             ViewGroup.LayoutParams.MATCH_PARENT,
@@ -476,6 +495,18 @@ public class HomeScreenActivity extends FragmentActivity implements OnMapReadyCa
 
                                     revealedUserName.setText(marker.getTitle());
                                     revealedUserAddress.setText(marker.getSnippet());
+
+                                    //*************************************************** reviewsPopupWindow ***************************************************
+                                    reviewsCloseButton = customViewCommentList.findViewById(R.id.close_button);
+                                    reviewsCloseButton.setOnClickListener(new View.OnClickListener()
+                                    {
+                                        @Override
+                                        public void onClick(View view)
+                                        {
+                                            // Dismiss the popup window
+                                            reviewsPopupWindow.dismiss();
+                                        }
+                                    });
 
                                     // Position camera near the marker
                                     mMap.animateCamera(CameraUpdateFactory.newLatLng(marker.getPosition()));

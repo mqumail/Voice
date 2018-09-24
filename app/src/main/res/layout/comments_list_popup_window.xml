@@ -63,7 +63,7 @@
                 android:textSize="16sp" />
         </LinearLayout>
 
-        <ListView
+        <android.support.v7.widget.RecyclerView
             android:id="@+id/users_comments_list"
             android:layout_width="match_parent"
             android:layout_height="250dp"
@@ -78,7 +78,7 @@
             app:layout_constraintBottom_toTopOf="@id/close_button"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent">
-        </ListView>
+        </android.support.v7.widget.RecyclerView>
 
         <Button
             android:id="@+id/close_button"
