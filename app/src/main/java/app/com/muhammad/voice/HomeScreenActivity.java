@@ -151,15 +151,16 @@ public class HomeScreenActivity extends FragmentActivity implements OnMapReadyCa
                         switch (id){
                             case R.id.local_cities:
                                 //Toast.makeText(getApplicationContext(), "Local Cities clicked", Toast.LENGTH_LONG).show();
-                                Intent intent = new Intent(HomeScreenActivity.this, SignUpActivity.class);
+                                Intent intent = new Intent(HomeScreenActivity.this, ProfileSettingsActivity.class);
                                 intent.putExtra("caller", TAG);
                                 startActivity(intent);
+                                HomeScreenActivity.this.finish();
                             return true;
 
                             case R.id.log_out:
                                 AuthUI.getInstance().signOut(getApplicationContext());
-                                finish();
                                 startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                                HomeScreenActivity.this.finish();
                             return true;
 
                             default:
@@ -580,7 +581,7 @@ public class HomeScreenActivity extends FragmentActivity implements OnMapReadyCa
         // TODO: Instead of just checking the names of the cities, also check the cities ID
         // for example, there is Weimar in Germany and Also in Texas USA
 
-        String savedCities = localCities.loadSPInfo();
+        String savedCities = localCities.getCitiesString();
         final LatLng placeLatLng = place.getLatLng();
 
         final List<String> cityNames = new ArrayList<>();
@@ -903,7 +904,7 @@ public class HomeScreenActivity extends FragmentActivity implements OnMapReadyCa
             }
         }else{
             mMap.addMarker(new MarkerOptions()
-                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_voice_marker))
+                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_img_marker_man))
                     .position(latLng));
         }
 
@@ -918,7 +919,7 @@ public class HomeScreenActivity extends FragmentActivity implements OnMapReadyCa
             MarkerOptions options = new MarkerOptions()
                     .position(latLng)
                     .title(title)
-                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_voice_marker));
+                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_img_marker_man));
             mMap.addMarker(options);
         }
 

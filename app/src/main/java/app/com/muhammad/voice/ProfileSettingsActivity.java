@@ -2,32 +2,34 @@ package app.com.muhammad.voice;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
+import android.widget.Toolbar;
 
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.places.AutocompleteFilter;
+import com.google.android.gms.location.places.GeoDataClient;
 import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.PlaceDetectionClient;
+import com.google.android.gms.location.places.Places;
 import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
 import com.google.android.gms.location.places.ui.PlaceSelectionListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-
-import com.google.android.gms.location.places.GeoDataClient;
-import com.google.android.gms.location.places.Places;
-import com.google.android.gms.location.places.PlaceDetectionClient;
 
 import java.util.ArrayList;
 
 import app.com.muhammad.voice.utils.LocalCity;
 import app.com.muhammad.voice.utils.UserInformation;
 
-public class SignUpActivity extends AppCompatActivity  {
+public class ProfileSettingsActivity extends AppCompatActivity  {
 
     protected GeoDataClient mGeoDataClient;
     protected PlaceDetectionClient mPlaceDetectionClient;
@@ -45,14 +47,17 @@ public class SignUpActivity extends AppCompatActivity  {
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_sign_up);
+        setContentView(R.layout.activity_profile_settings);
 
-        tUserName = findViewById(R.id.tUserName);
-        mListView = findViewById(R.id.citiesList);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+
+        tUserName = findViewById(R.id.tUserName_settings);
+        mListView = findViewById(R.id.citiesList_settings);
 
         aCityList = new ArrayList<>();
         aCityListView = new ArrayList<>();
-        arrayAdapter = new ArrayAdapter<>(SignUpActivity.this, android.R.layout.simple_list_item_1, aCityListView);
+        arrayAdapter = new ArrayAdapter<>(ProfileSettingsActivity.this, android.R.layout.simple_list_item_1, aCityListView);
         mListView.setAdapter(arrayAdapter);
 
         loadUserName();
@@ -66,7 +71,7 @@ public class SignUpActivity extends AppCompatActivity  {
                 .setTypeFilter(AutocompleteFilter.TYPE_FILTER_CITIES)
                 .build();
         PlaceAutocompleteFragment autocompleteFragment = (PlaceAutocompleteFragment)
-                getFragmentManager().findFragmentById(R.id.search_city);
+                getFragmentManager().findFragmentById(R.id.search_city_settings);
         autocompleteFragment.setFilter(typeFilter);
         autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
             private static final String TAG = "AutoComplete";
@@ -77,7 +82,7 @@ public class SignUpActivity extends AppCompatActivity  {
                 aCityList.add(allCityInfo);
                 aCityListView.add((String)place.getAddress());
                 arrayAdapter.notifyDataSetChanged();
-                Toast.makeText(SignUpActivity.this,  place.getName() + " added to you settings", Toast.LENGTH_SHORT).show();
+                Toast.makeText(ProfileSettingsActivity.this,  place.getName() + " added to you settings", Toast.LENGTH_SHORT).show();
             }
             @Override
             public void onError(Status status) {
@@ -87,13 +92,36 @@ public class SignUpActivity extends AppCompatActivity  {
 
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            // Respond to the action bar's Up/Home button
+            case android.R.id.home:
+                //NavUtils.navigateUpFromSameTask(this);
+                Intent upIntent = NavUtils.getParentActivityIntent(this);
+                this.startActivity(upIntent);
+                this.finish();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
     public void continueHome(View view)
     {
         saveCities();
         saveUserInfo();
         Intent intent = new Intent(this, HomeScreenActivity.class);
         this.startActivity(intent);
-        SignUpActivity.this.finish();
+        finish();
+    }
+
+    public void skipHome(View view)
+    {
+        localCities.clearSharedPreferences();
+        userInformation.clearSharedPreferences();
+        Intent intent = new Intent(this, HomeScreenActivity.class);
+        this.startActivity(intent);
+        finish();
     }
 
     private void loadUserName(){
@@ -138,20 +166,15 @@ public class SignUpActivity extends AppCompatActivity  {
         try{
             String[] citiesAddressArray = localCities.getCitiesAddress();
             String[] citiesArray = localCities.getCities();
-            if (citiesArray[0] == "empty") {
+            if (citiesArray[0] != "empty") {
                 int i = 0;
                 for (String aCitiesArray : citiesArray) {
-                    if (citiesArray[i] != "empty") {
-                        aCityList.add(0, aCitiesArray);
-                        aCityListView.add(0, citiesAddressArray[i]);
-                        arrayAdapter.notifyDataSetChanged();
-                    }
+                    aCityList.add(0, aCitiesArray);
+                    aCityListView.add(0, citiesAddressArray[i]);
+                    arrayAdapter.notifyDataSetChanged();
                     i++;
                 }
                 Toast.makeText(this, "Local Cities Loaded", Toast.LENGTH_SHORT).show();
-            } else{
-                startActivity(new Intent(getApplicationContext(), HomeScreenActivity.class));
-                SignUpActivity.this.finish();
             }
         }catch(Exception e) {
             System.err.println("Error while retrieving cities from Shared Preferences");

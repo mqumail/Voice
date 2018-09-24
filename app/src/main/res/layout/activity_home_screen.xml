@@ -28,24 +28,32 @@
                 android:layout_margin="16dp" />-->
         </fragment>
 
-        <Button
+        <ImageButton
             android:id="@+id/checkInButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:layout_marginEnd="8dp"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_marginBottom="24dp"
+            android:layout_marginEnd="24dp"
             android:onClick="checkIn"
             android:text="@string/check_in_button"
+            android:foregroundGravity="center"
+            android:foreground="@drawable/ic_add_place"
+            android:background="@drawable/button_add_place"
+            android:elevation="3dp"
             android:layout_alignParentBottom="true"
             android:layout_alignParentRight="true"/>
 
-        <Button
+        <ImageButton
             android:id="@+id/profileButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             android:onClick="profile"
+            android:foregroundGravity="center"
+            android:foreground="@drawable/ic_drawer_menu"
+            android:background="@drawable/button_drawer_menu"
+            android:elevation="3dp"
             android:text="@string/profile_button"
             android:layout_alignParentTop="true" />
 

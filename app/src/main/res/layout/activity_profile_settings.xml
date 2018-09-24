@@ -8,7 +8,7 @@
     tools:context=".SignUpActivity">
 
     <fragment
-        android:id="@+id/search_city"
+        android:id="@+id/search_city_settings"
         android:hint="Type a city"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -20,19 +20,19 @@
         app:layout_constraintStart_toStartOf="parent"/>
 
     <TextView
-        android:id="@+id/textViewCreateAccountMessage"
+        android:id="@+id/textViewCreateAccountMessage_settings"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
         android:layout_marginEnd="20dp"
         android:textColor="@color/colorDescText"
         android:text="@string/create_account_message"
-        app:layout_constraintTop_toBottomOf="@+id/search_city"
+        app:layout_constraintTop_toBottomOf="@id/search_city_settings"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
-        android:id="@+id/textViewCreateAccountTitle"
+        android:id="@+id/textViewCreateAccountTitle_settings"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="20dp"
@@ -42,14 +42,14 @@
         android:textSize="@dimen/titleTextSize"
         android:textColor="@color/colorPrimaryText"
         android:textStyle="bold"
-        app:layout_constraintTop_toBottomOf="@+id/textViewCreateAccountMessage"
+        app:layout_constraintTop_toBottomOf="@id/textViewCreateAccountMessage_settings"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintVertical_bias="0.0" />
 
     <ListView
-        android:id="@+id/citiesList"
+        android:id="@+id/citiesList_settings"
         android:layout_width="match_parent"
         android:layout_height="130dp"
         android:layout_marginTop="8dp"
@@ -57,13 +57,13 @@
         android:layout_marginEnd="20dp"
         android:foregroundGravity="top"
         android:orientation="vertical"
-        app:layout_constraintTop_toBottomOf="@+id/textViewCreateAccountTitle"
+        app:layout_constraintTop_toBottomOf="@id/textViewCreateAccountTitle_settings"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
     </ListView>
 
     <TextView
-        android:id="@+id/textViewUserTitle"
+        android:id="@+id/textViewUserTitle_settings"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="20dp"
@@ -73,14 +73,14 @@
         android:textColor="@color/colorPrimaryText"
         android:textSize="@dimen/titleTextSize"
         android:textStyle="bold"
-        app:layout_constraintTop_toBottomOf="@+id/citiesList"
+        app:layout_constraintTop_toBottomOf="@id/citiesList_settings"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintVertical_bias="0.0" />
 
     <EditText
-        android:id="@+id/tUserName"
+        android:id="@+id/tUserName_settings"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:ems="12"
@@ -89,29 +89,43 @@
         android:layout_marginTop="8dp"
         android:layout_marginStart="20dp"
         android:layout_marginEnd="20dp"
-        app:layout_constraintTop_toBottomOf="@+id/textViewUserTitle"
+        app:layout_constraintTop_toBottomOf="@id/textViewUserTitle_settings"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintVertical_bias="0.0"/>
 
     <TextView
-        android:id="@+id/textViewUserMessage"
+        android:id="@+id/textViewUserMessage_settings"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="20dp"
-        android:layout_marginStart="20dp"
         android:layout_marginEnd="20dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="0dp"
         android:text="@string/create_username_message"
         android:textColor="@color/colorDescText"
-        app:layout_constraintTop_toBottomOf="@id/tUserName"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tUserName_settings"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintVertical_bias="0.0"/>
 
+    <!--<Button
+        android:id="@+id/buttonSkip"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginStart="16dp"
+        android:onClick="skipHome"
+        android:text="@string/skip"
+        app:layout_constraintBottom_toTopOf="@+id/buttonRegister"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent" />-->
+
     <Button
-        android:id="@+id/buttonRegister"
+        android:id="@+id/buttonRegister_settings"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginBottom="32dp"
@@ -119,7 +133,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="20dp"
         android:onClick="continueHome"
-        android:text="@string/register"
+        android:text="@string/save_settings_button"
         android:textColor="#ffffff"
         android:background="@drawable/button_action"
         app:layout_constraintBottom_toBottomOf="parent"

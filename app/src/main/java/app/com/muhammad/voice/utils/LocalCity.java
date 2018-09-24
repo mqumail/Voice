@@ -20,7 +20,7 @@ public class LocalCity extends SharedPreferencesManagement{
             citiesString = preferences.getString(key, "empty" );
         }catch(Exception e){
             e.printStackTrace();
-            citiesString = "NA";
+            citiesString = "Error";
         }
         return citiesString;
     }
@@ -34,7 +34,7 @@ public class LocalCity extends SharedPreferencesManagement{
         }catch(Exception e){
             e.printStackTrace();
             citiesArray = new String[1];
-            citiesArray[0] = "NA";
+            citiesArray[0] = "Error";
         }
         return citiesArray;
     }
@@ -55,7 +55,7 @@ public class LocalCity extends SharedPreferencesManagement{
         } catch(Exception e) {
             e.printStackTrace();
             idArray = new String[1];
-            idArray[0] = "NA";
+            idArray[0] = "Error";
         }
 
         return idArray;
@@ -77,7 +77,7 @@ public class LocalCity extends SharedPreferencesManagement{
         } catch(Exception e) {
             e.printStackTrace();
             namesArray = new String[1];
-            namesArray[0] = "NA";
+            namesArray[0] = "Error";
         }
 
         return namesArray;
@@ -99,7 +99,7 @@ public class LocalCity extends SharedPreferencesManagement{
         } catch(Exception e) {
             e.printStackTrace();
             addressArray = new String[1];
-            addressArray[0] = "NA";
+            addressArray[0] = "Error";
         }
 
         return addressArray;

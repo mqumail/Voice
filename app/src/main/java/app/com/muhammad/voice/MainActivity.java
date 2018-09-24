@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.widget.Toast;
 
 import com.firebase.ui.auth.AuthUI;
 import com.google.firebase.auth.FirebaseAuth;
@@ -16,12 +15,6 @@ import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
-
-import app.com.muhammad.voice.utils.LocalCity;
-import app.com.muhammad.voice.utils.SharedPreferencesManagement;
-import app.com.muhammad.voice.utils.UserInformation;
 
 public class MainActivity extends AppCompatActivity
 {
@@ -54,12 +47,7 @@ public class MainActivity extends AppCompatActivity
                         new AuthUI.IdpConfig.EmailBuilder().build());
 
                 if(user != null){
-                    //function to change screen automatically
-                    if (readPreferences(user.getUid())){
-                        redirect(new HomeScreenActivity(), 1000);
-                    } else if (!readPreferences(user.getUid())){
-                        redirect(new SignUpActivity(), 1000);
-                    }
+                    redirect(new SignUpActivity());
                 }else{
                     startActivityForResult(
                             AuthUI.getInstance()
@@ -83,19 +71,14 @@ public class MainActivity extends AppCompatActivity
                 //The user is signed in
             }else if(resultCode == RESULT_CANCELED){
                 //The sign in process is canceled
-                finish();
+                MainActivity.this.finish();
             }
         }
     }
 
-    private void redirect(final Activity activity, int time){
-        new Timer().schedule(new TimerTask() {
-            @Override
-            public void run() {
-                startActivity(new Intent(getApplicationContext(), activity.getClass()));
-                finish();
-            }
-        },time);
+    private void redirect(final Activity activity){
+        startActivity(new Intent(getApplicationContext(), activity.getClass()));
+        MainActivity.this.finish();
     }
 
     @Override
@@ -112,19 +95,6 @@ public class MainActivity extends AppCompatActivity
         if(mAuthStateListener != null) {
             mFirebaseAuth.removeAuthStateListener(mAuthStateListener);
         }
-    }
-
-    private boolean readPreferences(String UID) {
-        boolean isData;
-        String mUser = UID;
-        LocalCity localCities = new LocalCity(mUser, this);
-        String savedCities = localCities.getCitiesString();
-        if(savedCities.equals("NA") || savedCities.equals("")){
-            isData = false; }
-            else{
-            isData = true;
-        }
-        return isData;
     }
 
 }

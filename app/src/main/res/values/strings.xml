@@ -18,9 +18,9 @@
     <string name="create_account_message">Type the cities where you have lived or currently living.</string>
     <string name="create_username_title">Name</string>
     <string name="create_username_message">Your name will only be displayed in the check-ins where you have revealed yourself.</string>
-    <string name="register">Save</string>
+    <string name="register">Continue</string>
     <string name="skip">Clear Shared Preferences</string>
-
+    <string name="save_settings_button">Save</string>
     <string name="check_in_button">Check-in</string>
     <string name="profile_button">Profile</string>
 
@@ -39,6 +39,7 @@
     <string name="comment_send">Finish</string>
     <string name="check_in_up_vote">Up-voted</string>
     <string name="check_in_down_vote">Down-voted</string>
+    <string name="title_comments_list_popoup">Reviews</string>
     <string name="close_button">Close</string>
 
 </resources>

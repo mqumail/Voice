@@ -38,6 +38,18 @@
         </activity>
 
         <activity
+            android:name=".ProfileSettingsActivity"
+            android:screenOrientation="portrait"
+            android:label="@string/settings_label"
+            android:theme="@style/CitiesUpdateTheme"
+            android:parentActivityName=".HomeScreenActivity"
+            android:windowSoftInputMode="adjustPan|stateVisible|stateHidden">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="app.com.muhammad.voice.MainActivity" />
+        </activity>
+
+        <activity
             android:name=".HomeScreenActivity"
             android:screenOrientation="portrait">
         </activity>
