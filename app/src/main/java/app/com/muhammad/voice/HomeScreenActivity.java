@@ -52,6 +52,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapStyleOptions;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -60,10 +61,6 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.ChildEventListener;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.ServerValue;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
@@ -78,7 +75,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -124,6 +120,7 @@ public class HomeScreenActivity extends FragmentActivity implements OnMapReadyCa
     private UserInformation userInformation = new UserInformation(mUID, this);
 
     private PopupWindow commentAndVotesPopup;
+    private PopupWindow placeDetailPopupWindow;
 
     PendingResult<PlaceBuffer> placeResult;
 
@@ -270,22 +267,139 @@ public class HomeScreenActivity extends FragmentActivity implements OnMapReadyCa
                                 MarkerOptions markerOptions = new MarkerOptions();
                                 markerOptions.position(checkIn.getLatlng())
                                         .title(checkIn.getName())
+                                        .snippet(checkIn.getAddress())
                                         // use Voice Icon here. TODO: the current icons are too large. Ask Luis to make it smaller
                                         .icon(BitmapDescriptorFactory.defaultMarker( BitmapDescriptorFactory.HUE_BLUE));
 
-                                PlaceInfo info = new PlaceInfo();
+                                /*PlaceInfo info = new PlaceInfo();
                                 info.setName(checkIn.getName());
                                 info.setAddress(checkIn.getAddress());
                                 info.setPhoneNumber(checkIn.getPhoneNumber());
                                 info.setWebsiteUri(checkIn.getWebsiteUri());
-                                info.setRating(checkIn.getRating());
+                                info.setRating(checkIn.getRating());*/
 
-                                CustomInfoWindowGoogleMap customInfoWindow = new CustomInfoWindowGoogleMap(HomeScreenActivity.this);
-                                mMap.setInfoWindowAdapter(customInfoWindow);
+                                //CustomInfoWindowGoogleMap customInfoWindow = new CustomInfoWindowGoogleMap(HomeScreenActivity.this);
+                                //mMap.setInfoWindowAdapter(customInfoWindow);
 
-                                com.google.android.gms.maps.model.Marker marker = mMap.addMarker(markerOptions);
-                                marker.setTag(info);
+                                mMap.addMarker(markerOptions);
+
+                                //marker.setTag(info);
                             }
+
+                            mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener()
+                            {
+                                TextView name, address,
+                                        localNumber, localUpvotes,
+                                        touristNumber, touristUpvotes,
+                                        commentsNumber;
+
+                                int numberOfLocalVisitors, numberOfTouristVisitors,
+                                        numberOfLocalHearts, numberOfTouristHearts,
+                                        numberOfComments;
+
+
+                                @Override
+                                public boolean onMarkerClick(Marker marker)
+                                {
+                                    // Reset the variables on each click so accurate number is shown
+                                    numberOfLocalVisitors = 0;
+                                    numberOfTouristVisitors = 0;
+                                    numberOfLocalHearts = 0;
+                                    numberOfTouristHearts = 0;
+                                    numberOfComments = 0;
+
+                                    // Hide the default Info Window
+                                    marker.hideInfoWindow();
+
+                                    LayoutInflater inflater = (LayoutInflater) HomeScreenActivity.this.getSystemService(LAYOUT_INFLATER_SERVICE);
+                                    final View customView = inflater.inflate(R.layout.place_details_popup_window, null);
+
+                                    placeDetailPopupWindow = new PopupWindow(
+                                            customView,
+                                            ViewGroup.LayoutParams.MATCH_PARENT,
+                                            ViewGroup.LayoutParams.MATCH_PARENT / 2);
+
+                                    // Set an elevation value for popup window
+                                    // Call requires API level 21
+                                    if(Build.VERSION.SDK_INT>=21){
+                                        placeDetailPopupWindow.setElevation(5.0f);
+                                    }
+
+                                    // Connect to DB and get the information needed to display on the popup
+                                    // Name and address of the place
+                                    // # of local visitors + # of hearts, # of tourist visitors + hearts, # of comments
+                                    name = customView.findViewById(R.id.namePlaceDetail);
+                                    address = customView.findViewById(R.id.addressPlaceDetail);
+                                    localNumber = customView.findViewById(R.id.localNumber);
+                                    localUpvotes = customView.findViewById(R.id.localUpvotes);
+                                    touristNumber = customView.findViewById(R.id.touristNumber);
+                                    touristUpvotes = customView.findViewById(R.id.touristUpvotes);
+                                    commentsNumber = customView.findViewById(R.id.commentNumber);
+
+                                    name.setText(marker.getTitle());
+                                    address.setText(marker.getSnippet());
+
+                                    db.collection("placesCollection")
+                                            .whereEqualTo("name", marker.getTitle())
+                                            .whereEqualTo("address", marker.getSnippet())
+                                            .get()
+                                            .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>()
+                                            {
+                                                @Override
+                                                public void onComplete(@NonNull Task<QuerySnapshot> task)
+                                                {
+                                                    for (DocumentSnapshot document : task.getResult())
+                                                    {
+                                                        document.getReference()
+                                                                .collection("CheckInsCollection")
+                                                                .get()
+                                                                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>()
+                                                                {
+                                                                    @Override
+                                                                    public void onComplete(@NonNull Task<QuerySnapshot> task)
+                                                                    {
+                                                                        for (DocumentSnapshot document : task.getResult().getDocuments())
+                                                                        {
+                                                                            if ((boolean)document.get("IsLocal"))
+                                                                            {
+                                                                                numberOfLocalVisitors++;
+                                                                                if ((boolean)document.get("IsHearted"))
+                                                                                {
+                                                                                    numberOfLocalHearts++;
+                                                                                }
+                                                                            }
+                                                                            else
+                                                                            {
+                                                                                numberOfTouristVisitors++;
+                                                                                if ((boolean)document.get("IsHearted"))
+                                                                                {
+                                                                                    numberOfTouristHearts++;
+                                                                                }
+                                                                            }
+                                                                            if (document.get("Review") != null)
+                                                                            {
+                                                                                numberOfComments++;
+                                                                            }
+                                                                        }
+
+                                                                        localNumber.setText(String.valueOf(numberOfLocalVisitors));
+                                                                        localUpvotes.setText(String.valueOf(numberOfLocalHearts));
+                                                                        touristNumber.setText(String.valueOf(numberOfTouristVisitors));
+                                                                        touristUpvotes.setText(String.valueOf(numberOfTouristHearts));
+                                                                        commentsNumber.setText(String.valueOf(numberOfComments));
+
+                                                                        placeDetailPopupWindow.showAtLocation(mDrawerLayout, Gravity.CENTER,0,0);
+                                                                    }
+                                                                });
+                                                    }
+                                                }
+                                            });
+
+                                    mMap.animateCamera(CameraUpdateFactory.newLatLng(marker.getPosition()));
+
+                                    return true;
+                                }
+                            });
 
                             Log.d(TAG, "Current check ins: " + userCheckIns);
                         }
@@ -775,7 +889,7 @@ public class HomeScreenActivity extends FragmentActivity implements OnMapReadyCa
         Log.d(TAG, "moveCamera: moving the camera to: lat: " + latLng.latitude + ", lng: " + latLng.longitude );
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom));
 
-        mMap.setInfoWindowAdapter(new CustomInfoWindowGoogleMap(HomeScreenActivity.this));
+        //mMap.setInfoWindowAdapter(new CustomInfoWindowGoogleMap(HomeScreenActivity.this));
 
         if(placeInfo != null){
             try{

@@ -28,7 +28,7 @@
         app:layout_constraintVertical_bias="0">
 
         <TextView
-            android:id="@+id/name"
+            android:id="@+id/namePlaceDetail"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:ellipsize="end"
@@ -39,7 +39,7 @@
             android:textSize="20sp" />
 
         <TextView
-            android:id="@+id/address"
+            android:id="@+id/addressPlaceDetail"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:ellipsize="end"
@@ -68,7 +68,7 @@
         app:layout_constraintVertical_bias="0">
 
         <TextView
-            android:id="@+id/local_number"
+            android:id="@+id/localNumber"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center"
@@ -78,7 +78,7 @@
             android:textStyle="bold" />
 
         <TextView
-            android:id="@+id/local_visitors"
+            android:id="@+id/localVisitors"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -87,7 +87,7 @@
             android:textSize="16sp" />
 
         <TextView
-            android:id="@+id/local_upvotes"
+            android:id="@+id/localUpvotes"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
@@ -126,7 +126,7 @@
         app:layout_constraintVertical_bias="0">
 
         <TextView
-            android:id="@+id/tourist_number"
+            android:id="@+id/touristNumber"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center"
@@ -136,7 +136,7 @@
             android:textStyle="bold" />
 
         <TextView
-            android:id="@+id/tourist_visitors"
+            android:id="@+id/touristVisitors"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
@@ -145,7 +145,7 @@
             android:textSize="16sp" />
 
         <TextView
-            android:id="@+id/tourist_upvotes"
+            android:id="@+id/touristUpvotes"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
@@ -184,7 +184,7 @@
         app:layout_constraintVertical_bias="0">
 
         <TextView
-            android:id="@+id/comment_number"
+            android:id="@+id/commentNumber"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center"
@@ -194,7 +194,7 @@
             android:textStyle="bold" />
 
         <TextView
-            android:id="@+id/comment_desc"
+            android:id="@+id/commentDesc"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
