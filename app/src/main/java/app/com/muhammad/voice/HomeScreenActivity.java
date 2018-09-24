@@ -17,6 +17,8 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -120,9 +122,14 @@ public class HomeScreenActivity extends FragmentActivity implements OnMapReadyCa
     private UserInformation userInformation = new UserInformation(mUID, this);
 
     private PopupWindow commentAndVotesPopup;
-    private PopupWindow placeDetailPopupWindow;
+    private PopupWindow placeDetailPopupWindow, revealedUserPopupWindow;
 
     PendingResult<PlaceBuffer> placeResult;
+
+    private RecyclerView mRecyclerView;
+    private RecyclerView.Adapter mAdapter;
+    private RecyclerView.LayoutManager mLayoutManager;
+    private List<String> revealedUserNameDataSet;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -272,36 +279,34 @@ public class HomeScreenActivity extends FragmentActivity implements OnMapReadyCa
                                         // use Voice Icon here. TODO: the current icons are too large. Ask Luis to make it smaller
                                         .icon(BitmapDescriptorFactory.defaultMarker( BitmapDescriptorFactory.HUE_BLUE));
 
-                                /*PlaceInfo info = new PlaceInfo();
-                                info.setName(checkIn.getName());
-                                info.setAddress(checkIn.getAddress());
-                                info.setPhoneNumber(checkIn.getPhoneNumber());
-                                info.setWebsiteUri(checkIn.getWebsiteUri());
-                                info.setRating(checkIn.getRating());*/
-
-                                //CustomInfoWindowGoogleMap customInfoWindow = new CustomInfoWindowGoogleMap(HomeScreenActivity.this);
-                                //mMap.setInfoWindowAdapter(customInfoWindow);
-
                                 mMap.addMarker(markerOptions);
-
-                                //marker.setTag(info);
                             }
 
                             mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener()
                             {
-                                TextView name, address,
+                                private TextView name, address,
                                         localNumber, localUpvotes,
                                         touristNumber, touristUpvotes,
-                                        commentsNumber;
+                                        commentsNumber, revealedUserName,
+                                        revealedUserAddress;
 
-                                int numberOfLocalVisitors, numberOfTouristVisitors,
+                                private Button placeDetailPopupWindowCloseButton,
+                                        placeDetailPopupWindowRevealedUserButton,
+                                        revealedUserPopupWindowCloseButton;
+
+
+                                private int numberOfLocalVisitors, numberOfTouristVisitors,
                                         numberOfLocalHearts, numberOfTouristHearts,
                                         numberOfComments;
-
 
                                 @Override
                                 public boolean onMarkerClick(Marker marker)
                                 {
+                                    LayoutInflater inflater = (LayoutInflater) HomeScreenActivity.this.getSystemService(LAYOUT_INFLATER_SERVICE);
+                                    final View customViewPlaceDetail = inflater.inflate(R.layout.place_details_popup_window, null);
+                                    final View customViewRevealedUser = inflater.inflate(R.layout.place_reveal_list_popup_window, null);
+
+                                    //*************************************************** placeDetailPopupWindow ***************************************************
                                     // Reset the variables on each click so accurate number is shown
                                     numberOfLocalVisitors = 0;
                                     numberOfTouristVisitors = 0;
@@ -312,13 +317,57 @@ public class HomeScreenActivity extends FragmentActivity implements OnMapReadyCa
                                     // Hide the default Info Window
                                     marker.hideInfoWindow();
 
-                                    LayoutInflater inflater = (LayoutInflater) HomeScreenActivity.this.getSystemService(LAYOUT_INFLATER_SERVICE);
-                                    final View customView = inflater.inflate(R.layout.place_details_popup_window, null);
-
                                     placeDetailPopupWindow = new PopupWindow(
-                                            customView,
+                                            customViewPlaceDetail,
                                             ViewGroup.LayoutParams.MATCH_PARENT,
-                                            ViewGroup.LayoutParams.MATCH_PARENT / 2);
+                                            ViewGroup.LayoutParams.MATCH_PARENT);
+
+                                    placeDetailPopupWindowCloseButton = customViewPlaceDetail.findViewById(R.id.closePopupButton);
+                                    placeDetailPopupWindowCloseButton.setOnClickListener(new View.OnClickListener()
+                                    {
+                                        @Override
+                                        public void onClick(View view)
+                                        {
+                                            // Dismiss the popup window
+                                            placeDetailPopupWindow.dismiss();
+                                        }
+                                    });
+
+                                    placeDetailPopupWindowRevealedUserButton = customViewPlaceDetail.findViewById(R.id.revealedUsersButton);
+                                    placeDetailPopupWindowRevealedUserButton.setOnClickListener(new View.OnClickListener()
+                                    {
+                                        @Override
+                                        public void onClick(View view)
+                                        {
+                                            // Set an elevation value for popup window
+                                            // Call requires API level 21
+                                            if(Build.VERSION.SDK_INT>=21){
+                                                revealedUserPopupWindow.setElevation(5.0f);
+                                            }
+
+                                            mRecyclerView = customViewRevealedUser.findViewById(R.id.users_revealed_list_recycler_view);
+
+                                            // use this setting to improve performance if you know that changes
+                                            // in content do not change the layout size of the RecyclerView
+                                            mRecyclerView.setHasFixedSize(true);
+
+                                            // use a linear layout manager
+                                            mLayoutManager = new LinearLayoutManager(HomeScreenActivity.this);
+                                            mRecyclerView.setLayoutManager(mLayoutManager);
+
+                                            if (revealedUserNameDataSet != null && revealedUserNameDataSet.size() > 0)
+                                            {
+                                                // specify an adapter (see also next example)
+                                                mAdapter = new RecyclerViewAdapter(revealedUserNameDataSet);
+                                                mRecyclerView.setAdapter(mAdapter);
+                                            }
+
+                                            revealedUserPopupWindow.showAtLocation(mDrawerLayout, Gravity.CENTER,0,0);
+
+                                            // Dismiss the popup window
+                                            placeDetailPopupWindow.dismiss();
+                                        }
+                                    });
 
                                     // Set an elevation value for popup window
                                     // Call requires API level 21
@@ -329,13 +378,13 @@ public class HomeScreenActivity extends FragmentActivity implements OnMapReadyCa
                                     // Connect to DB and get the information needed to display on the popup
                                     // Name and address of the place
                                     // # of local visitors + # of hearts, # of tourist visitors + hearts, # of comments
-                                    name = customView.findViewById(R.id.namePlaceDetail);
-                                    address = customView.findViewById(R.id.addressPlaceDetail);
-                                    localNumber = customView.findViewById(R.id.localNumber);
-                                    localUpvotes = customView.findViewById(R.id.localUpvotes);
-                                    touristNumber = customView.findViewById(R.id.touristNumber);
-                                    touristUpvotes = customView.findViewById(R.id.touristUpvotes);
-                                    commentsNumber = customView.findViewById(R.id.commentNumber);
+                                    name = customViewPlaceDetail.findViewById(R.id.namePlaceDetail);
+                                    address = customViewPlaceDetail.findViewById(R.id.addressPlaceDetail);
+                                    localNumber = customViewPlaceDetail.findViewById(R.id.localNumber);
+                                    localUpvotes = customViewPlaceDetail.findViewById(R.id.localUpvotes);
+                                    touristNumber = customViewPlaceDetail.findViewById(R.id.touristNumber);
+                                    touristUpvotes = customViewPlaceDetail.findViewById(R.id.touristUpvotes);
+                                    commentsNumber = customViewPlaceDetail.findViewById(R.id.commentNumber);
 
                                     name.setText(marker.getTitle());
                                     address.setText(marker.getSnippet());
@@ -349,6 +398,8 @@ public class HomeScreenActivity extends FragmentActivity implements OnMapReadyCa
                                                 @Override
                                                 public void onComplete(@NonNull Task<QuerySnapshot> task)
                                                 {
+                                                    revealedUserNameDataSet = new ArrayList<>();
+
                                                     for (DocumentSnapshot document : task.getResult())
                                                     {
                                                         document.getReference()
@@ -361,6 +412,11 @@ public class HomeScreenActivity extends FragmentActivity implements OnMapReadyCa
                                                                     {
                                                                         for (DocumentSnapshot document : task.getResult().getDocuments())
                                                                         {
+                                                                            if ((boolean)document.get("IsIdentifiedCheckin"))
+                                                                            {
+                                                                                revealedUserNameDataSet.add((String)document.get("UserName"));
+                                                                            }
+
                                                                             if ((boolean)document.get("IsLocal"))
                                                                             {
                                                                                 numberOfLocalVisitors++;
@@ -396,8 +452,35 @@ public class HomeScreenActivity extends FragmentActivity implements OnMapReadyCa
                                                 }
                                             });
 
+                                    //*************************************************** revealedUserPopupWindow ***************************************************
+
+
+                                    revealedUserPopupWindow = new PopupWindow(
+                                            customViewRevealedUser,
+                                            ViewGroup.LayoutParams.MATCH_PARENT,
+                                            ViewGroup.LayoutParams.MATCH_PARENT);
+
+                                    revealedUserPopupWindowCloseButton = customViewRevealedUser.findViewById(R.id.close_button);
+                                    revealedUserPopupWindowCloseButton.setOnClickListener(new View.OnClickListener()
+                                    {
+                                        @Override
+                                        public void onClick(View view)
+                                        {
+                                            // Dismiss the popup window
+                                            revealedUserPopupWindow.dismiss();
+                                        }
+                                    });
+
+                                    revealedUserName = customViewRevealedUser.findViewById(R.id.revealedUserNameTextView);
+                                    revealedUserAddress = customViewRevealedUser.findViewById(R.id.revealedUserAddressTextView);
+
+                                    revealedUserName.setText(marker.getTitle());
+                                    revealedUserAddress.setText(marker.getSnippet());
+
+                                    // Position camera near the marker
                                     mMap.animateCamera(CameraUpdateFactory.newLatLng(marker.getPosition()));
 
+                                    // Return true so the default infoWindow is not shown
                                     return true;
                                 }
                             });
