@@ -129,7 +129,11 @@ public class HomeScreenActivity extends FragmentActivity implements OnMapReadyCa
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
-    private List<String> revealedUserNameDataSet;
+    private RecyclerView mRecyclerViewReviews;
+    private RecyclerView.Adapter mAdapterReviews;
+    private RecyclerView.LayoutManager mLayoutManagerReviews;
+    private List<String> revealedUserNameDataSet, reviewsDataSet;
+    private List<String> emptyUserNameDataSetMessage, emptyReviewsDataSetMessage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -352,6 +356,33 @@ public class HomeScreenActivity extends FragmentActivity implements OnMapReadyCa
                                                 reviewsPopupWindow.setElevation(5.0f);
                                             }
 
+                                            mRecyclerViewReviews = customViewCommentList.findViewById(R.id.users_comments_list);
+
+                                            // use this setting to improve performance if you know that changes
+                                            // in content do not change the layout size of the RecyclerView
+                                            mRecyclerViewReviews.setHasFixedSize(true);
+
+                                            // use a linear layout manager
+                                            mLayoutManagerReviews = new LinearLayoutManager(HomeScreenActivity.this);
+                                            mRecyclerViewReviews.setLayoutManager(mLayoutManagerReviews);
+
+                                            if (reviewsDataSet != null)
+                                            {
+                                                if(reviewsDataSet.size() > 0)
+                                                {
+                                                    // specify an adapter (see also next example)
+                                                    mAdapterReviews = new RecyclerViewAdapter(reviewsDataSet);
+                                                    mRecyclerViewReviews.setAdapter(mAdapterReviews);
+                                                }
+                                                else
+                                                {
+                                                    emptyReviewsDataSetMessage = new ArrayList<>();
+                                                    emptyReviewsDataSetMessage.add("No reviews yet!");
+                                                    mAdapterReviews = new RecyclerViewAdapter(emptyReviewsDataSetMessage);
+                                                    mRecyclerViewReviews.setAdapter(mAdapterReviews);
+                                                }
+                                            }
+
                                             reviewsPopupWindow.showAtLocation(mDrawerLayout, Gravity.CENTER,0,0);
                                         }
                                     });
@@ -378,11 +409,21 @@ public class HomeScreenActivity extends FragmentActivity implements OnMapReadyCa
                                             mLayoutManager = new LinearLayoutManager(HomeScreenActivity.this);
                                             mRecyclerView.setLayoutManager(mLayoutManager);
 
-                                            if (revealedUserNameDataSet != null && revealedUserNameDataSet.size() > 0)
+                                            if (revealedUserNameDataSet != null)
                                             {
-                                                // specify an adapter (see also next example)
-                                                mAdapter = new RecyclerViewAdapter(revealedUserNameDataSet);
-                                                mRecyclerView.setAdapter(mAdapter);
+                                                if(revealedUserNameDataSet.size() > 0)
+                                                {
+                                                    // specify an adapter (see also next example)
+                                                    mAdapter = new RecyclerViewAdapter(revealedUserNameDataSet);
+                                                    mRecyclerView.setAdapter(mAdapter);
+                                                }
+                                                else
+                                                {
+                                                    emptyUserNameDataSetMessage = new ArrayList<>();
+                                                    emptyUserNameDataSetMessage.add("No revealed users have checked in yet!");
+                                                    mAdapter = new RecyclerViewAdapter(emptyUserNameDataSetMessage);
+                                                    mRecyclerView.setAdapter(mAdapter);
+                                                }
                                             }
 
                                             revealedUserPopupWindow.showAtLocation(mDrawerLayout, Gravity.CENTER,0,0);
@@ -419,6 +460,7 @@ public class HomeScreenActivity extends FragmentActivity implements OnMapReadyCa
                                                 public void onComplete(@NonNull Task<QuerySnapshot> task)
                                                 {
                                                     revealedUserNameDataSet = new ArrayList<>();
+                                                    reviewsDataSet = new ArrayList<>();
 
                                                     for (DocumentSnapshot document : task.getResult())
                                                     {
@@ -436,6 +478,8 @@ public class HomeScreenActivity extends FragmentActivity implements OnMapReadyCa
                                                                             {
                                                                                 revealedUserNameDataSet.add((String)document.get("UserName"));
                                                                             }
+
+                                                                            reviewsDataSet.add((String)document.get("Review"));
 
                                                                             if ((boolean)document.get("IsLocal"))
                                                                             {
@@ -613,8 +657,12 @@ public class HomeScreenActivity extends FragmentActivity implements OnMapReadyCa
                     }
                 });
 
+                // Allow user to enter comments
+                commentAndVotesPopup.setFocusable(true);
+
                 // Finally, show the popup window at the center location of root relative layout
                 commentAndVotesPopup.showAtLocation(mDrawerLayout, Gravity.CENTER,0,0);
+
                 ///////////////////////////////////////////////////////
 
                 String toastMsg = String.format("Place: %s", place.getName());

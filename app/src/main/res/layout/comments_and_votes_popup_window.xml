@@ -159,7 +159,6 @@
             android:gravity="top"
             android:singleLine="false"
             android:textSize="@dimen/descTextSize"
-            android:text="Comment sample Lorem Ipsum mortem."
             app:layout_constraintTop_toBottomOf="@id/commentTittleTextView"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
