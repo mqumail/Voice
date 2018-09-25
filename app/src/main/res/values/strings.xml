@@ -41,5 +41,8 @@
     <string name="check_in_down_vote">Down-voted</string>
     <string name="title_comments_list_popoup">Reviews</string>
     <string name="close_button">Close</string>
+    <string name="review_place_details">Reviews</string>
+    <string name="toursit_visitors_place_details">Tourist Visitors</string>
+    <string name="local_visitors_place_details">Local Visitors</string>
 
 </resources>

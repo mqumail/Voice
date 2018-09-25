@@ -4,12 +4,15 @@ import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.location.Address;
 import android.location.Geocoder;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
@@ -334,7 +337,13 @@ public class HomeScreenActivity extends FragmentActivity implements OnMapReadyCa
                                     placeDetailPopupWindow = new PopupWindow(
                                             customViewPlaceDetail,
                                             ViewGroup.LayoutParams.MATCH_PARENT,
-                                            ViewGroup.LayoutParams.MATCH_PARENT);
+                                            ViewGroup.LayoutParams.WRAP_CONTENT);
+                                    View parent = findViewById(android.R.id.content);
+                                    placeDetailPopupWindow.showAtLocation(parent, Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL, 0, 0);
+                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                                        placeDetailPopupWindow.setBackgroundDrawable(new ColorDrawable(Color.WHITE));
+                                        placeDetailPopupWindow.setElevation(20);
+                                    }
 
                                     reviewsPopupWindow = new PopupWindow(
                                             customViewCommentList,
