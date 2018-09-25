@@ -307,6 +307,14 @@ public class HomeScreenActivity extends FragmentActivity implements OnMapReadyCa
                                 @Override
                                 public boolean onMarkerClick(Marker marker)
                                 {
+                                    if(placeDetailPopupWindow != null)
+                                    {
+                                        if (placeDetailPopupWindow.isShowing())
+                                        {
+                                            placeDetailPopupWindow.dismiss();
+                                        }
+                                    }
+
                                     LayoutInflater inflater = (LayoutInflater) HomeScreenActivity.this.getSystemService(LAYOUT_INFLATER_SERVICE);
                                     final View customViewPlaceDetail = inflater.inflate(R.layout.place_details_popup_window, null);
                                     final View customViewRevealedUser = inflater.inflate(R.layout.place_reveal_list_popup_window, null);
