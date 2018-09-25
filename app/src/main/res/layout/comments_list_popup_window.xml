@@ -53,9 +53,8 @@
                 android:paddingTop="16dp"
                 android:paddingEnd="16dp"
                 android:paddingStart="16dp"
-                android:textAppearance="@style/TextAppearance.AppCompat.Headline"
                 android:textColor="@color/colorPrimaryText"
-                android:textSize="20sp" />
+                android:textSize="@dimen/titleTextSize" />
 
             <TextView
                 android:id="@+id/title_comments_list"
@@ -69,13 +68,13 @@
                 android:text="@string/title_comments_list_popoup"
                 android:maxLines="1"
                 android:textColor="@color/colorDescText"
-                android:textSize="16sp" />
+                android:textSize="@dimen/bodyTextSize" />
         </LinearLayout>
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/users_comments_list"
             android:layout_width="match_parent"
-            android:layout_height="180dp"
+            android:layout_height="200dp"
             android:layout_marginTop="4dp"
             android:paddingTop="16dp"
             android:paddingStart="16dp"

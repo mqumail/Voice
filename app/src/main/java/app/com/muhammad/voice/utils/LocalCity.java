@@ -4,6 +4,9 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
 public class LocalCity extends SharedPreferencesManagement{
 
     public LocalCity(String uid, Context context){
@@ -29,8 +32,12 @@ public class LocalCity extends SharedPreferencesManagement{
     public String[] getCities(){
         preferences =  PreferenceManager.getDefaultSharedPreferences(context);
         String[] citiesArray;
+        //ArrayList<String> citiesArray;
         try{
             citiesArray = preferences.getString(key, "empty" ).split("/");
+            //citiesString = preferences.getString(key, "empty" );
+            //citiesArray = new ArrayList<>(Arrays.asList(citiesString.split("/")));
+
         }catch(Exception e){
             e.printStackTrace();
             citiesArray = new String[1];

@@ -671,7 +671,10 @@ public class HomeScreenActivity extends FragmentActivity implements OnMapReadyCa
                 if(Build.VERSION.SDK_INT>=21){
                     commentAndVotesPopup.setElevation(5.0f);
                 }
-
+                TextView checkinTitle = customView.findViewById(R.id.checkinTitle);
+                TextView checkinAddress = customView.findViewById(R.id.checkinAdress);
+                checkinTitle.setText(place.getName());
+                checkinAddress.setText(place.getAddress());
                 Button sendButton = customView.findViewById(R.id.commentSendButton);
                 sendButton.setOnClickListener(new View.OnClickListener()
                 {
