@@ -135,7 +135,8 @@ public class HomeScreenActivity extends FragmentActivity implements OnMapReadyCa
     private RecyclerView mRecyclerViewReviews;
     private RecyclerView.Adapter mAdapterReviews;
     private RecyclerView.LayoutManager mLayoutManagerReviews;
-    private List<String> revealedUserNameDataSet, reviewsDataSet;
+    private List<String> revealedUserNameDataSet;
+    private List<CheckinInfo> reviewsDataSet;
     private List<String> emptyUserNameDataSetMessage, emptyReviewsDataSetMessage;
 
     @Override
@@ -295,7 +296,7 @@ public class HomeScreenActivity extends FragmentActivity implements OnMapReadyCa
                                         localNumber, localUpvotes,
                                         touristNumber, touristUpvotes,
                                         commentsNumber, revealedUserName,
-                                        revealedUserAddress;
+                                        revealedUserAddress, placeReviewTitle;
 
                                 private Button placeDetailPopupWindowCloseButton,
                                         placeDetailPopupWindowRevealedUserButton,
@@ -308,7 +309,7 @@ public class HomeScreenActivity extends FragmentActivity implements OnMapReadyCa
                                         numberOfComments;
 
                                 @Override
-                                public boolean onMarkerClick(Marker marker)
+                                public boolean onMarkerClick(final Marker marker)
                                 {
                                     if(placeDetailPopupWindow != null)
                                     {
@@ -373,6 +374,10 @@ public class HomeScreenActivity extends FragmentActivity implements OnMapReadyCa
                                                 reviewsPopupWindow.setElevation(5.0f);
                                             }
 
+                                            // set the title
+                                            placeReviewTitle = customViewCommentList.findViewById(R.id.name_comments_list);
+                                            placeReviewTitle.setText(marker.getTitle());
+
                                             mRecyclerViewReviews = customViewCommentList.findViewById(R.id.users_comments_list);
 
                                             // use this setting to improve performance if you know that changes
@@ -388,7 +393,7 @@ public class HomeScreenActivity extends FragmentActivity implements OnMapReadyCa
                                                 if(reviewsDataSet.size() > 0)
                                                 {
                                                     // specify an adapter (see also next example)
-                                                    mAdapterReviews = new RecyclerViewAdapter(reviewsDataSet);
+                                                    mAdapterReviews = new RecyclerViewReviewsAdapter(reviewsDataSet);
                                                     mRecyclerViewReviews.setAdapter(mAdapterReviews);
                                                 }
                                                 else
@@ -489,6 +494,8 @@ public class HomeScreenActivity extends FragmentActivity implements OnMapReadyCa
                                                                     @Override
                                                                     public void onComplete(@NonNull Task<QuerySnapshot> task)
                                                                     {
+                                                                        CheckinInfo reviewData = new CheckinInfo();
+
                                                                         for (DocumentSnapshot document : task.getResult().getDocuments())
                                                                         {
                                                                             if ((boolean)document.get("IsIdentifiedCheckin"))
@@ -496,7 +503,22 @@ public class HomeScreenActivity extends FragmentActivity implements OnMapReadyCa
                                                                                 revealedUserNameDataSet.add((String)document.get("UserName"));
                                                                             }
 
-                                                                            reviewsDataSet.add((String)document.get("Review"));
+                                                                            if ((boolean)document.get("IsIdentifiedCheckin"))
+                                                                            {
+                                                                                reviewData.setReview((String)document.get("Review"));
+                                                                                reviewData.setUserName((String)document.get("UserName"));
+                                                                                reviewData.setCheckInTime(new Timestamp((Date) document.get("CheckInTime")));
+                                                                            }
+                                                                            else
+                                                                            {
+                                                                                reviewData.setReview((String)document.get("Review"));
+                                                                                reviewData.setUserName("Anonymous");
+                                                                                reviewData.setCheckInTime(new Timestamp((Date) document.get("CheckInTime")));
+                                                                            }
+
+
+
+                                                                            reviewsDataSet.add(reviewData);
 
                                                                             if ((boolean)document.get("IsLocal"))
                                                                             {
@@ -555,7 +577,7 @@ public class HomeScreenActivity extends FragmentActivity implements OnMapReadyCa
                                     revealedUserAddress = customViewRevealedUser.findViewById(R.id.revealedUserAddressTextView);
 
                                     revealedUserName.setText(marker.getTitle());
-                                    revealedUserAddress.setText(marker.getSnippet());
+                                    revealedUserAddress.setText(R.string.guest_book_title);
 
                                     //*************************************************** reviewsPopupWindow ***************************************************
                                     reviewsCloseButton = customViewCommentList.findViewById(R.id.close_button);
