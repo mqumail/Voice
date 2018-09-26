@@ -12,7 +12,6 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
@@ -66,6 +65,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
@@ -100,7 +100,6 @@ public class HomeScreenActivity extends FragmentActivity implements OnMapReadyCa
     private static final String TAG = "HomeScreenActivity";
     private PlaceInfo mPlace;
     private static final float DEFAULT_ZOOM = 15f;
-    private com.google.android.gms.maps.model.Marker mMarker;
 
     private GoogleMap mMap;
     protected GeoDataClient mGeoDataClient;
@@ -109,12 +108,12 @@ public class HomeScreenActivity extends FragmentActivity implements OnMapReadyCa
 
     private static final int finePermissionLocation = 101;
     FirebaseFirestore db;
+    CollectionReference placesCollectionReference;
 
     DrawerLayout mDrawerLayout;
 
     String textCoordinates = "";
 
-    private FirebaseAuth mAuth;
     private TextView email;
     private TextView userName;
 
@@ -145,9 +144,43 @@ public class HomeScreenActivity extends FragmentActivity implements OnMapReadyCa
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_screen);
 
+        init();
+
+        NavigationDrawerSetup();
+
+        GoogleAPIClientSetup();
+    }
+
+    private void init()
+    {
         mDrawerLayout = findViewById(R.id.drawer_layout);
         mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
 
+        db = FirebaseFirestore.getInstance();
+        placesCollectionReference = db.collection("placesCollection");
+
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+        mapFragment.getMapAsync(this);
+    }
+
+    private void GoogleAPIClientSetup()
+    {
+        // Construct a GeoDataClient
+        mGeoDataClient = Places.getGeoDataClient(this, null);
+
+        // Construct a PlaceDetectionClient.
+        mPlaceDetectionClient = Places.getPlaceDetectionClient(this, null);
+
+        mGoogleApiClient = new GoogleApiClient
+                .Builder(this)
+                .addApi(Places.GEO_DATA_API)
+                .addApi(Places.PLACE_DETECTION_API)
+                .enableAutoManage(this, this)
+                .build();
+    }
+
+    private void NavigationDrawerSetup()
+    {
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(
                 new NavigationView.OnNavigationItemSelectedListener() {
@@ -183,26 +216,6 @@ public class HomeScreenActivity extends FragmentActivity implements OnMapReadyCa
                         }
                     }
                 });
-
-        db = FirebaseFirestore.getInstance();
-        //placesCollectionReference = db.collection("placesCollection");
-
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
-
-        // Construct a GeoDataClient
-        mGeoDataClient = Places.getGeoDataClient(this, null);
-
-        // Construct a PlaceDetectionClient.
-        mPlaceDetectionClient = Places.getPlaceDetectionClient(this, null);
-
-        mGoogleApiClient = new GoogleApiClient
-                .Builder(this)
-                .addApi(Places.GEO_DATA_API)
-                .addApi(Places.PLACE_DETECTION_API)
-                .enableAutoManage(this, this)
-                .build();
-
     }
 
     @Override
@@ -210,299 +223,223 @@ public class HomeScreenActivity extends FragmentActivity implements OnMapReadyCa
     {
         mMap = googleMap;
 
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) ==
-                PackageManager.PERMISSION_GRANTED)
+        if (ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
         {
             mMap.setMyLocationEnabled(true);
 
             // code to load raw map without default markers
             mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this, R.raw.style_json));
 
-            // load the user check ins
-            db.collection("placesCollection")
-                    .addSnapshotListener(new EventListener<QuerySnapshot>()
+            LoadUserCheckIns();
+        }
+        else
+        {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+            {
+                requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, finePermissionLocation);
+            }
+        }
+    }
+
+    private void LoadUserCheckIns()
+    {
+        // load the user check ins
+        placesCollectionReference
+                .addSnapshotListener(new EventListener<QuerySnapshot>()
+                {
+                    @Override
+                    public void onEvent(@Nullable QuerySnapshot value,
+                                        @Nullable FirebaseFirestoreException e)
                     {
-                        @Override
-                        public void onEvent(@Nullable QuerySnapshot value,
-                                            @Nullable FirebaseFirestoreException e)
+                        if (e != null)
                         {
-                            if (e != null)
+                            Log.w(TAG, "Listen failed.", e);
+                            return;
+                        }
+
+                        List<PlaceInfo> userCheckIns = AddMarkersOnMap(value);
+
+                        mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener()
+                        {
+                            private TextView name, address,
+                                    localNumber, localUpvotes,
+                                    touristNumber, touristUpvotes,
+                                    commentsNumber, revealedUserName,
+                                    revealedUserAddress, placeReviewTitle;
+
+                            private Button placeDetailPopupWindowCloseButton,
+                                    placeDetailPopupWindowRevealedUserButton,
+                                    revealedUserPopupWindowCloseButton,
+                                    reviewsButton, reviewsCloseButton;
+
+
+                            private int numberOfLocalVisitors, numberOfTouristVisitors,
+                                    numberOfLocalHearts, numberOfTouristHearts,
+                                    numberOfComments;
+
+                            @Override
+                            public boolean onMarkerClick(final Marker marker)
                             {
-                                Log.w(TAG, "Listen failed.", e);
-                                return;
+                                if(placeDetailPopupWindow != null)
+                                {
+                                    if (placeDetailPopupWindow.isShowing())
+                                    {
+                                        placeDetailPopupWindow.dismiss();
+                                    }
+                                }
+
+                                LayoutInflater inflater = (LayoutInflater) HomeScreenActivity.this.getSystemService(LAYOUT_INFLATER_SERVICE);
+                                final View customViewPlaceDetail = inflater.inflate(R.layout.place_details_popup_window, null);
+                                final View customViewRevealedUser = inflater.inflate(R.layout.place_reveal_list_popup_window, null);
+                                final View customViewCommentList = inflater.inflate(R.layout.comments_list_popup_window, null);
+
+                                // Reset the variables on each click so accurate number is shown
+                                numberOfLocalVisitors = 0;
+                                numberOfTouristVisitors = 0;
+                                numberOfLocalHearts = 0;
+                                numberOfTouristHearts = 0;
+                                numberOfComments = 0;
+
+                                // Hide the default Info Window
+                                marker.hideInfoWindow();
+
+                                PlaceDetailsPopupWindow(customViewPlaceDetail, marker, customViewRevealedUser);
+
+                                GuestBookPopupWindow(marker, customViewRevealedUser);
+
+                                ReviewsPopupWindow(marker, customViewPlaceDetail, customViewCommentList);
+
+                                // Position camera near the marker
+                                mMap.animateCamera(CameraUpdateFactory.newLatLng(marker.getPosition()));
+
+                                // Return true so the default infoWindow is not shown
+                                return true;
                             }
 
-                            List<PlaceInfo> userCheckIns = new ArrayList<>();
-                            for (QueryDocumentSnapshot doc : value)
+                            private void PlaceDetailsPopupWindow(View customViewPlaceDetail, Marker marker, final View customViewRevealedUser)
                             {
-                                // Create a new placeInfo object for each check in user has made
-                                PlaceInfo userCheckIn = new PlaceInfo();
+                                placeDetailPopupWindow = new PopupWindow(
+                                        customViewPlaceDetail,
+                                        ViewGroup.LayoutParams.MATCH_PARENT,
+                                        ViewGroup.LayoutParams.WRAP_CONTENT);
 
-                                if (doc.get("name") != null)
-                                {
-                                    userCheckIn.setName(doc.getString("name"));
-                                }
-                                if (doc.get("address") != null)
-                                {
-                                    userCheckIn.setAddress(doc.getString("address"));
-                                }
-                                if (doc.get("id") != null)
-                                {
-                                    userCheckIn.setId(doc.getString("id"));
-                                }
-                                if (doc.get("phone") != null)
-                                {
-                                    userCheckIn.setPhoneNumber(doc.getString("phone"));
-                                }
-                                if (doc.get("website") != null)
-                                {
-                                    userCheckIn.setWebsiteUri(Uri.parse(doc.getString("website")));
+                                View parent = findViewById(android.R.id.content);
+
+                                placeDetailPopupWindow.showAtLocation(parent, Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL, 0, 0);
+
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                                    placeDetailPopupWindow.setBackgroundDrawable(new ColorDrawable(Color.WHITE));
+                                    placeDetailPopupWindow.setElevation(20);
                                 }
 
-                                userCheckIn.setLatlng(new LatLng(doc.getGeoPoint("LatLng").getLatitude(),
-                                        doc.getGeoPoint("LatLng").getLongitude()));
-
-                                try
+                                placeDetailPopupWindowCloseButton = customViewPlaceDetail.findViewById(R.id.closePopupButton);
+                                placeDetailPopupWindowCloseButton.setOnClickListener(new View.OnClickListener()
                                 {
-                                    userCheckIn.setRating(doc.getDouble("rating"));
-                                }
-                                catch (NullPointerException ex)
-                                {
-                                    Log.e(TAG, "Null exception");
-                                }
-
-                                // Add the individual check in to the collection
-                                userCheckIns.add(userCheckIn);
-                            }
-
-                            mMap.clear();
-
-                            // Add the markers, including the new ones on the map
-                            for (PlaceInfo checkIn: userCheckIns)
-                            {
-                                MarkerOptions markerOptions = new MarkerOptions();
-                                markerOptions.position(checkIn.getLatlng())
-                                        .title(checkIn.getName())
-                                        .snippet(checkIn.getAddress())
-                                        // use Voice Icon here. TODO: the current icons are too large. Ask Luis to make it smaller
-                                        .icon(BitmapDescriptorFactory.defaultMarker( BitmapDescriptorFactory.HUE_BLUE));
-
-                                mMap.addMarker(markerOptions);
-                            }
-
-                            mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener()
-                            {
-                                private TextView name, address,
-                                        localNumber, localUpvotes,
-                                        touristNumber, touristUpvotes,
-                                        commentsNumber, revealedUserName,
-                                        revealedUserAddress, placeReviewTitle;
-
-                                private Button placeDetailPopupWindowCloseButton,
-                                        placeDetailPopupWindowRevealedUserButton,
-                                        revealedUserPopupWindowCloseButton,
-                                        reviewsButton, reviewsCloseButton;
-
-
-                                private int numberOfLocalVisitors, numberOfTouristVisitors,
-                                        numberOfLocalHearts, numberOfTouristHearts,
-                                        numberOfComments;
-
-                                @Override
-                                public boolean onMarkerClick(final Marker marker)
-                                {
-                                    if(placeDetailPopupWindow != null)
+                                    @Override
+                                    public void onClick(View view)
                                     {
-                                        if (placeDetailPopupWindow.isShowing())
-                                        {
-                                            placeDetailPopupWindow.dismiss();
-                                        }
+                                        // Dismiss the popup window
+                                        placeDetailPopupWindow.dismiss();
                                     }
+                                });
 
-                                    LayoutInflater inflater = (LayoutInflater) HomeScreenActivity.this.getSystemService(LAYOUT_INFLATER_SERVICE);
-                                    final View customViewPlaceDetail = inflater.inflate(R.layout.place_details_popup_window, null);
-                                    final View customViewRevealedUser = inflater.inflate(R.layout.place_reveal_list_popup_window, null);
-                                    final View customViewCommentList = inflater.inflate(R.layout.comments_list_popup_window, null);
+                                placeDetailPopupWindowRevealedUserButton = customViewPlaceDetail.findViewById(R.id.revealedUsersButton);
+                                placeDetailPopupWindowRevealedUserButton.setOnClickListener(new View.OnClickListener()
+                                {
+                                    @Override
+                                    public void onClick(View view)
+                                    {
+                                        // Set an elevation value for popup window
+                                        // Call requires API level 21
+                                        if(Build.VERSION.SDK_INT>=21){
+                                            revealedUserPopupWindow.setElevation(5.0f);
+                                        }
 
-                                    //*************************************************** placeDetailPopupWindow ***************************************************
-                                    // Reset the variables on each click so accurate number is shown
-                                    numberOfLocalVisitors = 0;
-                                    numberOfTouristVisitors = 0;
-                                    numberOfLocalHearts = 0;
-                                    numberOfTouristHearts = 0;
-                                    numberOfComments = 0;
+                                        mRecyclerView = customViewRevealedUser.findViewById(R.id.users_revealed_list_recycler_view);
 
-                                    // Hide the default Info Window
-                                    marker.hideInfoWindow();
+                                        // use this setting to improve performance if you know that changes
+                                        // in content do not change the layout size of the RecyclerView
+                                        mRecyclerView.setHasFixedSize(true);
 
-                                    placeDetailPopupWindow = new PopupWindow(
-                                            customViewPlaceDetail,
-                                            ViewGroup.LayoutParams.MATCH_PARENT,
-                                            ViewGroup.LayoutParams.WRAP_CONTENT);
-                                    View parent = findViewById(android.R.id.content);
-                                    placeDetailPopupWindow.showAtLocation(parent, Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL, 0, 0);
-                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                                        placeDetailPopupWindow.setBackgroundDrawable(new ColorDrawable(Color.WHITE));
-                                        placeDetailPopupWindow.setElevation(20);
+                                        // use a linear layout manager
+                                        mLayoutManager = new LinearLayoutManager(HomeScreenActivity.this);
+                                        mRecyclerView.setLayoutManager(mLayoutManager);
+
+                                        if (revealedUserNameDataSet != null)
+                                        {
+                                            if(revealedUserNameDataSet.size() > 0)
+                                            {
+                                                // specify an adapter (see also next example)
+                                                mAdapter = new RecyclerViewAdapter(revealedUserNameDataSet);
+                                                mRecyclerView.setAdapter(mAdapter);
+                                            }
+                                            else
+                                            {
+                                                emptyUserNameDataSetMessage = new ArrayList<>();
+                                                emptyUserNameDataSetMessage.add("No revealed users have checked in yet!");
+                                                mAdapter = new RecyclerViewAdapter(emptyUserNameDataSetMessage);
+                                                mRecyclerView.setAdapter(mAdapter);
+                                            }
+                                        }
+
+                                        revealedUserPopupWindow.showAtLocation(mDrawerLayout, Gravity.CENTER,0,0);
                                     }
+                                });
 
-                                    reviewsPopupWindow = new PopupWindow(
-                                            customViewCommentList,
-                                            ViewGroup.LayoutParams.MATCH_PARENT,
-                                            ViewGroup.LayoutParams.MATCH_PARENT);
+                                // Set an elevation value for popup window
+                                // Call requires API level 21
+                                if(Build.VERSION.SDK_INT>=21){
+                                    placeDetailPopupWindow.setElevation(5.0f);
+                                }
 
-                                    placeDetailPopupWindowCloseButton = customViewPlaceDetail.findViewById(R.id.closePopupButton);
-                                    placeDetailPopupWindowCloseButton.setOnClickListener(new View.OnClickListener()
-                                    {
-                                        @Override
-                                        public void onClick(View view)
+                                // Connect to DB and get the information needed to display on the popup
+                                // Name and address of the place
+                                // # of local visitors + # of hearts, # of tourist visitors + hearts, # of comments
+                                name = customViewPlaceDetail.findViewById(R.id.namePlaceDetail);
+                                address = customViewPlaceDetail.findViewById(R.id.addressPlaceDetail);
+                                localNumber = customViewPlaceDetail.findViewById(R.id.localNumber);
+                                localUpvotes = customViewPlaceDetail.findViewById(R.id.localUpvotes);
+                                touristNumber = customViewPlaceDetail.findViewById(R.id.touristNumber);
+                                touristUpvotes = customViewPlaceDetail.findViewById(R.id.touristUpvotes);
+                                commentsNumber = customViewPlaceDetail.findViewById(R.id.commentNumber);
+
+                                name.setText(marker.getTitle());
+                                address.setText(marker.getSnippet());
+
+                                placesCollectionReference
+                                        .whereEqualTo("name", marker.getTitle())
+                                        .whereEqualTo("address", marker.getSnippet())
+                                        .get()
+                                        .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>()
                                         {
-                                            // Dismiss the popup window
-                                            placeDetailPopupWindow.dismiss();
-                                        }
-                                    });
-
-                                    reviewsButton = customViewPlaceDetail.findViewById(R.id.reviews_button);
-                                    reviewsButton.setOnClickListener(new View.OnClickListener()
-                                    {
-                                        @Override
-                                        public void onClick(View view)
-                                        {
-                                            // Set an elevation value for popup window
-                                            // Call requires API level 21
-                                            if(Build.VERSION.SDK_INT>=21){
-                                                reviewsPopupWindow.setElevation(5.0f);
-                                            }
-
-                                            // set the title
-                                            placeReviewTitle = customViewCommentList.findViewById(R.id.name_comments_list);
-                                            placeReviewTitle.setText(marker.getTitle());
-
-                                            mRecyclerViewReviews = customViewCommentList.findViewById(R.id.users_comments_list);
-
-                                            // use this setting to improve performance if you know that changes
-                                            // in content do not change the layout size of the RecyclerView
-                                            mRecyclerViewReviews.setHasFixedSize(true);
-
-                                            // use a linear layout manager
-                                            mLayoutManagerReviews = new LinearLayoutManager(HomeScreenActivity.this);
-                                            mRecyclerViewReviews.setLayoutManager(mLayoutManagerReviews);
-
-                                            if (reviewsDataSet != null)
+                                            @Override
+                                            public void onComplete(@NonNull Task<QuerySnapshot> task)
                                             {
-                                                if(reviewsDataSet.size() > 0)
+                                                revealedUserNameDataSet = new ArrayList<>();
+                                                reviewsDataSet = new ArrayList<>();
+
+                                                for (DocumentSnapshot document : task.getResult())
                                                 {
-                                                    // specify an adapter (see also next example)
-                                                    mAdapterReviews = new RecyclerViewReviewsAdapter(reviewsDataSet);
-                                                    mRecyclerViewReviews.setAdapter(mAdapterReviews);
-                                                }
-                                                else
-                                                {
-                                                    emptyReviewsDataSetMessage = new ArrayList<>();
-                                                    emptyReviewsDataSetMessage.add("No reviews yet!");
-                                                    mAdapterReviews = new RecyclerViewAdapter(emptyReviewsDataSetMessage);
-                                                    mRecyclerViewReviews.setAdapter(mAdapterReviews);
-                                                }
-                                            }
-
-                                            reviewsPopupWindow.showAtLocation(mDrawerLayout, Gravity.CENTER,0,0);
-                                        }
-                                    });
-
-                                    placeDetailPopupWindowRevealedUserButton = customViewPlaceDetail.findViewById(R.id.revealedUsersButton);
-                                    placeDetailPopupWindowRevealedUserButton.setOnClickListener(new View.OnClickListener()
-                                    {
-                                        @Override
-                                        public void onClick(View view)
-                                        {
-                                            // Set an elevation value for popup window
-                                            // Call requires API level 21
-                                            if(Build.VERSION.SDK_INT>=21){
-                                                revealedUserPopupWindow.setElevation(5.0f);
-                                            }
-
-                                            mRecyclerView = customViewRevealedUser.findViewById(R.id.users_revealed_list_recycler_view);
-
-                                            // use this setting to improve performance if you know that changes
-                                            // in content do not change the layout size of the RecyclerView
-                                            mRecyclerView.setHasFixedSize(true);
-
-                                            // use a linear layout manager
-                                            mLayoutManager = new LinearLayoutManager(HomeScreenActivity.this);
-                                            mRecyclerView.setLayoutManager(mLayoutManager);
-
-                                            if (revealedUserNameDataSet != null)
-                                            {
-                                                if(revealedUserNameDataSet.size() > 0)
-                                                {
-                                                    // specify an adapter (see also next example)
-                                                    mAdapter = new RecyclerViewAdapter(revealedUserNameDataSet);
-                                                    mRecyclerView.setAdapter(mAdapter);
-                                                }
-                                                else
-                                                {
-                                                    emptyUserNameDataSetMessage = new ArrayList<>();
-                                                    emptyUserNameDataSetMessage.add("No revealed users have checked in yet!");
-                                                    mAdapter = new RecyclerViewAdapter(emptyUserNameDataSetMessage);
-                                                    mRecyclerView.setAdapter(mAdapter);
-                                                }
-                                            }
-
-                                            revealedUserPopupWindow.showAtLocation(mDrawerLayout, Gravity.CENTER,0,0);
-                                        }
-                                    });
-
-                                    // Set an elevation value for popup window
-                                    // Call requires API level 21
-                                    if(Build.VERSION.SDK_INT>=21){
-                                        placeDetailPopupWindow.setElevation(5.0f);
-                                    }
-
-                                    // Connect to DB and get the information needed to display on the popup
-                                    // Name and address of the place
-                                    // # of local visitors + # of hearts, # of tourist visitors + hearts, # of comments
-                                    name = customViewPlaceDetail.findViewById(R.id.namePlaceDetail);
-                                    address = customViewPlaceDetail.findViewById(R.id.addressPlaceDetail);
-                                    localNumber = customViewPlaceDetail.findViewById(R.id.localNumber);
-                                    localUpvotes = customViewPlaceDetail.findViewById(R.id.localUpvotes);
-                                    touristNumber = customViewPlaceDetail.findViewById(R.id.touristNumber);
-                                    touristUpvotes = customViewPlaceDetail.findViewById(R.id.touristUpvotes);
-                                    commentsNumber = customViewPlaceDetail.findViewById(R.id.commentNumber);
-
-                                    name.setText(marker.getTitle());
-                                    address.setText(marker.getSnippet());
-
-                                    db.collection("placesCollection")
-                                            .whereEqualTo("name", marker.getTitle())
-                                            .whereEqualTo("address", marker.getSnippet())
-                                            .get()
-                                            .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>()
-                                            {
-                                                @Override
-                                                public void onComplete(@NonNull Task<QuerySnapshot> task)
-                                                {
-                                                    revealedUserNameDataSet = new ArrayList<>();
-                                                    reviewsDataSet = new ArrayList<>();
-
-                                                    for (DocumentSnapshot document : task.getResult())
-                                                    {
-                                                        document.getReference()
-                                                                .collection("CheckInsCollection")
-                                                                .get()
-                                                                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>()
+                                                    document.getReference()
+                                                            .collection("CheckInsCollection")
+                                                            .get()
+                                                            .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>()
+                                                            {
+                                                                @Override
+                                                                public void onComplete(@NonNull Task<QuerySnapshot> task)
                                                                 {
-                                                                    @Override
-                                                                    public void onComplete(@NonNull Task<QuerySnapshot> task)
+                                                                    for (DocumentSnapshot document : task.getResult().getDocuments())
                                                                     {
                                                                         CheckinInfo reviewData = new CheckinInfo();
 
-                                                                        for (DocumentSnapshot document : task.getResult().getDocuments())
+                                                                        if ((boolean)document.get("IsIdentifiedCheckin"))
                                                                         {
-                                                                            if ((boolean)document.get("IsIdentifiedCheckin"))
-                                                                            {
-                                                                                revealedUserNameDataSet.add((String)document.get("UserName"));
-                                                                            }
+                                                                            revealedUserNameDataSet.add((String)document.get("UserName"));
+                                                                        }
 
+                                                                        if (document.get("Review") != "")
+                                                                        {
                                                                             if ((boolean)document.get("IsIdentifiedCheckin"))
                                                                             {
                                                                                 reviewData.setReview((String)document.get("Review"));
@@ -516,100 +453,203 @@ public class HomeScreenActivity extends FragmentActivity implements OnMapReadyCa
                                                                                 reviewData.setCheckInTime(new Timestamp((Date) document.get("CheckInTime")));
                                                                             }
 
-
-
                                                                             reviewsDataSet.add(reviewData);
-
-                                                                            if ((boolean)document.get("IsLocal"))
-                                                                            {
-                                                                                numberOfLocalVisitors++;
-                                                                                if ((boolean)document.get("IsHearted"))
-                                                                                {
-                                                                                    numberOfLocalHearts++;
-                                                                                }
-                                                                            }
-                                                                            else
-                                                                            {
-                                                                                numberOfTouristVisitors++;
-                                                                                if ((boolean)document.get("IsHearted"))
-                                                                                {
-                                                                                    numberOfTouristHearts++;
-                                                                                }
-                                                                            }
-                                                                            if (document.get("Review") != null)
-                                                                            {
-                                                                                numberOfComments++;
-                                                                            }
                                                                         }
 
-                                                                        localNumber.setText(String.valueOf(numberOfLocalVisitors));
-                                                                        localUpvotes.setText(String.valueOf(numberOfLocalHearts));
-                                                                        touristNumber.setText(String.valueOf(numberOfTouristVisitors));
-                                                                        touristUpvotes.setText(String.valueOf(numberOfTouristHearts));
-                                                                        commentsNumber.setText(String.valueOf(numberOfComments));
-
-                                                                        placeDetailPopupWindow.showAtLocation(mDrawerLayout, Gravity.CENTER,0,0);
+                                                                        if ((boolean)document.get("IsLocal"))
+                                                                        {
+                                                                            numberOfLocalVisitors++;
+                                                                            if ((boolean)document.get("IsHearted"))
+                                                                            {
+                                                                                numberOfLocalHearts++;
+                                                                            }
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            numberOfTouristVisitors++;
+                                                                            if ((boolean)document.get("IsHearted"))
+                                                                            {
+                                                                                numberOfTouristHearts++;
+                                                                            }
+                                                                        }
+                                                                        if (document.get("Review") != null)
+                                                                        {
+                                                                            numberOfComments++;
+                                                                        }
                                                                     }
-                                                                });
-                                                    }
+
+                                                                    localNumber.setText(String.valueOf(numberOfLocalVisitors));
+                                                                    localUpvotes.setText(String.valueOf(numberOfLocalHearts));
+                                                                    touristNumber.setText(String.valueOf(numberOfTouristVisitors));
+                                                                    touristUpvotes.setText(String.valueOf(numberOfTouristHearts));
+                                                                    commentsNumber.setText(String.valueOf(numberOfComments));
+
+                                                                    placeDetailPopupWindow.showAtLocation(mDrawerLayout, Gravity.CENTER,0,0);
+                                                                }
+                                                            });
                                                 }
-                                            });
+                                            }
+                                        });
+                            }
 
-                                    //*************************************************** revealedUserPopupWindow ***************************************************
+                            private void ReviewsPopupWindow(final Marker marker, View customViewPlaceDetail, final View customViewCommentList)
+                            {
+                                reviewsPopupWindow = new PopupWindow(
+                                        customViewCommentList,
+                                        ViewGroup.LayoutParams.MATCH_PARENT,
+                                        ViewGroup.LayoutParams.MATCH_PARENT);
 
-                                    revealedUserPopupWindow = new PopupWindow(
-                                            customViewRevealedUser,
-                                            ViewGroup.LayoutParams.MATCH_PARENT,
-                                            ViewGroup.LayoutParams.MATCH_PARENT);
-
-                                    revealedUserPopupWindowCloseButton = customViewRevealedUser.findViewById(R.id.close_button);
-                                    revealedUserPopupWindowCloseButton.setOnClickListener(new View.OnClickListener()
+                                reviewsButton = customViewPlaceDetail.findViewById(R.id.reviews_button);
+                                reviewsButton.setOnClickListener(new View.OnClickListener()
+                                {
+                                    @Override
+                                    public void onClick(View view)
                                     {
-                                        @Override
-                                        public void onClick(View view)
-                                        {
-                                            // Dismiss the popup window
-                                            revealedUserPopupWindow.dismiss();
+                                        // Set an elevation value for popup window
+                                        // Call requires API level 21
+                                        if(Build.VERSION.SDK_INT>=21){
+                                            reviewsPopupWindow.setElevation(5.0f);
                                         }
-                                    });
 
-                                    revealedUserName = customViewRevealedUser.findViewById(R.id.revealedUserNameTextView);
-                                    revealedUserAddress = customViewRevealedUser.findViewById(R.id.revealedUserAddressTextView);
+                                        // set the title
+                                        placeReviewTitle = customViewCommentList.findViewById(R.id.name_comments_list);
+                                        placeReviewTitle.setText(marker.getTitle());
 
-                                    revealedUserName.setText(marker.getTitle());
-                                    revealedUserAddress.setText(R.string.guest_book_title);
+                                        mRecyclerViewReviews = customViewCommentList.findViewById(R.id.users_comments_list);
 
-                                    //*************************************************** reviewsPopupWindow ***************************************************
-                                    reviewsCloseButton = customViewCommentList.findViewById(R.id.close_button);
-                                    reviewsCloseButton.setOnClickListener(new View.OnClickListener()
+                                        // use this setting to improve performance if you know that changes
+                                        // in content do not change the layout size of the RecyclerView
+                                        mRecyclerViewReviews.setHasFixedSize(true);
+
+                                        // use a linear layout manager
+                                        mLayoutManagerReviews = new LinearLayoutManager(HomeScreenActivity.this);
+                                        mRecyclerViewReviews.setLayoutManager(mLayoutManagerReviews);
+
+                                        if (reviewsDataSet != null)
+                                        {
+                                            if(reviewsDataSet.size() > 0)
+                                            {
+                                                // specify an adapter (see also next example)
+                                                mAdapterReviews = new RecyclerViewReviewsAdapter(reviewsDataSet);
+                                                mRecyclerViewReviews.setAdapter(mAdapterReviews);
+                                            }
+                                            else
+                                            {
+                                                emptyReviewsDataSetMessage = new ArrayList<>();
+                                                emptyReviewsDataSetMessage.add("No reviews yet!");
+                                                mAdapterReviews = new RecyclerViewAdapter(emptyReviewsDataSetMessage);
+                                                mRecyclerViewReviews.setAdapter(mAdapterReviews);
+                                            }
+                                        }
+
+                                        reviewsPopupWindow.showAtLocation(mDrawerLayout, Gravity.CENTER,0,0);
+                                    }
+                                });
+
+                                reviewsCloseButton = customViewCommentList.findViewById(R.id.close_button);
+                                reviewsCloseButton.setOnClickListener(new View.OnClickListener()
+                                {
+                                    @Override
+                                    public void onClick(View view)
                                     {
-                                        @Override
-                                        public void onClick(View view)
-                                        {
-                                            // Dismiss the popup window
-                                            reviewsPopupWindow.dismiss();
-                                        }
-                                    });
+                                        // Dismiss the popup window
+                                        reviewsPopupWindow.dismiss();
+                                    }
+                                });
+                            }
 
-                                    // Position camera near the marker
-                                    mMap.animateCamera(CameraUpdateFactory.newLatLng(marker.getPosition()));
+                            private void GuestBookPopupWindow(Marker marker, View customViewRevealedUser)
+                            {
+                                revealedUserPopupWindow = new PopupWindow(
+                                        customViewRevealedUser,
+                                        ViewGroup.LayoutParams.MATCH_PARENT,
+                                        ViewGroup.LayoutParams.MATCH_PARENT);
 
-                                    // Return true so the default infoWindow is not shown
-                                    return true;
-                                }
-                            });
+                                revealedUserPopupWindowCloseButton = customViewRevealedUser.findViewById(R.id.close_button);
+                                revealedUserPopupWindowCloseButton.setOnClickListener(new View.OnClickListener()
+                                {
+                                    @Override
+                                    public void onClick(View view)
+                                    {
+                                        // Dismiss the popup window
+                                        revealedUserPopupWindow.dismiss();
+                                    }
+                                });
 
-                            Log.d(TAG, "Current check ins: " + userCheckIns);
-                        }
-                    });
-        }
-        else
+                                revealedUserName = customViewRevealedUser.findViewById(R.id.revealedUserNameTextView);
+                                revealedUserAddress = customViewRevealedUser.findViewById(R.id.revealedUserAddressTextView);
+
+                                revealedUserName.setText(marker.getTitle());
+                                revealedUserAddress.setText(R.string.guest_book_title);
+                            }
+                        });
+
+                        Log.d(TAG, "Current check ins: " + userCheckIns);
+                    }
+                });
+    }
+
+    @NonNull
+    private List<PlaceInfo> AddMarkersOnMap(@Nullable QuerySnapshot value)
+    {
+        List<PlaceInfo> userCheckIns = new ArrayList<>();
+        for (QueryDocumentSnapshot doc : value)
         {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+            // Create a new placeInfo object for each check in user has made
+            PlaceInfo userCheckIn = new PlaceInfo();
+
+            if (doc.get("name") != null)
             {
-                requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, finePermissionLocation);
+                userCheckIn.setName(doc.getString("name"));
             }
+            if (doc.get("address") != null)
+            {
+                userCheckIn.setAddress(doc.getString("address"));
+            }
+            if (doc.get("id") != null)
+            {
+                userCheckIn.setId(doc.getString("id"));
+            }
+            if (doc.get("phone") != null)
+            {
+                userCheckIn.setPhoneNumber(doc.getString("phone"));
+            }
+            if (doc.get("website") != null)
+            {
+                userCheckIn.setWebsiteUri(Uri.parse(doc.getString("website")));
+            }
+
+            userCheckIn.setLatlng(new LatLng(doc.getGeoPoint("LatLng").getLatitude(),
+                    doc.getGeoPoint("LatLng").getLongitude()));
+
+            try
+            {
+                userCheckIn.setRating(doc.getDouble("rating"));
+            }
+            catch (NullPointerException ex)
+            {
+                Log.e(TAG, "Null exception");
+            }
+
+            // Add the individual check in to the collection
+            userCheckIns.add(userCheckIn);
         }
+
+        mMap.clear();
+
+        // Add the markers, including the new ones on the map
+        for (PlaceInfo checkIn: userCheckIns)
+        {
+            MarkerOptions markerOptions = new MarkerOptions();
+            markerOptions.position(checkIn.getLatlng())
+                    .title(checkIn.getName())
+                    .snippet(checkIn.getAddress())
+                    // use Voice Icon here. TODO: the current icons are too large. Ask Luis to make it smaller
+                    .icon(BitmapDescriptorFactory.defaultMarker( BitmapDescriptorFactory.HUE_BLUE));
+
+            mMap.addMarker(markerOptions);
+        }
+        return userCheckIns;
     }
 
     @Override
@@ -671,6 +711,7 @@ public class HomeScreenActivity extends FragmentActivity implements OnMapReadyCa
                 if(Build.VERSION.SDK_INT>=21){
                     commentAndVotesPopup.setElevation(5.0f);
                 }
+
                 TextView checkinTitle = customView.findViewById(R.id.checkinTitle);
                 TextView checkinAddress = customView.findViewById(R.id.checkinAdress);
                 checkinTitle.setText(place.getName());
@@ -704,8 +745,6 @@ public class HomeScreenActivity extends FragmentActivity implements OnMapReadyCa
 
                 // Finally, show the popup window at the center location of root relative layout
                 commentAndVotesPopup.showAtLocation(mDrawerLayout, Gravity.CENTER,0,0);
-
-                ///////////////////////////////////////////////////////
 
                 String toastMsg = String.format("Place: %s", place.getName());
                 Toast.makeText(this, toastMsg, Toast.LENGTH_LONG).show();
@@ -876,7 +915,7 @@ public class HomeScreenActivity extends FragmentActivity implements OnMapReadyCa
 
     private void PlaceExistsInDB(final MyCallBack myCallBack, String id, CharSequence name)
     {
-        db.collection("placesCollection")
+        placesCollectionReference
                 .whereEqualTo("id", id)
                 .whereEqualTo("name", name)
                 .get()
@@ -913,7 +952,7 @@ public class HomeScreenActivity extends FragmentActivity implements OnMapReadyCa
 
     private void UpdatePlaceInfo(String id, CharSequence name)
     {
-        db.collection("placesCollection")
+        placesCollectionReference
                 .whereEqualTo("id", id)
                 .whereEqualTo("name", name)
                 .get()
@@ -1055,14 +1094,14 @@ public class HomeScreenActivity extends FragmentActivity implements OnMapReadyCa
         }
 
         // Add a new document with a generated ID
-        db.collection("placesCollection")
+        placesCollectionReference
             .add(placeCollection)
             .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                 @Override
                 public void onSuccess(DocumentReference documentReference) {
                     Log.d(TAG, "DocumentSnapshot added with ID: " + documentReference.getId());
 
-                    db.collection("placesCollection")
+                    placesCollectionReference
                             .document(documentReference.getId())
                             .collection("CheckInsCollection")
                             .add(checkInsCollection).addOnSuccessListener(new OnSuccessListener<DocumentReference>()
@@ -1110,21 +1149,6 @@ public class HomeScreenActivity extends FragmentActivity implements OnMapReadyCa
             mMap.addMarker(new MarkerOptions()
                     .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_img_marker_man))
                     .position(latLng));
-        }
-
-        hideSoftKeyboard();
-    }
-
-    private void moveCamera(LatLng latLng, float zoom, String title){
-        Log.d(TAG, "moveCamera: moving the camera to: lat: " + latLng.latitude + ", lng: " + latLng.longitude );
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom));
-
-        if(!title.equals("My Location")){
-            MarkerOptions options = new MarkerOptions()
-                    .position(latLng)
-                    .title(title)
-                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_img_marker_man));
-            mMap.addMarker(options);
         }
 
         hideSoftKeyboard();
