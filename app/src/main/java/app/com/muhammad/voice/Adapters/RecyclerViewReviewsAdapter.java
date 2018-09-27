@@ -1,4 +1,4 @@
-package app.com.muhammad.voice;
+package app.com.muhammad.voice.Adapters;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -12,6 +12,7 @@ import java.util.Date;
 import java.util.List;
 
 import app.com.muhammad.voice.DTO.CheckinInfo;
+import app.com.muhammad.voice.R;
 
 public class RecyclerViewReviewsAdapter extends
         RecyclerView.Adapter<RecyclerViewReviewsAdapter.RecyclerViewHolder>

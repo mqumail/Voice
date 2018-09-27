@@ -1,4 +1,4 @@
-package app.com.muhammad.voice;
+package app.com.muhammad.voice.Adapters;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -6,6 +6,8 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.google.android.gms.maps.GoogleMap;
+
+import app.com.muhammad.voice.R;
 
 public class CustomInfoWindowAdapter implements GoogleMap.InfoWindowAdapter
 {

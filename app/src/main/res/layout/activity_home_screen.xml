@@ -34,7 +34,6 @@
             android:layout_height="60dp"
             android:layout_marginBottom="24dp"
             android:layout_marginEnd="24dp"
-            android:onClick="checkIn"
             android:text="@string/check_in_button"
             android:foregroundGravity="center"
             android:foreground="@drawable/ic_add_place"
