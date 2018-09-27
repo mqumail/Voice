@@ -175,6 +175,7 @@ public class HomeScreenActivity extends FragmentActivity implements OnMapReadyCa
                             case R.id.log_out:
                                 AuthUI.getInstance().signOut(getApplicationContext());
                                 startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                                user = null;
                                 HomeScreenActivity.this.finish();
                             return true;
 

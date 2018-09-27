@@ -27,12 +27,14 @@ import com.google.firebase.auth.FirebaseUser;
 import java.util.ArrayList;
 
 import app.com.muhammad.voice.utils.LocalCity;
+import app.com.muhammad.voice.utils.SettingsUtils;
 import app.com.muhammad.voice.utils.UserInformation;
 
 public class ProfileSettingsActivity extends AppCompatActivity  {
 
     protected GeoDataClient mGeoDataClient;
     protected PlaceDetectionClient mPlaceDetectionClient;
+    private SettingsUtils settingsUtils = new SettingsUtils();
     private EditText tUserName;
     private ListView mListView;
     private ArrayList<String> aCityList;
@@ -60,8 +62,8 @@ public class ProfileSettingsActivity extends AppCompatActivity  {
         arrayAdapter = new ArrayAdapter<>(ProfileSettingsActivity.this, android.R.layout.simple_list_item_1, aCityListView);
         mListView.setAdapter(arrayAdapter);
 
-        loadUserName();
-        loadCities();
+        settingsUtils.loadUserName(user, userInformation, tUserName);
+        settingsUtils.loadCities(localCities, aCityList, aCityListView, arrayAdapter, this);
 
         // Construct a GeoDataClient.
         mGeoDataClient = Places.getGeoDataClient(this, null);
@@ -78,11 +80,7 @@ public class ProfileSettingsActivity extends AppCompatActivity  {
             @Override
             public void onPlaceSelected(Place place) {
                 Log.i(TAG, "Place: " + place.getName());
-                String allCityInfo = place.getId() + "-" + place.getName() + "-" + place.getAddress();
-                aCityList.add(allCityInfo);
-                aCityListView.add((String)place.getAddress());
-                arrayAdapter.notifyDataSetChanged();
-                Toast.makeText(ProfileSettingsActivity.this,  place.getName() + " added to you settings", Toast.LENGTH_SHORT).show();
+                settingsUtils.addCitytoList(aCityListView, aCityList, arrayAdapter, place, ProfileSettingsActivity.this);
             }
             @Override
             public void onError(Status status) {
@@ -108,80 +106,10 @@ public class ProfileSettingsActivity extends AppCompatActivity  {
 
     public void continueHome(View view)
     {
-        saveCities();
-        saveUserInfo();
+        settingsUtils.saveCities(aCityList, localCities, this);
+        settingsUtils.saveUserInfo(tUserName, mUID, user, userInformation);
         Intent intent = new Intent(this, HomeScreenActivity.class);
         this.startActivity(intent);
         finish();
-    }
-
-    public void skipHome(View view)
-    {
-        localCities.clearSharedPreferences();
-        userInformation.clearSharedPreferences();
-        Intent intent = new Intent(this, HomeScreenActivity.class);
-        this.startActivity(intent);
-        finish();
-    }
-
-    private void loadUserName(){
-        if(user != null)
-        {
-            String mName = user.getDisplayName();
-
-            if(userInformation.getUserName() == "NA" || userInformation.getUserName() == "") {
-                if (mName == ""){
-                    tUserName.setText("Anonymous");
-                }else{
-                    tUserName.setText(mName);
-                }
-            } else {
-                tUserName.setText(userInformation.getUserName());
-            }
-        }
-    }
-
-    private void saveUserInfo(){
-        String userInfo;
-        if(tUserName.getText().length() > 2){
-            userInfo = mUID + "/" + tUserName.getText() + "/" + user.getEmail();
-        }else userInfo = mUID + "/" + "Anonymous" + "/" + user.getEmail();
-        userInformation.setUserInformation(userInfo);
-    }
-
-    private void saveCities(){
-        String citiesInfo = "";
-        if (aCityList.size() > 0){
-            if (aCityList.get(0) != "" || aCityList.get(0) != "empty"){
-                for (String aCitiesArray : aCityList) {
-                    citiesInfo = aCitiesArray + "/" + citiesInfo;
-                }
-                localCities.setCities(citiesInfo);
-            }
-            Toast.makeText(this, "Settings Saved", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    private void loadCities(){
-        try{
-            String[] citiesAddressArray = localCities.getCitiesAddress();
-            String[] citiesArray = localCities.getCities();
-            if (citiesArray[0] != "empty") {
-                int i = 0;
-                for (String aCitiesArray : citiesArray) {
-                    aCityList.add(0, aCitiesArray);
-                    aCityListView.add(0, citiesAddressArray[i]);
-                    arrayAdapter.notifyDataSetChanged();
-                    i++;
-                }
-                Toast.makeText(this, "Local Cities Loaded", Toast.LENGTH_SHORT).show();
-            }
-        }catch(Exception e) {
-            System.err.println("Error while retrieving cities from Shared Preferences");
-            e.printStackTrace();
-            localCities.clearSharedPreferences();
-            Toast.makeText(this, "Error Loading Cities", Toast.LENGTH_SHORT).show();
-        }
-
     }
 }

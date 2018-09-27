@@ -29,84 +29,76 @@ public class LocalCity extends SharedPreferencesManagement{
     }
 
     //Gets all local cities information in an Array format
-    public String[] getCities(){
+    public ArrayList<String> getCities(){
         preferences =  PreferenceManager.getDefaultSharedPreferences(context);
-        String[] citiesArray;
-        //ArrayList<String> citiesArray;
+        String citiesString;
+        ArrayList<String> citiesArray = new ArrayList<>();
         try{
-            citiesArray = preferences.getString(key, "empty" ).split("/");
-            //citiesString = preferences.getString(key, "empty" );
-            //citiesArray = new ArrayList<>(Arrays.asList(citiesString.split("/")));
+            //citiesArray = preferences.getString(key, "empty" ).split("/");
+            citiesString = preferences.getString(key, "empty" );
+            citiesArray = new ArrayList<>(Arrays.asList(citiesString.split("/")));
 
         }catch(Exception e){
             e.printStackTrace();
-            citiesArray = new String[1];
-            citiesArray[0] = "Error";
+            citiesArray.add("Error");
         }
         return citiesArray;
     }
 
     //Gets all local cities IDs in a Array format
-    public String[] getCitiesID(){
-        String[] citiesArray = getCities();
-        String[] filterArray;
-        String[] idArray = new String[citiesArray.length];
-        int i = 0;
+    public ArrayList<String> getCitiesID(){
+        ArrayList<String> citiesArray = getCities();
+        ArrayList<String> filterArray;
+        ArrayList<String> idArray = new ArrayList<>(citiesArray.size());
 
         try{
             for (String aCitiesArray : citiesArray) {
-                filterArray = aCitiesArray.split("-");
-                idArray[i] = filterArray[0];
-                i++;
+                filterArray = new ArrayList<>(Arrays.asList(aCitiesArray.split("-")));
+                idArray.add(filterArray.get(0));
             }
         } catch(Exception e) {
             e.printStackTrace();
-            idArray = new String[1];
-            idArray[0] = "Error";
+            idArray.add("Error");
         }
 
         return idArray;
     }
 
     //Gets all local cities Names in a Array format
-    public String[] getCitiesName(){
-        String[] citiesArray = getCities();
-        String[] filterArray;
-        String[] namesArray = new String[citiesArray.length];
-        int i = 0;
+    public ArrayList<String> getCitiesName(){
+        ArrayList<String> citiesArray = getCities();
+        ArrayList<String> filterArray;
+        ArrayList<String> namesArray = new ArrayList<>(citiesArray.size());
 
         try{
             for (String aCitiesArray : citiesArray) {
-                filterArray = aCitiesArray.split("-");
-                namesArray[i] = filterArray[1];
-                i++;
+                filterArray = new ArrayList<>(Arrays.asList(aCitiesArray.split("-")));
+                namesArray.add(filterArray.get(1));
             }
         } catch(Exception e) {
             e.printStackTrace();
-            namesArray = new String[1];
-            namesArray[0] = "Error";
+            namesArray.add("Error");
         }
 
         return namesArray;
     }
 
     //Gets all local cities Address in a Array format
-    public String[] getCitiesAddress(){
-        String[] citiesArray = getCities();
-        String[] filterArray;
-        String[] addressArray = new String[citiesArray.length];
+    public ArrayList<String> getCitiesAddress(){
+        ArrayList<String> citiesArray = getCities();
+        ArrayList<String> filterArray;
+        ArrayList<String> addressArray = new ArrayList<>(citiesArray.size());
         int i = 0;
 
         try{
             for (String aCitiesArray : citiesArray) {
-                filterArray = aCitiesArray.split("-");
-                addressArray[i] = filterArray[2];
+                filterArray = new ArrayList<>(Arrays.asList(aCitiesArray.split("-")));
+                addressArray.add(filterArray.get(2));
                 i++;
             }
         } catch(Exception e) {
             e.printStackTrace();
-            addressArray = new String[1];
-            addressArray[0] = "Error";
+            addressArray.add("Error");
         }
 
         return addressArray;
