@@ -236,9 +236,7 @@ public class HomeScreenActivity extends FragmentActivity implements OnMapReadyCa
 
     public void profile(View view)
     {
-        // TODO: Find a better way (or location) to place the get user code since this is expensive. Everytime this method executes, the db is called
         // Get current user info before drawer is opened
-
         email = findViewById(R.id.navigationHeaderTextView);
         userName = findViewById(R.id.navigationHeaderTextUSerName);
         assignProfileView();
@@ -246,8 +244,8 @@ public class HomeScreenActivity extends FragmentActivity implements OnMapReadyCa
         mDrawerLayout.openDrawer(Gravity.START);
     }
 
-    private void assignProfileView(){
-        // TODO: Refactor this code to a utility class as its needed multiple places.
+    private void assignProfileView()
+    {
         String mUserInfo = userInformation.loadSPInfo();
         if(mUserInfo == "empty"){
             email.setText("Mail not available");
