@@ -58,8 +58,8 @@ public class RecyclerViewReviewsAdapter extends
     @Override
     public void onBindViewHolder(RecyclerViewHolder holder, int position)
     {
-        Date date = new Date();
         CheckinInfo checkinInfo = mDataset.get(position);
+        Date date = checkinInfo.getCheckInTime().toDate();
         SimpleDateFormat dateFormatter = new SimpleDateFormat("dd MMM, yyyy");
         try {
             date = dateFormatter.parse(String.valueOf(checkinInfo.getCheckInTime()));

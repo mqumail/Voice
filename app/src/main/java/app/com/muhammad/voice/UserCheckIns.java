@@ -359,8 +359,13 @@ class UserCheckIns
                             CheckInsCollection.put("IsLocal", mPlace.getCheckinInfo().isLocal());
                             CheckInsCollection.put("IsHearted", mPlace.getCheckinInfo().isHearted());
                             CheckInsCollection.put("IsIdentifiedCheckin", mPlace.getCheckinInfo().isIdentifiedCheckIn());
-                            CheckInsCollection.put("Review", mPlace.getCheckinInfo().getReview());
                             CheckInsCollection.put("CheckInTime", mPlace.getCheckinInfo().getCheckInTime());
+
+                            if (!mPlace.getCheckinInfo().getReview().equals(""))
+                            {
+                                CheckInsCollection.put("Review", mPlace.getCheckinInfo().getReview());
+                            }
+
 
                             if (mPlace.getCheckinInfo().isIdentifiedCheckIn())
                             {
@@ -442,9 +447,12 @@ class UserCheckIns
         checkInsCollection.put("IsLocal", mPlace.getCheckinInfo().isLocal());
         checkInsCollection.put("IsHearted", mPlace.getCheckinInfo().isHearted());
         checkInsCollection.put("IsIdentifiedCheckin", mPlace.getCheckinInfo().isIdentifiedCheckIn());
-        checkInsCollection.put("Review", mPlace.getCheckinInfo().getReview());
         checkInsCollection.put("CheckInTime", mPlace.getCheckinInfo().getCheckInTime());
 
+        if (!mPlace.getCheckinInfo().getReview().equals(""))
+        {
+            checkInsCollection.put("Review", mPlace.getCheckinInfo().getReview());
+        }
 
         if (mPlace.getCheckinInfo().isIdentifiedCheckIn())
         {

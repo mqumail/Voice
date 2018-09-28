@@ -259,15 +259,15 @@ class DisplayUserCheckIns
                                                                 {
                                                                     for (DocumentSnapshot document : task.getResult().getDocuments())
                                                                     {
-                                                                        CheckinInfo reviewData = new CheckinInfo();
-
-                                                                        if ((boolean)document.get("IsIdentifiedCheckin"))
+                                                                        if (document.contains("Review") && !document.get("Review").equals(""))
                                                                         {
-                                                                            revealedUserNameDataSet.add((String)document.get("UserName"));
-                                                                        }
+                                                                            CheckinInfo reviewData = new CheckinInfo();
 
-                                                                        if (document.get("Review") != "")
-                                                                        {
+                                                                            if ((boolean)document.get("IsIdentifiedCheckin"))
+                                                                            {
+                                                                                revealedUserNameDataSet.add((String)document.get("UserName"));
+                                                                            }
+
                                                                             if ((boolean)document.get("IsIdentifiedCheckin"))
                                                                             {
                                                                                 reviewData.setReview((String)document.get("Review"));
@@ -283,6 +283,11 @@ class DisplayUserCheckIns
 
                                                                             reviewsDataSet.add(reviewData);
                                                                         }
+
+
+
+
+
 
                                                                         if ((boolean)document.get("IsLocal"))
                                                                         {
