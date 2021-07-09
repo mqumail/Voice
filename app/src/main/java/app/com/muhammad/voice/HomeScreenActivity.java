@@ -7,12 +7,14 @@ import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.design.widget.NavigationView;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.FragmentActivity;
+import androidx.annotation.NonNull;
 
-import android.support.v4.widget.DrawerLayout;
+import com.google.android.libraries.places.api.model.Place;
+import com.google.android.material.navigation.NavigationView;
+import androidx.core.app.ActivityCompat;
+import androidx.fragment.app.FragmentActivity;
+
+import androidx.drawerlayout.widget.DrawerLayout;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.MenuItem;
@@ -23,21 +25,23 @@ import android.widget.Toast;
 
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
-import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.places.GeoDataClient;
-import com.google.android.gms.location.places.PlaceDetectionClient;
-import com.google.android.gms.location.places.Places;
-import com.google.android.gms.location.places.ui.PlacePicker;
+//import com.google.android.gms.location.places.GeoDataClient;
+//import com.google.android.gms.location.places.PlaceDetectionClient;
+//import com.google.android.gms.location.places.Places;
+//import com.google.android.gms.location.places.ui.PlacePicker;
+import com.google.android.libraries.places.api.Places;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.MapStyleOptions;
+import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.rtchagas.pingplacepicker.PingPlacePicker;
+import com.sucho.placepicker.PlacePicker;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -53,8 +57,9 @@ public class HomeScreenActivity extends FragmentActivity implements OnMapReadyCa
     private static final int finePermissionLocation = 101;
 
     private GoogleMap mMap;
-    protected GeoDataClient mGeoDataClient;
-    protected PlaceDetectionClient mPlaceDetectionClient;
+    //protected GeoDataClient mGeoDataClient;
+    //protected PlaceDetectionClient mPlaceDetectionClient;
+    protected Places mPlaces;
     protected GoogleApiClient mGoogleApiClient;
 
     private FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
@@ -86,8 +91,12 @@ public class HomeScreenActivity extends FragmentActivity implements OnMapReadyCa
         mDrawerLayout = findViewById(R.id.drawer_layout);
         mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
 
+        mPlaces.initialize(getApplicationContext(), "AIzaSyAD2mONY8_s4OffYrAsIKW5b_dbRmDSH0Y");
+        PlacesClient mPlacesClient = Places.createClient(this);
+
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         placesCollectionReference = db.collection("placesCollection");
+        //TODO:  Mock the user check ins
 
         ImageButton checkInButton = findViewById(R.id.checkInButton);
         checkInButton.setOnClickListener(new View.OnClickListener()
@@ -105,45 +114,66 @@ public class HomeScreenActivity extends FragmentActivity implements OnMapReadyCa
 
     public void CheckIn()
     {
-        PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
+        PingPlacePicker.IntentBuilder builder = new PingPlacePicker.IntentBuilder();
+        builder.setAndroidApiKey("AIzaSyA9r6LFkV5wLvb-KLqZmFSrAlK4W9IY2nU")
+                .setMapsApiKey("AIzaSyAD2mONY8_s4OffYrAsIKW5b_dbRmDSH0Y");
 
-        try {
+        try{
+            Intent placeIntent = builder.build(this);
+            this.startActivityForResult(placeIntent, PLACE_PICKER_REQUEST);
+        }
+        catch (Exception ex) {
+
+        }
+
+        //PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
+
+        //PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
+        //Intent i = new Intent(this, UserCheckIns.class);
+
+        //this.startActivityForResult(i, PLACE_PICKER_REQUEST);
+
+        /*try {
             this.startActivityForResult(builder.build(this), PLACE_PICKER_REQUEST);
         } catch (GooglePlayServicesRepairableException e) {
             Log.e(TAG, "GooglePlayServicesRepairableException: " + e.getMessage());
         } catch (GooglePlayServicesNotAvailableException e) {
             Log.e(TAG, "GooglePlayServicesNotAvailableException: " + e.getMessage());
-        }
+        }*/
 
         Log.i(TAG, "startActivityForResult finished");
     }
 
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == PLACE_PICKER_REQUEST)
-        {
-            if (resultCode == RESULT_OK)
-            {
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == PLACE_PICKER_REQUEST) {
+            if (resultCode == RESULT_OK) {
+                Place place = PingPlacePicker.getPlace(data);
+                if (place != null) {
+                    Toast.makeText(this, "You selected the place: " + place.getName(), Toast.LENGTH_SHORT).show();
+                }
                 UserCheckIns userCheckIns = new UserCheckIns(HomeScreenActivity.this, mMap, placesCollectionReference);
-
-                userCheckIns.PlacePicker(data);
+                userCheckIns.PlacePicker(data, place);
             }
         }
     }
 
     private void GoogleAPIClientSetup()
     {
-        // Construct a GeoDataClient
-        mGeoDataClient = Places.getGeoDataClient(this, null);
-
-        // Construct a PlaceDetectionClient.
-        mPlaceDetectionClient = Places.getPlaceDetectionClient(this, null);
-
-        mGoogleApiClient = new GoogleApiClient
-                .Builder(this)
-                .addApi(Places.GEO_DATA_API)
-                .addApi(Places.PLACE_DETECTION_API)
-                .enableAutoManage(this, this)
-                .build();
+//        // Construct a GeoDataClient
+//        mGeoDataClient = mPlaces.getGeoDataClient(this, null);
+//
+//        // Construct a PlaceDetectionClient.
+//        mPlaceDetectionClient = Places.getPlaceDetectionClient(this, null);
+//
+//        mGoogleApiClient = new GoogleApiClient
+//                .Builder(this)
+//                .addApi(Places.GEO_DATA_API)
+//                .addApi(Places.PLACE_DETECTION_API)
+//                .enableAutoManage(this, this)
+//                .build();
     }
 
     private void NavigationDrawerSetup()
@@ -200,7 +230,8 @@ public class HomeScreenActivity extends FragmentActivity implements OnMapReadyCa
             mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this, R.raw.style_json));
 
             DisplayUserCheckIns displayUserCheckIns = new DisplayUserCheckIns(HomeScreenActivity.this, mMap, placesCollectionReference);
-            displayUserCheckIns.LoadUserCheckIns();
+            //displayUserCheckIns.LoadUserCheckIns();
+            displayUserCheckIns.LoadMockUserCheckIns();
         }
         else
         {
@@ -241,7 +272,7 @@ public class HomeScreenActivity extends FragmentActivity implements OnMapReadyCa
         userName = findViewById(R.id.navigationHeaderTextUSerName);
         assignProfileView();
 
-        mDrawerLayout.openDrawer(Gravity.START);
+        mDrawerLayout.openDrawer(Gravity.LEFT);
     }
 
     private void assignProfileView()

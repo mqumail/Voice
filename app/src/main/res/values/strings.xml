@@ -46,4 +46,13 @@
     <string name="local_visitors_place_details">Local Visitors</string>
     <string name="guest_book_title">Guest Book</string>
 
+<!--    Mock local cities-->
+    <string-array name="Local_cities">
+        <item>New York</item>
+        <item>Weimar</item>
+        <item>Karachi</item>
+        <item>Muscat</item>
+        <item>Dubai</item>
+    </string-array>
+
 </resources>

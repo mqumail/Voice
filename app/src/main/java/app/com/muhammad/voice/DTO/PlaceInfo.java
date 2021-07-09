@@ -3,6 +3,10 @@ package app.com.muhammad.voice.DTO;
 import android.net.Uri;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.libraries.places.api.model.Place;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class PlaceInfo
 {
@@ -22,7 +26,7 @@ public class PlaceInfo
     private String attributions;
     private String comment;
 
-    private CheckinInfo checkinInfo;
+    private List<CheckinInfo> checkinInfos;
 
     // Delete the bottom ones
     //private boolean IsIdentifiedCheckIn;
@@ -50,7 +54,11 @@ public class PlaceInfo
     }
 
     public PlaceInfo() {
+        this.checkinInfos = new ArrayList<>();
+    }
 
+    public void addCheckInInfo(CheckinInfo checkinInfo){
+        this.checkinInfos.add(checkinInfo);
     }
 
     public String getName() {
@@ -127,14 +135,35 @@ public class PlaceInfo
         this.comment = comment;
     }
 
-    public CheckinInfo getCheckinInfo()
+    public List<CheckinInfo> getCheckinInfos()
     {
-        return checkinInfo;
+        return checkinInfos;
     }
 
-    public void setCheckinInfo(CheckinInfo checkinInfo)
+    public void setCheckinInfos(List<CheckinInfo> checkinInfos)
     {
-        this.checkinInfo = checkinInfo;
+        this.checkinInfos = checkinInfos;
+    }
+
+    public void copy(Place place) {
+        this.address = place.getAddress();
+        this.latlng = place.getLatLng();
+    }
+
+    @Override
+    public boolean equals(Object object){
+        boolean isEqual = false;
+
+        if (object != null && object instanceof PlaceInfo){
+            isEqual = (this.latlng.equals(((PlaceInfo) object).latlng));
+        }
+
+        return isEqual;
+    }
+
+    @Override
+    public int hashCode() {
+        return Integer.parseInt(String.valueOf(this.latlng));
     }
 
     /*public boolean isIdentifiedCheckIn()

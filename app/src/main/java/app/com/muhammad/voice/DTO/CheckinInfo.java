@@ -4,14 +4,33 @@ import com.google.firebase.Timestamp;
 
 import java.time.LocalDateTime;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 public class CheckinInfo
 {
+    public CheckinInfo(boolean isLocal, boolean isHearted, boolean isIdentifiedCheckIn, String userName, String review, Timestamp checkInTime) {
+        this.isLocal = isLocal;
+        this.isHearted = isHearted;
+        this.isIdentifiedCheckIn = isIdentifiedCheckIn;
+        this.userName = userName;
+        this.review = review;
+        this.checkInTime = checkInTime;
+    }
+
     private boolean isLocal;
     private boolean isHearted;
     private boolean isIdentifiedCheckIn;
     private String userName;
     private String review;
     private Timestamp checkInTime;
+
+    public CheckinInfo()
+    {
+
+    }
 
     public boolean isLocal()
     {
