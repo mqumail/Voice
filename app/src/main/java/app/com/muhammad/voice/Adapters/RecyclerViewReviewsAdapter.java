@@ -1,6 +1,6 @@
 package app.com.muhammad.voice.Adapters;
 
-import android.support.v7.widget.RecyclerView;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -58,23 +58,23 @@ public class RecyclerViewReviewsAdapter extends
     @Override
     public void onBindViewHolder(RecyclerViewHolder holder, int position)
     {
-        CheckinInfo checkinInfo = mDataset.get(position);
-        Date date = checkinInfo.getCheckInTime().toDate();
-        SimpleDateFormat dateFormatter = new SimpleDateFormat("dd MMM, yyyy");
-        try {
-            date = dateFormatter.parse(String.valueOf(checkinInfo.getCheckInTime()));
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
+//        CheckinInfo checkinInfo = mDataset.get(position);
+//        Date date = checkinInfo.getCheckInTime().toDate();
+//        SimpleDateFormat dateFormatter = new SimpleDateFormat("dd MMM, yyyy");
+//        try {
+//            date = dateFormatter.parse(String.valueOf(checkinInfo.getCheckInTime()));
+//        } catch (ParseException e) {
+//            e.printStackTrace();
+//        }
 
 
         TextView userNameTextView = holder.userName;
         TextView reviewTextView = holder.review;
         TextView checkInDateTextView = holder.checkInDate;
 
-        userNameTextView.setText(checkinInfo.getUserName());
-        reviewTextView.setText(checkinInfo.getReview());
-        checkInDateTextView.setText(dateFormatter.format(date));
+//        userNameTextView.setText(checkinInfo.getUserName());
+//        reviewTextView.setText(checkinInfo.getReview());
+//        checkInDateTextView.setText(dateFormatter.format(date));
     }
 
     // Return the size of your dataset (invoked by the layout manager)

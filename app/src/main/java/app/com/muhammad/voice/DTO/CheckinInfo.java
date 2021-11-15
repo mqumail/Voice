@@ -1,7 +1,5 @@
 package app.com.muhammad.voice.DTO;
 
-import com.google.firebase.Timestamp;
-
 import java.time.LocalDateTime;
 
 public class CheckinInfo
@@ -11,7 +9,6 @@ public class CheckinInfo
     private boolean isIdentifiedCheckIn;
     private String userName;
     private String review;
-    private Timestamp checkInTime;
 
     public boolean isLocal()
     {
@@ -61,15 +58,5 @@ public class CheckinInfo
     public void setReview(String review)
     {
         this.review = review;
-    }
-
-    public Timestamp getCheckInTime()
-    {
-        return checkInTime;
-    }
-
-    public void setCheckInTime(Timestamp checkInTime)
-    {
-        this.checkInTime = checkInTime;
     }
 }

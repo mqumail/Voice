@@ -2,8 +2,6 @@ package app.com.muhammad.voice.DTO;
 
 import android.net.Uri;
 
-import com.google.android.gms.maps.model.LatLng;
-
 public class PlaceInfo
 {
     // IsLocal
@@ -17,7 +15,6 @@ public class PlaceInfo
     private String phoneNumber;
     private String id;
     private Uri websiteUri;
-    private LatLng latlng;
     private double rating;
     private String attributions;
     private String comment;
@@ -31,7 +28,7 @@ public class PlaceInfo
 
     public PlaceInfo(String name, String address,
                      String phoneNumber, String id,
-                     Uri websiteUri, LatLng latlng,
+                     Uri websiteUri,
                      float rating, String attributions,
                      String comment, boolean IsIdentifiedCheckIn,
                      boolean IsHearted, boolean IsLocalCheckIn) {
@@ -40,7 +37,6 @@ public class PlaceInfo
         this.phoneNumber = phoneNumber;
         this.id = id;
         this.websiteUri = websiteUri;
-        this.latlng = latlng;
         this.rating = rating;
         this.attributions = attributions;
         this.comment = comment;
@@ -91,14 +87,6 @@ public class PlaceInfo
 
     public void setWebsiteUri(Uri websiteUri) {
         this.websiteUri = websiteUri;
-    }
-
-    public LatLng getLatlng() {
-        return latlng;
-    }
-
-    public void setLatlng(LatLng latlng) {
-        this.latlng = latlng;
     }
 
     public double getRating() {
@@ -166,7 +154,6 @@ public class PlaceInfo
                 ", phoneNumber='" + phoneNumber + '\'' +
                 ", id='" + id + '\'' +
                 ", websiteUri=" + websiteUri +
-                ", latlng=" + latlng +
                 ", rating=" + rating +
                 ", attributions='" + attributions + '\'' +
                 '}';
