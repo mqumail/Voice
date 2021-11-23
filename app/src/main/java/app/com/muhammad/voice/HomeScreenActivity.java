@@ -1,36 +1,28 @@
 package app.com.muhammad.voice;
 
-import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
 import com.google.android.material.navigation.NavigationView;
-import androidx.core.app.ActivityCompat;
 import androidx.core.view.GravityCompat;
 import androidx.fragment.app.FragmentActivity;
 
 import androidx.drawerlayout.widget.DrawerLayout;
+
 import android.util.Log;
-import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.osmdroid.views.MapView;
 
 public class HomeScreenActivity extends FragmentActivity
 {
     private static final String TAG = "HomeScreenActivity";
-    private static final int PLACE_PICKER_REQUEST = 1;
-    private static final int finePermissionLocation = 101;
 
     public DrawerLayout mDrawerLayout;
 
@@ -73,13 +65,13 @@ public class HomeScreenActivity extends FragmentActivity
 
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == PLACE_PICKER_REQUEST) {
-            if (resultCode == RESULT_OK) {
-//                UserCheckIns userCheckIns = new UserCheckIns(HomeScreenActivity.this, null, null);
-//
-//                userCheckIns.PlacePicker(data);
-            }
-        }
+//        if (requestCode == PLACE_PICKER_REQUEST) {
+//            if (resultCode == RESULT_OK) {
+////                UserCheckIns userCheckIns = new UserCheckIns(HomeScreenActivity.this, null, null);
+////
+////                userCheckIns.PlacePicker(data);
+//            }
+//        }
     }
 
     private void GoogleAPIClientSetup() {
@@ -118,7 +110,7 @@ public class HomeScreenActivity extends FragmentActivity
 
                             case R.id.log_out:
 
-                                startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                                //startActivity(new Intent(getApplicationContext(), MainActivity.class));
 
                                 HomeScreenActivity.this.finish();
                             return true;
@@ -130,23 +122,6 @@ public class HomeScreenActivity extends FragmentActivity
                 });
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        switch (requestCode){
-            case finePermissionLocation:
-                if(grantResults[0] == PackageManager.PERMISSION_GRANTED){
-                    if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-
-                    }
-                } else{
-                    Toast.makeText(getApplicationContext(), "Location permissions are required", Toast.LENGTH_LONG).show();
-                    finish();
-                }
-                break;
-        }
-    }
-
     public void profile(View view)
     {
         // Get current user info before drawer is opened
@@ -154,7 +129,7 @@ public class HomeScreenActivity extends FragmentActivity
         userName = findViewById(R.id.navigationHeaderTextUSerName);
         assignProfileView();
 
-        mDrawerLayout.openDrawer(Gravity.START);
+        mDrawerLayout.openDrawer(GravityCompat.START);
     }
 
     private void assignProfileView() {
