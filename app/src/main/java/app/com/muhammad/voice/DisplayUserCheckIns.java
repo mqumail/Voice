@@ -12,7 +12,7 @@ import app.com.muhammad.voice.DTO.PlaceInfo;
 
 class DisplayUserCheckIns
 {
-    private HomeScreenActivity mHomeScreenActivity;
+//    private HomeScreenActivity mHomeScreenActivity;
 
     private static final String TAG = "DisplayUserCheckIns";
 
@@ -28,10 +28,10 @@ class DisplayUserCheckIns
     private List<CheckinInfo> reviewsDataSet;
     private List<String> emptyUserNameDataSetMessage, emptyReviewsDataSetMessage;
 
-    public DisplayUserCheckIns(HomeScreenActivity homeScreenActivity)
-    {
-        mHomeScreenActivity = homeScreenActivity;
-    }
+//    public DisplayUserCheckIns(HomeScreenActivity homeScreenActivity)
+//    {
+//        mHomeScreenActivity = homeScreenActivity;
+//    }
 
     @NonNull
     private List<PlaceInfo> AddMarkersOnMap()

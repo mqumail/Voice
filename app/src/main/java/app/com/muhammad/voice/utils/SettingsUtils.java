@@ -1,16 +1,10 @@
 package app.com.muhammad.voice.utils;
 
-import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.widget.ArrayAdapter;
 import android.widget.Toast;
 
 import java.util.ArrayList;
-
-import app.com.muhammad.voice.HomeScreenActivity;
-import app.com.muhammad.voice.ProfileSettingsActivity;
-import app.com.muhammad.voice.SignUpActivity;
 
 public class SettingsUtils {
     public SettingsUtils(){}
@@ -28,46 +22,46 @@ public class SettingsUtils {
     }
 
 
-    public void loadCities(LocalCity localCities, ArrayList<String> aCityList, ArrayList<String> aCityListView, ArrayAdapter arrayAdapter, Context context){
-        try{
-            ArrayList<String> citiesAddressArray = localCities.getCitiesAddress();
-            ArrayList<String> citiesArray = localCities.getCities();
-            if (context.getClass().getName() == SignUpActivity.class.getName()) {
-                if (citiesArray.contains("empty")) {
-                    int i = 0;
-                    for (String aCitiesArray : citiesArray) {
-                        if (citiesArray.get(0) != "empty") {
-                            aCityList.add(0, aCitiesArray);
-                            aCityListView.add(0, citiesAddressArray.get(i));
-                            arrayAdapter.notifyDataSetChanged();
-                        }
-                        i++;
-                    }
-                    Toast.makeText(context, "Local Cities Loaded", Toast.LENGTH_SHORT).show();
-                } else{
-                    context.startActivity(new Intent(context, HomeScreenActivity.class));
-                    ((Activity)(context)).finish();
-                }
-            }else if (context.getClass().getName() == ProfileSettingsActivity.class.getName()){
-                if (!citiesArray.contains("empty")) {
-                    int i = 0;
-                    for (String aCitiesArray : citiesArray) {
-                        aCityList.add(0, aCitiesArray);
-                        aCityListView.add(0, citiesAddressArray.get(i));
-                        arrayAdapter.notifyDataSetChanged();
-                        i++;
-                    }
-                    Toast.makeText(context, "Local Cities Loaded", Toast.LENGTH_SHORT).show();
-                }
-            }
-
-        }catch(Exception e) {
-            System.err.println("Error while retrieving cities from Shared Preferences");
-            e.printStackTrace();
-            localCities.clearSharedPreferences();
-            Toast.makeText(context, "Error Loading Cities", Toast.LENGTH_SHORT).show();
-        }
-    }
+//    public void loadCities(LocalCity localCities, ArrayList<String> aCityList, ArrayList<String> aCityListView, ArrayAdapter arrayAdapter, Context context){
+//        try{
+//            ArrayList<String> citiesAddressArray = localCities.getCitiesAddress();
+//            ArrayList<String> citiesArray = localCities.getCities();
+//            if (context.getClass().getName() == SignUpActivity.class.getName()) {
+//                if (citiesArray.contains("empty")) {
+//                    int i = 0;
+//                    for (String aCitiesArray : citiesArray) {
+//                        if (citiesArray.get(0) != "empty") {
+//                            aCityList.add(0, aCitiesArray);
+//                            aCityListView.add(0, citiesAddressArray.get(i));
+//                            arrayAdapter.notifyDataSetChanged();
+//                        }
+//                        i++;
+//                    }
+//                    Toast.makeText(context, "Local Cities Loaded", Toast.LENGTH_SHORT).show();
+//                } else{
+//                    context.startActivity(new Intent(context, HomeScreenActivity.class));
+//                    ((Activity)(context)).finish();
+//                }
+//            }else if (context.getClass().getName() == ProfileSettingsActivity.class.getName()){
+//                if (!citiesArray.contains("empty")) {
+//                    int i = 0;
+//                    for (String aCitiesArray : citiesArray) {
+//                        aCityList.add(0, aCitiesArray);
+//                        aCityListView.add(0, citiesAddressArray.get(i));
+//                        arrayAdapter.notifyDataSetChanged();
+//                        i++;
+//                    }
+//                    Toast.makeText(context, "Local Cities Loaded", Toast.LENGTH_SHORT).show();
+//                }
+//            }
+//
+//        }catch(Exception e) {
+//            System.err.println("Error while retrieving cities from Shared Preferences");
+//            e.printStackTrace();
+//            localCities.clearSharedPreferences();
+//            Toast.makeText(context, "Error Loading Cities", Toast.LENGTH_SHORT).show();
+//        }
+//    }
 
     public void saveCities(ArrayList<String> aCityList, LocalCity localCities, Context context){
         String citiesInfo = "";

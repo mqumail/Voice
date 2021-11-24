@@ -32,22 +32,18 @@
         <activity
             android:name=".SignUpActivity"
             android:label="@string/settings_label"
-            android:screenOrientation="portrait"
+            android:screenOrientation="fullSensor"
             android:theme="@style/CitiesTheme"
             android:windowSoftInputMode="adjustPan|stateVisible|stateHidden" />
         <activity
             android:name=".ProfileSettingsActivity"
             android:label="@string/settings_label"
-            android:parentActivityName=".HomeScreenActivity"
-            android:screenOrientation="portrait"
+            android:screenOrientation="fullSensor"
             android:theme="@style/CitiesUpdateTheme"
             android:windowSoftInputMode="adjustPan|stateVisible|stateHidden">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="app.com.muhammad.voice.OSMActivity" />
         </activity>
-        <activity
-            android:name=".HomeScreenActivity"
-            android:screenOrientation="fullSensor" />
     </application>
 </manifest>
