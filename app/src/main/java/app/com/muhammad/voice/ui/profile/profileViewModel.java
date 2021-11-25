@@ -1,18 +1,18 @@
-package app.com.muhammad.voice.ui.gallery;
+package app.com.muhammad.voice.ui.profile;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-public class GalleryViewModel extends ViewModel
+public class profileViewModel extends ViewModel
 {
 
     private MutableLiveData<String> mText;
 
-    public GalleryViewModel()
+    public profileViewModel()
     {
         mText = new MutableLiveData<>();
-        mText.setValue("This is gallery fragment");
+        mText.setValue("This is profile fragment");
     }
 
     public LiveData<String> getText()
