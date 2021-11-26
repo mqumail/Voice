@@ -58,6 +58,9 @@ dependencies {
 
     //osmBonusPack
     implementation 'com.github.MKergall:osmbonuspack:6.7.0'
+
+    //Logger
+    implementation 'com.jakewharton.timber:timber:5.0.1'
 }
 
 repositories {

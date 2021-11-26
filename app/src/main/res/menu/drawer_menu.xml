@@ -5,18 +5,18 @@
 
     <group android:checkableBehavior="single">
         <item
-            android:id="@+id/nav_home"
+            android:id="@+id/nav_osm"
             android:checked="true"
             android:icon="@drawable/ic_favorite_border"
-            android:title="@string/menu_home" />
+            android:title="@string/menu_osm" />
         <item
-            android:id="@+id/nav_gallery"
+            android:id="@+id/nav_profile"
             android:icon="@drawable/person"
-            android:title="@string/menu_gallery" />
+            android:title="@string/menu_profile" />
         <item
-            android:id="@+id/nav_slideshow"
+            android:id="@+id/nav_settings"
             android:icon="@drawable/osm_ic_follow_me"
-            android:title="@string/menu_slideshow" />
+            android:title="@string/menu_settings" />
     </group>
 </menu>
 
