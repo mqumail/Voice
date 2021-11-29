@@ -1,8 +1,14 @@
 package app.com.muhammad.voice;
 
+
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
+
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.google.android.material.navigation.NavigationView;
 
@@ -14,6 +20,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
+import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 import app.com.muhammad.voice.databinding.ActivityBaseBinding;
@@ -24,16 +31,20 @@ import timber.log.Timber;
 
 public class BaseActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener
 {
+    private static final String ACTIVITY_TAG = "BaseAvtivity";
     protected AppBarConfiguration appBarConfiguration;
     private ActivityBaseBinding binding;
     private Toolbar toolbar;
     protected DrawerLayout drawer;
     private NavigationView navigationView;
+    private NavController navController;
+    private NavHostFragment navHostFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+        Timber.i("BaseActivty starting");
 
         // Timber Logger
         if (BuildConfig.DEBUG) {
@@ -42,6 +53,8 @@ public class BaseActivity extends AppCompatActivity implements NavigationView.On
 
         binding = ActivityBaseBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
+        navHostFragment = (NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
 
         toolbar = findViewById(R.id.toolbar_base);
         setSupportActionBar(toolbar);
@@ -58,12 +71,14 @@ public class BaseActivity extends AppCompatActivity implements NavigationView.On
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
+
+        navigationView.setNavigationItemSelectedListener(this);
     }
 
     @Override
     public boolean onSupportNavigateUp()
     {
-        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
+        navController = navHostFragment.getNavController();
         return NavigationUI.navigateUp(navController, appBarConfiguration)
                 || super.onSupportNavigateUp();
     }
@@ -77,42 +92,61 @@ public class BaseActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item)
     {
-
-        drawer.closeDrawer(GravityCompat.START);
-        return true;
-    }
-
-    public void displayView(int viewId) {
-        Fragment fragment = null;
-//        String title = getString(R.id.app_name);
-
-        switch (viewId) {
+        switch (item.getItemId()) {
             case R.id.nav_osm: {
-                //start home activity
-                Intent intent = new Intent(this, OsmFragment.class);
-                startActivity(intent);
+                //replace fragment to fragment_osm
+                // Create new fragment and transaction
+
+                FragmentManager fragmentManager = getSupportFragmentManager();
+                FragmentTransaction transaction = fragmentManager.beginTransaction();
+                transaction.setReorderingAllowed(true);
+
+                Fragment fragment = new OsmFragment();
+
+                transaction.replace(R.id.nav_host_fragment, fragment, null);
+
+                // Commit the transaction
+                transaction.commit();
+
                 Timber.d("Starting osm activity");
+                Log.d(ACTIVITY_TAG,"Starting osm activity");
                 break;
             }
             case R.id.nav_profile: {
-                //start gallery
-                Intent intent = new Intent(this, ProfileFragment.class);
-                startActivity(intent);
+                //replace fragment to gallery
+                FragmentManager fragmentManager = getSupportFragmentManager();
+                FragmentTransaction transaction = fragmentManager.beginTransaction();
+                transaction.setReorderingAllowed(true);
+
+                Fragment fragment = new ProfileFragment();
+
+                transaction.replace(R.id.content_container, fragment, null);
+                transaction.commit();
+
+                Toast.makeText(this, "profile", Toast.LENGTH_SHORT).show();
                 Timber.d("Starting profile activity");
+                Log.d(ACTIVITY_TAG,"Starting profile activity");
+
                 break;
             }
             case R.id.nav_settings: {
-                //start slideshow activity
-                Intent intent = new Intent(this, SettingsFragment.class);
-                startActivity(intent);
+                //replace fragment to settings
+                FragmentManager fragmentManager = getSupportFragmentManager();
+                FragmentTransaction transaction = fragmentManager.beginTransaction();
+                transaction.setReorderingAllowed(true);
+
+                Fragment fragment = new SettingsFragment();
+
+                transaction.replace(R.id.content_container, fragment, null);
+                transaction.commit();
+
                 Timber.d("Starting settings activity");
+                Log.d(ACTIVITY_TAG,"Starting settings activity");
                 break;
             }
         }
 
-        if (fragment != null) {
-//            FragmentTra
-        }
-
+        drawer.closeDrawer(GravityCompat.START);
+        return true;
     }
 }

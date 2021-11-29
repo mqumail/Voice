@@ -5,10 +5,13 @@
     android:layout_height="match_parent"
     tools:context=".ui.profile.ProfileFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:orientation="vertical"
+        android:layout_marginTop="?android:attr/actionBarSize"
+        android:background="@color/colorPrimaryDark">
+    </LinearLayout>
 
 </FrameLayout>
+

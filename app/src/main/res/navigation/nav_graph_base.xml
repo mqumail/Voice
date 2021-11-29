@@ -13,6 +13,9 @@
         <action
             android:id="@+id/action_osmFragment_to_profileFragment"
             app:destination="@id/profileFragment" />
+        <action
+            android:id="@+id/action_osmFragment_to_settingsFragment"
+            app:destination="@id/settingsFragment" />
     </fragment>
     <fragment
         android:id="@+id/profileFragment"
@@ -22,10 +25,20 @@
         <action
             android:id="@+id/action_profileFragment_to_settingsFragment"
             app:destination="@id/settingsFragment" />
+        <action
+            android:id="@+id/action_profileFragment_to_osmFragment"
+            app:destination="@id/osmFragment" />
     </fragment>
     <fragment
         android:id="@+id/settingsFragment"
         android:name="app.com.muhammad.voice.ui.settings.SettingsFragment"
         android:label="fragment_settings"
-        tools:layout="@layout/fragment_settings" />
+        tools:layout="@layout/fragment_settings" >
+        <action
+            android:id="@+id/action_settingsFragment_to_profileFragment"
+            app:destination="@id/profileFragment" />
+        <action
+            android:id="@+id/action_settingsFragment_to_osmFragment"
+            app:destination="@id/osmFragment" />
+    </fragment>
 </navigation>

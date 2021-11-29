@@ -6,7 +6,9 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.fragment.app.Fragment;
-import app.com.muhammad.voice.R;
+import androidx.lifecycle.ViewModelProvider;
+
+import app.com.muhammad.voice.databinding.FragmentProfileBinding;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -15,6 +17,8 @@ import app.com.muhammad.voice.R;
  */
 public class ProfileFragment extends Fragment
 {
+    private ProfileViewModel viewModel;
+    private FragmentProfileBinding binding;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -60,15 +64,26 @@ public class ProfileFragment extends Fragment
     }
 
     @Override
+    public void onStart(){
+        super.onStart();
+
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState)
     {
+        viewModel = new ViewModelProvider(this).get(ProfileViewModel.class);
+        binding = FragmentProfileBinding.inflate(inflater, container, false);
+        View root = binding.getRoot();
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_profile, container, false);
+        //inflater.inflate(R.layout.fragment_profile, container, false);
+        return root;
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        binding = null;
     }
 }

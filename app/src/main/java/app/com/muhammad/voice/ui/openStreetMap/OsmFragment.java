@@ -100,8 +100,6 @@ public class OsmFragment extends Fragment
         viewModel = new ViewModelProvider(this).get(OsmViewModel.class);
         binding = FragmentOsmBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
-        // Inflate the layout for this fragment
-        //inflater.inflate(R.layout.fragment_osm, container, false);
 
         openStreetMapInit();
 
