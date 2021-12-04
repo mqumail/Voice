@@ -90,6 +90,7 @@ public class BaseActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item)
     {
+        Timber.i("Item selected: " + item.toString());
         switch (item.getItemId()) {
             case R.id.nav_osm: {
                 //replace fragment to fragment_osm
@@ -101,7 +102,7 @@ public class BaseActivity extends AppCompatActivity implements NavigationView.On
 
                 Fragment fragment = new OsmFragment();
 
-                transaction.replace(R.id.nav_host_fragment, fragment, null);
+                transaction.replace(R.id.content_container, fragment, null);
 
                 // Commit the transaction
                 transaction.commit();
