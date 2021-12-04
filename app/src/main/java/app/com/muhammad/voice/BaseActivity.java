@@ -1,10 +1,6 @@
 package app.com.muhammad.voice;
 
 
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
-
-import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
@@ -18,6 +14,8 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
@@ -31,7 +29,7 @@ import timber.log.Timber;
 
 public class BaseActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener
 {
-    private static final String ACTIVITY_TAG = "BaseAvtivity";
+    private static final String ACTIVITY_TAG = "BaseActivity";
     protected AppBarConfiguration appBarConfiguration;
     private ActivityBaseBinding binding;
     private Toolbar toolbar;
@@ -44,7 +42,7 @@ public class BaseActivity extends AppCompatActivity implements NavigationView.On
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        Timber.i("BaseActivty starting");
+        Timber.i("%s starting", ACTIVITY_TAG);
 
         // Timber Logger
         if (BuildConfig.DEBUG) {
