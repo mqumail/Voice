@@ -38,6 +38,9 @@ import static app.com.muhammad.voice.utils.ConstantsVariables.MY_USER_AGENT;
 import static app.com.muhammad.voice.utils.ConstantsVariables.NETWORK_STATE_PERMISSION_CODE;
 import static app.com.muhammad.voice.utils.ConstantsVariables.WIFI_STATE_PERMISSION_CODE;
 import static app.com.muhammad.voice.utils.ConstantsVariables.WRITE_EXTERNAL_STORAGE_PERMISSION_CODE;
+import static app.com.muhammad.voice.utils.UiHelperMethods.replaceContentContainer;
+
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -100,6 +103,17 @@ public class OsmFragment extends Fragment
         viewModel = new ViewModelProvider(this).get(OsmViewModel.class);
         binding = FragmentOsmBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
+
+        FloatingActionButton checkInFAB = binding.checkInFAB;
+        checkInFAB.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                //replace the current view
+                replaceContentContainer(R.id.nav_check_in, getParentFragmentManager());
+
+            }
+        });
 
         openStreetMapInit();
 

@@ -76,6 +76,18 @@
             <LayoutPositions>
               <option name="myPositions">
                 <map>
+                  <entry key="checkInFragment">
+                    <value>
+                      <LayoutPositions>
+                        <option name="myPosition">
+                          <Point>
+                            <option name="x" value="-918" />
+                            <option name="y" value="289" />
+                          </Point>
+                        </option>
+                      </LayoutPositions>
+                    </value>
+                  </entry>
                   <entry key="osmFragment">
                     <value>
                       <LayoutPositions>
@@ -87,6 +99,11 @@
                         </option>
                         <option name="myPositions">
                           <map>
+                            <entry key="action_osmFragment_to_checkInFragment">
+                              <value>
+                                <LayoutPositions />
+                              </value>
+                            </entry>
                             <entry key="action_osmFragment_to_profileFragment">
                               <value>
                                 <LayoutPositions />
@@ -107,7 +124,7 @@
                       <LayoutPositions>
                         <option name="myPosition">
                           <Point>
-                            <option name="x" value="-351" />
+                            <option name="x" value="-454" />
                             <option name="y" value="379" />
                           </Point>
                         </option>
@@ -139,6 +156,16 @@
                         </option>
                         <option name="myPositions">
                           <map>
+                            <entry key="action_settingsFragment_to_checkInFragment">
+                              <value>
+                                <LayoutPositions />
+                              </value>
+                            </entry>
+                            <entry key="action_settingsFragment_to_osmFragment">
+                              <value>
+                                <LayoutPositions />
+                              </value>
+                            </entry>
                             <entry key="action_settingsFragment_to_profileFragment">
                               <value>
                                 <LayoutPositions />

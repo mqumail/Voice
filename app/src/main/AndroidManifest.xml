@@ -34,7 +34,7 @@
             android:screenOrientation="fullSensor"
             android:theme="@style/CitiesTheme"
             android:windowSoftInputMode="adjustPan|stateVisible|stateHidden" />
-        <activity android:name=".ProfileFragment" />
+
         <activity
             android:name=".ProfileSettingsActivity"
             android:label="@string/settings_label"

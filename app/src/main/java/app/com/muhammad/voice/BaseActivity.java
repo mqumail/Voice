@@ -1,6 +1,8 @@
 package app.com.muhammad.voice;
 
 
+import static app.com.muhammad.voice.utils.UiHelperMethods.replaceContentContainer;
+
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
@@ -90,61 +92,8 @@ public class BaseActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item)
     {
-        Timber.i("Item selected: " + item.toString());
-        switch (item.getItemId()) {
-            case R.id.nav_osm: {
-                //replace fragment to fragment_osm
-                // Create new fragment and transaction
-
-                FragmentManager fragmentManager = getSupportFragmentManager();
-                FragmentTransaction transaction = fragmentManager.beginTransaction();
-                transaction.setReorderingAllowed(true);
-
-                Fragment fragment = new OsmFragment();
-
-                transaction.replace(R.id.content_container, fragment, null);
-
-                // Commit the transaction
-                transaction.commit();
-
-                Timber.d("Starting osm activity");
-                Log.d(ACTIVITY_TAG,"Starting osm activity");
-                break;
-            }
-            case R.id.nav_profile: {
-                //replace fragment to gallery
-                FragmentManager fragmentManager = getSupportFragmentManager();
-                FragmentTransaction transaction = fragmentManager.beginTransaction();
-                transaction.setReorderingAllowed(true);
-
-                Fragment fragment = new ProfileFragment();
-
-                transaction.replace(R.id.content_container, fragment, null);
-                transaction.commit();
-
-                Toast.makeText(this, "profile", Toast.LENGTH_SHORT).show();
-                Timber.d("Starting profile activity");
-                Log.d(ACTIVITY_TAG,"Starting profile activity");
-
-                break;
-            }
-            case R.id.nav_settings: {
-                //replace fragment to settings
-                FragmentManager fragmentManager = getSupportFragmentManager();
-                FragmentTransaction transaction = fragmentManager.beginTransaction();
-                transaction.setReorderingAllowed(true);
-
-                Fragment fragment = new SettingsFragment();
-
-                transaction.replace(R.id.content_container, fragment, null);
-                transaction.commit();
-
-                Timber.d("Starting settings activity");
-                Log.d(ACTIVITY_TAG,"Starting settings activity");
-                break;
-            }
-        }
-
+        Timber.i("Item selected: %s", item.toString());
+        replaceContentContainer(item.getItemId(), getSupportFragmentManager());
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }

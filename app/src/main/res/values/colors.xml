@@ -9,4 +9,6 @@
     <color name="colorPrimaryText">#333333</color>
     <color name="colorBodyText">#222222</color>
     <color name="colorDescText">#666666</color>
+    <color name="colorRed">#FF0000</color>
+    <color name="checkInFab">#E6bf4a50</color>
 </resources>
