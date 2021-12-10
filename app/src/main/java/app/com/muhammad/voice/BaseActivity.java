@@ -4,29 +4,22 @@ package app.com.muhammad.voice;
 import static app.com.muhammad.voice.utils.UiHelperMethods.replaceContentContainer;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MenuItem;
-import android.widget.Toast;
-
-import com.google.android.material.navigation.NavigationView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 import app.com.muhammad.voice.databinding.ActivityBaseBinding;
-import app.com.muhammad.voice.ui.openStreetMap.OsmFragment;
-import app.com.muhammad.voice.ui.profile.ProfileFragment;
-import app.com.muhammad.voice.ui.settings.SettingsFragment;
+
+import com.google.android.material.navigation.NavigationView;
+
 import timber.log.Timber;
 
 public class BaseActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener

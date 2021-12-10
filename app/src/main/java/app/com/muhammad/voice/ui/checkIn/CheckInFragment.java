@@ -1,47 +1,22 @@
 package app.com.muhammad.voice.ui.checkIn;
 
-import android.Manifest;
+import android.app.SearchManager;
 import android.content.Context;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
-import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
-import org.osmdroid.api.IMapController;
-import org.osmdroid.config.Configuration;
-import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
-import org.osmdroid.util.GeoPoint;
-import org.osmdroid.views.MapView;
-import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
-import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
-
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
-import androidx.annotation.NonNull;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
+import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+
 import app.com.muhammad.voice.R;
 import app.com.muhammad.voice.databinding.FragmentCheckInBinding;
-import app.com.muhammad.voice.databinding.FragmentOsmBinding;
-import app.com.muhammad.voice.ui.openStreetMap.OsmViewModel;
-
-import static app.com.muhammad.voice.utils.ConstantsVariables.COARSE_LOCATION_PERMISSION_CODE;
-import static app.com.muhammad.voice.utils.ConstantsVariables.FINE_LOCATION_PERMISSION_CODE;
-import static app.com.muhammad.voice.utils.ConstantsVariables.INTERNET_PERMISSION_CODE;
-import static app.com.muhammad.voice.utils.ConstantsVariables.MY_USER_AGENT;
-import static app.com.muhammad.voice.utils.ConstantsVariables.NETWORK_STATE_PERMISSION_CODE;
-import static app.com.muhammad.voice.utils.ConstantsVariables.WIFI_STATE_PERMISSION_CODE;
-import static app.com.muhammad.voice.utils.ConstantsVariables.WRITE_EXTERNAL_STORAGE_PERMISSION_CODE;
-
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import timber.log.Timber;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -50,7 +25,11 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
  */
 public class CheckInFragment extends Fragment
 {
+    private CheckInViewModel viewModel;
     private FragmentCheckInBinding binding;
+
+    private SearchView searchView = null;
+    private SearchView.OnQueryTextListener queryTextListener;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -89,6 +68,7 @@ public class CheckInFragment extends Fragment
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
@@ -99,8 +79,11 @@ public class CheckInFragment extends Fragment
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState)
     {
+        viewModel = new ViewModelProvider(this).get(CheckInViewModel.class);
         binding = FragmentCheckInBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
+
+        //TODO: Bug - hide the overflow option
 
         return root;
     }
@@ -109,5 +92,52 @@ public class CheckInFragment extends Fragment
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+
+        inflater.inflate(R.menu.check_in_menu, menu);
+
+        MenuItem searchItem = menu.findItem(R.id.nav_search);
+        SearchManager searchManager = (SearchManager) getActivity().getSystemService(Context.SEARCH_SERVICE);
+
+        if (searchItem != null) {
+            searchView = (SearchView) searchItem.getActionView();
+        }
+        if (searchView != null) {
+            searchView.setSearchableInfo(searchManager.getSearchableInfo(getActivity().getComponentName()));
+
+            queryTextListener = new SearchView.OnQueryTextListener() {
+                @Override
+                public boolean onQueryTextChange(String newText) {
+                    Timber.i("onQueryTextChange: %s", newText);
+
+                    return true;
+                }
+                @Override
+                public boolean onQueryTextSubmit(String query) {
+                    Timber.i("onQueryTextSubmit: %s", query);
+
+                    return true;
+                }
+            };
+            searchView.setOnQueryTextListener(queryTextListener);
+        }
+
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.nav_search:
+                // Not implemented here
+                return false;
+            default:
+                break;
+        }
+        searchView.setOnQueryTextListener(queryTextListener);
+        return super.onOptionsItemSelected(item);
     }
 }

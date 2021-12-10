@@ -28,6 +28,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+
 import app.com.muhammad.voice.R;
 import app.com.muhammad.voice.databinding.FragmentOsmBinding;
 
@@ -108,10 +109,8 @@ public class OsmFragment extends Fragment
         checkInFAB.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-                //replace the current view
-                replaceContentContainer(R.id.nav_check_in, getParentFragmentManager());
-
+                //start CheckIn Fragment
+                replaceContentContainer(R.id.nav_check_in, getActivity().getSupportFragmentManager());
             }
         });
 
@@ -166,23 +165,23 @@ public class OsmFragment extends Fragment
         switch (requestCode){
             case COARSE_LOCATION_PERMISSION_CODE:
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
-                    Toast.makeText(getActivity(), "Coarse Location Permission Granted", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(getActivity(), "Coarse Location Permission Granted", Toast.LENGTH_SHORT).show();
                 }
             case FINE_LOCATION_PERMISSION_CODE:
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
-                    Toast.makeText(getActivity(), "Fine Location Permission Granted", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(getActivity(), "Fine Location Permission Granted", Toast.LENGTH_SHORT).show();
                 }
             case WIFI_STATE_PERMISSION_CODE:
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
-                    Toast.makeText(getActivity(), "WIFI Permission Granted", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(getActivity(), "WIFI Permission Granted", Toast.LENGTH_SHORT).show();
                 }
             case NETWORK_STATE_PERMISSION_CODE:
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
-                    Toast.makeText(getActivity(), "Network Permission Granted", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(getActivity(), "Network Permission Granted", Toast.LENGTH_SHORT).show();
                 }
             case INTERNET_PERMISSION_CODE:
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
-                    Toast.makeText(getActivity(), "Internet Permission Granted", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(getActivity(), "Internet Permission Granted", Toast.LENGTH_SHORT).show();
                 }
                 break;
         }
