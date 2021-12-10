@@ -29,14 +29,14 @@ public class SignUpActivity extends AppCompatActivity  {
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_up);
-
-        tUserName = findViewById(R.id.tUserName);
-        mListView = findViewById(R.id.citiesList);
-
-        aCityList = new ArrayList<>();
-        aCityListView = new ArrayList<>();
-        arrayAdapter = new ArrayAdapter<>(SignUpActivity.this, android.R.layout.simple_list_item_1, aCityListView);
-        mListView.setAdapter(arrayAdapter);
+//
+//        tUserName = findViewById(R.id.tUserName);
+//        mListView = findViewById(R.id.citiesList);
+//
+//        aCityList = new ArrayList<>();
+//        aCityListView = new ArrayList<>();
+//        arrayAdapter = new ArrayAdapter<>(SignUpActivity.this, android.R.layout.simple_list_item_1, aCityListView);
+//        mListView.setAdapter(arrayAdapter);
 
 
         // Construct a GeoDataClient.
