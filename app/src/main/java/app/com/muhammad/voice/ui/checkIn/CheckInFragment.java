@@ -1,8 +1,18 @@
 package app.com.muhammad.voice.ui.checkIn;
 
+import static app.com.muhammad.voice.utils.ConstantsVariables.MY_USER_AGENT;
+import static app.com.muhammad.voice.utils.UiHelperMethods.getBitmapFromVectorDrawable;
+
 import android.app.SearchManager;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -11,11 +21,31 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.appcompat.widget.SearchView;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import org.osmdroid.api.IMapController;
+import org.osmdroid.bonuspack.clustering.RadiusMarkerClusterer;
+import org.osmdroid.bonuspack.location.OverpassAPIProvider;
+import org.osmdroid.bonuspack.location.POI;
+import org.osmdroid.config.Configuration;
+import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
+import org.osmdroid.util.GeoPoint;
+import org.osmdroid.views.MapView;
+import org.osmdroid.views.overlay.Marker;
+import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
+import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
+
+import java.util.ArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+import org.osmdroid.util.BoundingBox;
+
 import app.com.muhammad.voice.R;
 import app.com.muhammad.voice.databinding.FragmentCheckInBinding;
+import app.com.muhammad.voice.utils.CustomInfoWindow;
 import timber.log.Timber;
 
 /**
@@ -27,9 +57,11 @@ public class CheckInFragment extends Fragment
 {
     private CheckInViewModel viewModel;
     private FragmentCheckInBinding binding;
+    private MapView map;
 
     private SearchView searchView = null;
     private SearchView.OnQueryTextListener queryTextListener;
+    private ArrayList<POI> POIs;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -83,15 +115,9 @@ public class CheckInFragment extends Fragment
         binding = FragmentCheckInBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        //TODO: Bug - hide the overflow option
+        openStreetMapInit();
 
         return root;
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        binding = null;
     }
 
     @Override
@@ -119,6 +145,11 @@ public class CheckInFragment extends Fragment
                 public boolean onQueryTextSubmit(String query) {
                     Timber.i("onQueryTextSubmit: %s", query);
 
+                    //clear all the markers from the map except myoverlay
+
+                    // TODO: Search for whatever the user is requesting
+                    searchOnOsm(query);
+
                     return true;
                 }
             };
@@ -126,6 +157,69 @@ public class CheckInFragment extends Fragment
         }
 
         super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    private void searchOnOsm(String query) {
+
+        ExecutorService service = Executors.newSingleThreadExecutor();
+        Handler handler = new Handler(Looper.getMainLooper());
+
+        service.execute(() -> {
+            //Set user agent
+            final Context context = getActivity();
+            Configuration.getInstance().load(context, PreferenceManager.getDefaultSharedPreferences(context));
+            Configuration.getInstance().setUserAgentValue(MY_USER_AGENT);
+
+            // Weimar BoundingBox
+            BoundingBox weimarBoundingBox = new BoundingBox();
+            weimarBoundingBox.set(50.9847962773, 11.3484415648, 50.9716374502, 11.3235935805);
+
+//            IMapController mapController = map.getController();
+//            mapController.setZoom(17.0);
+//            mapController.setCenter(weimarBoundingBox.getCenterWithDateLine());
+
+            OverpassAPIProvider overpassAPIProvider = new OverpassAPIProvider();
+            String url = overpassAPIProvider.urlForPOISearch("amenity="+ query, weimarBoundingBox, 50, 15);
+
+            // Get POIs
+            POIs = overpassAPIProvider.getPOIsFromUrl(url);
+
+            if (POIs != null){
+                handler.post(() -> {
+                    RadiusMarkerClusterer poiMarkerCluster = new RadiusMarkerClusterer(getActivity());
+                    if (POIs.size() > 1) {
+                        Bitmap clusterIcon = getBitmapFromVectorDrawable(getActivity(), R.drawable.marker_cluster);
+                        poiMarkerCluster.setIcon(clusterIcon);
+
+                        // CLuster Design
+                        poiMarkerCluster.getTextPaint().setColor(Color.DKGRAY);
+                        poiMarkerCluster.getTextPaint().setTextSize(12 * getResources().getDisplayMetrics().density); //taking into account the screen density
+                        poiMarkerCluster.mAnchorU = Marker.ANCHOR_RIGHT;
+                        poiMarkerCluster.mAnchorV = Marker.ANCHOR_BOTTOM;
+                        poiMarkerCluster.mTextAnchorV = 0.40f;
+
+                        map.getOverlays().add(poiMarkerCluster);
+                    }
+
+                    //Drop Pins
+                    Drawable poiIcon = ResourcesCompat.getDrawable(getResources(), R.drawable.marker_poi_default, null);
+                    for (POI poi : POIs){
+                        Marker poiMarker = new Marker(map);
+                        poiMarker.setTitle(poi.mType);
+                        poiMarker.setSnippet(poi.mDescription);
+                        poiMarker.setPosition(poi.mLocation);
+                        poiMarker.setIcon(poiIcon);
+                        if (poi.mThumbnail != null){
+                            poiMarker.setImage(new BitmapDrawable(poi.mThumbnail));
+                        }
+                        poiMarker.setInfoWindow(new CustomInfoWindow(map));
+                        poiMarker.setRelatedObject(poi);
+                        poiMarkerCluster.add(poiMarker);
+                    }
+                    map.invalidate();
+                });
+            }
+        });
     }
 
     @Override
@@ -139,5 +233,41 @@ public class CheckInFragment extends Fragment
         }
         searchView.setOnQueryTextListener(queryTextListener);
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        binding = null;
+    }
+
+    private void openStreetMapInit(){
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        Handler handler = new Handler(Looper.getMainLooper());
+
+        executorService.execute(() -> {
+            //Set user agent
+            final Context context = getActivity();
+            Configuration.getInstance().load(context, PreferenceManager.getDefaultSharedPreferences(context));
+            Configuration.getInstance().setUserAgentValue(MY_USER_AGENT);
+
+            handler.post(() -> {
+                map = binding.mapCheckIn;
+                map.setTileSource(TileSourceFactory.MAPNIK);
+                map.setMultiTouchControls(true);
+
+                //My Location Overlay
+                MyLocationNewOverlay myLocationNewOverlay = new MyLocationNewOverlay(new GpsMyLocationProvider(getActivity()), map);
+                myLocationNewOverlay.enableMyLocation();
+                map.getOverlays().add(myLocationNewOverlay);
+
+                IMapController mapController = map.getController();
+                mapController.setZoom(17.0);
+
+                //TODO: This is hard coded location, use users actual location
+                mapController.setCenter(new GeoPoint(50.978284, 11.340627));
+                map.invalidate();
+            });
+        });
     }
 }

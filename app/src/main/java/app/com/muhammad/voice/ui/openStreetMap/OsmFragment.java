@@ -141,7 +141,7 @@ public class OsmFragment extends Fragment
                 checkPermission(Manifest.permission.ACCESS_WIFI_STATE, WIFI_STATE_PERMISSION_CODE);
                 checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE, WRITE_EXTERNAL_STORAGE_PERMISSION_CODE);
 
-                map = getView().findViewById(R.id.map);
+                map = binding.map;
                 map.setTileSource(TileSourceFactory.MAPNIK);
                 map.setMultiTouchControls(true);
 
@@ -151,8 +151,10 @@ public class OsmFragment extends Fragment
                 map.getOverlays().add(myLocationNewOverlay);
 
                 IMapController mapController = map.getController();
-                mapController.setZoom(9);
-                mapController.setCenter(new GeoPoint(50.9846195739, 11.3378999626));
+                mapController.setZoom(17.0);
+
+                //TODO: This is hard coded location, use users actual location
+                mapController.setCenter(new GeoPoint(50.978284, 11.340627));
                 map.invalidate();
             });
         });
@@ -191,9 +193,6 @@ public class OsmFragment extends Fragment
         // Checking if permission is not granted
         if (ContextCompat.checkSelfPermission(getActivity(), permission) == PackageManager.PERMISSION_DENIED) {
             ActivityCompat.requestPermissions(getActivity(), new String[] { permission }, requestCode);
-        }
-        else {
-            Toast.makeText(getActivity(), "Permission already granted", Toast.LENGTH_SHORT).show();
         }
     }
 
