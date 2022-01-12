@@ -1,8 +1,5 @@
 package app.com.muhammad.voice.ui.checkIn;
 
-import static app.com.muhammad.voice.utils.ConstantsVariables.MY_USER_AGENT;
-import static app.com.muhammad.voice.utils.UiHelperMethods.getBitmapFromVectorDrawable;
-
 import android.app.SearchManager;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -19,11 +16,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-
-import androidx.appcompat.widget.SearchView;
-import androidx.core.content.res.ResourcesCompat;
-import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 
 import org.osmdroid.api.IMapController;
 import org.osmdroid.bonuspack.clustering.RadiusMarkerClusterer;
@@ -31,6 +25,7 @@ import org.osmdroid.bonuspack.location.OverpassAPIProvider;
 import org.osmdroid.bonuspack.location.POI;
 import org.osmdroid.config.Configuration;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
+import org.osmdroid.util.BoundingBox;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
@@ -41,12 +36,17 @@ import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import org.osmdroid.util.BoundingBox;
-
+import androidx.appcompat.widget.SearchView;
+import androidx.core.content.res.ResourcesCompat;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import app.com.muhammad.voice.R;
 import app.com.muhammad.voice.databinding.FragmentCheckInBinding;
 import app.com.muhammad.voice.utils.CustomInfoWindow;
 import timber.log.Timber;
+
+import static app.com.muhammad.voice.utils.ConstantsVariables.MY_USER_AGENT;
+import static app.com.muhammad.voice.utils.UiHelperMethods.getBitmapFromVectorDrawable;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -62,6 +62,8 @@ public class CheckInFragment extends Fragment
     private SearchView searchView = null;
     private SearchView.OnQueryTextListener queryTextListener;
     private ArrayList<POI> POIs;
+
+    ListView nearByPlacesListView;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -114,6 +116,8 @@ public class CheckInFragment extends Fragment
         viewModel = new ViewModelProvider(this).get(CheckInViewModel.class);
         binding = FragmentCheckInBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
+
+        nearByPlacesListView = binding.nearByPlaces;
 
         openStreetMapInit();
 
@@ -184,8 +188,19 @@ public class CheckInFragment extends Fragment
             // Get POIs
             POIs = overpassAPIProvider.getPOIsFromUrl(url);
 
-            if (POIs != null){
+            if (POIs != null && POIs.size() > 0){
                 handler.post(() -> {
+
+                    // TODO: Populate the list
+                    ArrayList<String> descriptionPOIs = new ArrayList<String>();
+
+                    for (POI poi: POIs) {
+                        descriptionPOIs.add(poi.mType);
+                    }
+
+                    ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, descriptionPOIs);
+                    nearByPlacesListView.setAdapter(arrayAdapter);
+
                     RadiusMarkerClusterer poiMarkerCluster = new RadiusMarkerClusterer(getActivity());
                     if (POIs.size() > 1) {
                         Bitmap clusterIcon = getBitmapFromVectorDrawable(getActivity(), R.drawable.marker_cluster);
@@ -216,6 +231,7 @@ public class CheckInFragment extends Fragment
                         poiMarker.setRelatedObject(poi);
                         poiMarkerCluster.add(poiMarker);
                     }
+                    // TODO: figure out the which are the outer most POIs and then creating a bounding box there, move camera to there
                     map.invalidate();
                 });
             }

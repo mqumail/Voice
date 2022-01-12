@@ -1,10 +1,10 @@
 package app.com.muhammad.voice;
 
 
-import static app.com.muhammad.voice.utils.UiHelperMethods.replaceContentContainer;
-
 import android.os.Bundle;
 import android.view.MenuItem;
+
+import com.google.android.material.navigation.NavigationView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -17,10 +17,9 @@ import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 import app.com.muhammad.voice.databinding.ActivityBaseBinding;
-
-import com.google.android.material.navigation.NavigationView;
-
 import timber.log.Timber;
+
+import static app.com.muhammad.voice.utils.UiHelperMethods.replaceContentContainer;
 
 public class BaseActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener
 {
@@ -37,6 +36,7 @@ public class BaseActivity extends AppCompatActivity implements NavigationView.On
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+        Timber.i("%s starting", ACTIVITY_TAG);
         Timber.i("%s starting", ACTIVITY_TAG);
 
         // Timber Logger
