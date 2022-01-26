@@ -45,6 +45,10 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="app.com.muhammad.voice.BaseActivity" />
         </activity>
+        <activity android:name=".OnBoardingActivity"
+            android:label="@string/onBoarding_label"
+            android:screenOrientation="fullSensor">
+        </activity>
     </application>
 
 </manifest>

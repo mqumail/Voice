@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="24dp"
+    android:gravity="center"
+    >
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/VoiceLogo"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:layout_gravity="center"
+        app:srcCompat="@drawable/ic_baseline_lock_24" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingTop="50dp"
+        android:layout_gravity="center"
+        android:text="We care about your privacy!"
+        android:textSize="24sp"
+        android:lineSpacingExtra="8sp"
+        />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:layout_width="265dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:lineSpacingExtra="8sp"
+        android:text="* When you check in to a place, we encrypt your location before storing it \n* You can choose to stay annonymous when making a check in for added security"
+        android:textSize="16sp" />
+
+</LinearLayout>

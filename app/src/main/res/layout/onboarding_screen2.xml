@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="24dp"
+    android:gravity="center"
+    >
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/VoiceLogo"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:layout_gravity="center"
+        app:srcCompat="@drawable/ic_marker_man" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingTop="50dp"
+        android:layout_gravity="center"
+        android:text="Press the plus button, bottom-right of the home screen, to Check In"
+        android:textSize="24sp"
+        android:lineSpacingExtra="8sp"
+        />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:textSize="16sp"
+        android:lineSpacingExtra="8sp"
+        android:text="* See what the fuss is all about \n* Read reviews by locals or tourists \n* Finally Check In and Share."
+        />
+
+</LinearLayout>

@@ -64,6 +64,12 @@ dependencies {
 
     //Logger
     implementation 'com.jakewharton.timber:timber:5.0.1'
+
+//    //Onboarding Library
+//    implementation 'com.github.navasmdc:MaterialDesign:1.5@aar'
+
+    //SmartTabLayout
+    implementation 'com.ogaclejapan.smarttablayout:library:1.2.1@aar'
 }
 
 repositories {

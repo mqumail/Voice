@@ -1,6 +1,8 @@
 package app.com.muhammad.voice;
 
 
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.MenuItem;
 
@@ -35,6 +37,9 @@ public class BaseActivity extends AppCompatActivity implements NavigationView.On
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
+        // Make sure this is before calling super.onCreate
+        //TODO: Fix me :) splash screen setTheme(R.style.AppTheme);
+
         super.onCreate(savedInstanceState);
         Timber.i("%s starting", ACTIVITY_TAG);
         Timber.i("%s starting", ACTIVITY_TAG);
@@ -42,6 +47,16 @@ public class BaseActivity extends AppCompatActivity implements NavigationView.On
         // Timber Logger
         if (BuildConfig.DEBUG) {
             Timber.plant(new Timber.DebugTree());
+        }
+
+        SharedPreferences preferences =  getSharedPreferences("my_preferences", MODE_PRIVATE);
+
+        if(!preferences.getBoolean("onboarding_complete", false)){
+            Intent onboarding = new Intent(this, OnBoardingActivity.class);
+            startActivity(onboarding);
+
+            finish();
+            return;
         }
 
         binding = ActivityBaseBinding.inflate(getLayoutInflater());

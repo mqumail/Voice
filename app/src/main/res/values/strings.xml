@@ -71,5 +71,9 @@
     <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
     <string name="search_title">Search for a Place</string>
     <string name="check_in_search_hint">Search here</string>
+    <string name="onBoarding_label">On Boarding</string>
+    <string name="title_onBoarding_on">Raise your voice &amp; discover local gems</string>
+    <string name="subheading_onboarding_one">Find experiments happening nearby</string>
+    <string name="get_started">GET STARTED</string>
 
 </resources>
