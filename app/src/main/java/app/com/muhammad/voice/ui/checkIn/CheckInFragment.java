@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -43,7 +44,6 @@ import androidx.lifecycle.ViewModelProvider;
 import app.com.muhammad.voice.R;
 import app.com.muhammad.voice.databinding.FragmentCheckInBinding;
 import app.com.muhammad.voice.utils.CustomInfoWindow;
-import timber.log.Timber;
 
 import static app.com.muhammad.voice.utils.ConstantsVariables.MY_USER_AGENT;
 import static app.com.muhammad.voice.utils.UiHelperMethods.getBitmapFromVectorDrawable;
@@ -141,13 +141,13 @@ public class CheckInFragment extends Fragment
             queryTextListener = new SearchView.OnQueryTextListener() {
                 @Override
                 public boolean onQueryTextChange(String newText) {
-                    Timber.i("onQueryTextChange: %s", newText);
+                    Log.i("onQueryTextChange: %s", newText);
 
                     return true;
                 }
                 @Override
                 public boolean onQueryTextSubmit(String query) {
-                    Timber.i("onQueryTextSubmit: %s", query);
+                    Log.i("onQueryTextSubmit: %s", query);
 
                     //clear all the markers from the map except myoverlay
 

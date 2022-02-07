@@ -11,4 +11,12 @@
     <color name="colorDescText">#666666</color>
     <color name="colorRed">#FF0000</color>
     <color name="checkInFab">#E6bf4a50</color>
+
+    <color name="colorPrimaryNew">#2D383F</color>
+    <color name="colorPrimaryDarkNew">#2D383F</color>
+    <color name="colorAccentNew">#FF6C02</color>
+    <color name="backgroundNew">#EEEDEF</color>
+
+    <color name="bg_color">#040507</color>
+    <color name="bg_card_color">#423F5B</color>
 </resources>
