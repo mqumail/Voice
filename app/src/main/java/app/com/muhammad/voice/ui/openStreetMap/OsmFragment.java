@@ -10,7 +10,8 @@ import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
+
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import org.osmdroid.api.IMapController;
 import org.osmdroid.config.Configuration;
@@ -28,7 +29,6 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
-
 import app.com.muhammad.voice.R;
 import app.com.muhammad.voice.databinding.FragmentOsmBinding;
 
@@ -40,8 +40,6 @@ import static app.com.muhammad.voice.utils.ConstantsVariables.NETWORK_STATE_PERM
 import static app.com.muhammad.voice.utils.ConstantsVariables.WIFI_STATE_PERMISSION_CODE;
 import static app.com.muhammad.voice.utils.ConstantsVariables.WRITE_EXTERNAL_STORAGE_PERMISSION_CODE;
 import static app.com.muhammad.voice.utils.UiHelperMethods.replaceContentContainer;
-
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 /**
  * A simple {@link Fragment} subclass.
