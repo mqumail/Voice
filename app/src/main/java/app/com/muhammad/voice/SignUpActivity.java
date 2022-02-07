@@ -2,75 +2,95 @@ package app.com.muhammad.voice;
 
 import android.content.Intent;
 import android.os.Bundle;
-import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
-import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ListView;
+import android.widget.Toast;
 
-import java.util.ArrayList;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
-import app.com.muhammad.voice.utils.LocalCity;
-import app.com.muhammad.voice.utils.SettingsUtils;
-import app.com.muhammad.voice.utils.UserInformation;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import app.com.muhammad.voice.databinding.ActivitySignUpBinding;
 
 public class SignUpActivity extends AppCompatActivity  {
 
-    private SettingsUtils settingsUtils = new SettingsUtils();
-    private EditText tUserName;
-    private ListView mListView;
-    private ArrayList<String> aCityList;
-    private ArrayList<String> aCityListView;
-    private ArrayAdapter<String> arrayAdapter;
+    private static final String ACTIVITY_TAG = "SignUpActivity";
+
+    private ActivitySignUpBinding binding;
+
+    private EditText fullName;
+    private EditText userName;
+    private EditText email;
+    private EditText password;
+    private EditText confirmPassword;
+    private Button register;
+
+    private FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_up);
-//
-//        tUserName = findViewById(R.id.tUserName);
-//        mListView = findViewById(R.id.citiesList);
-//
-//        aCityList = new ArrayList<>();
-//        aCityListView = new ArrayList<>();
-//        arrayAdapter = new ArrayAdapter<>(SignUpActivity.this, android.R.layout.simple_list_item_1, aCityListView);
-//        mListView.setAdapter(arrayAdapter);
 
+        binding = ActivitySignUpBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
 
-        // Construct a GeoDataClient.
-//        mGeoDataClient = Places.getGeoDataClient(this, null);
-//        // Construct a PlaceDetectionClient.
-//        mPlaceDetectionClient = Places.getPlaceDetectionClient(this, null);
-//        AutocompleteFilter typeFilter = new AutocompleteFilter.Builder()
-//                .setTypeFilter(AutocompleteFilter.TYPE_FILTER_CITIES)
-//                .build();
-//        PlaceAutocompleteFragment autocompleteFragment = (PlaceAutocompleteFragment)
-//                getFragmentManager().findFragmentById(R.id.search_city);
-//        autocompleteFragment.setFilter(typeFilter);
-//        autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
-//            private static final String TAG = "AutoComplete";
-//            @Override
-//            public void onPlaceSelected(Place place) {
-//                Log.i(TAG, "Place: " + place.getName());
-//                settingsUtils.addCitytoList(aCityListView, aCityList, arrayAdapter, SignUpActivity.this);
-//            }
-//            @Override
-//            public void onError(Status status) {
-//                Log.i(TAG, "An error occurred: (Autocomplete failed)" + status);
-//            }
-//        });
+        mAuth = FirebaseAuth.getInstance();
 
+        fullName = binding.fullNameRegister;
+        userName = binding.usernameRegister;
+        email = binding.emailRegister;
+        password = binding.passwordRegister;
+        confirmPassword = binding.confirmPasswordRegister;
+        register = binding.buttonRegister;
+
+        //TODO: code goes here to sign a new user up
+        register.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                String email = binding.emailRegister.getText().toString();
+                String password = binding.passwordRegister.getText().toString();
+                signUp(email, password);
+
+                continueHome();
+            }
+        });
     }
 
-    public void continueHome(View view)
+    private void signUp(String email, String password) {
+
+        //Todo: Put all Auth and Firebase stuff in a util class
+        mAuth.createUserWithEmailAndPassword(email, password)
+                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (task.isSuccessful()) {
+                            // Sign in success, update UI with the signed-in user's information
+                            Log.d(ACTIVITY_TAG, "createUserWithEmail:success");
+                            FirebaseUser user = mAuth.getCurrentUser();
+                            //TODO: store new user in SP
+                        } else {
+                            // If sign in fails, display a message to the user.
+                            Log.w(ACTIVITY_TAG, "createUserWithEmail:failure", task.getException());
+                            Toast.makeText(SignUpActivity.this, "Authentication failed.",
+                                    Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+    }
+
+    public void continueHome()
     {
-//        settingsUtils.saveCities(aCityList, localCities, this);
-//        settingsUtils.saveUserInfo(tUserName, mUID, user, userInformation);
-//        Intent intent = new Intent(this, HomeScreenActivity.class);
-//        this.startActivity(intent);
-//        SignUpActivity.this.finish();
+        Intent intent = new Intent(SignUpActivity.this, BaseActivity.class);
+        startActivity(intent);
     }
-
 }

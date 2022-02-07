@@ -4,9 +4,13 @@ package app.com.muhammad.voice;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 
 import com.google.android.material.navigation.NavigationView;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -19,13 +23,14 @@ import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 import app.com.muhammad.voice.databinding.ActivityBaseBinding;
-import timber.log.Timber;
 
 import static app.com.muhammad.voice.utils.UiHelperMethods.replaceContentContainer;
 
 public class BaseActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener
 {
     private static final String ACTIVITY_TAG = "BaseActivity";
+    private static final String MY_PREFERENCES = "my_preferences";
+
     protected AppBarConfiguration appBarConfiguration;
     private ActivityBaseBinding binding;
     private Toolbar toolbar;
@@ -34,22 +39,21 @@ public class BaseActivity extends AppCompatActivity implements NavigationView.On
     private NavController navController;
     private NavHostFragment navHostFragment;
 
+    private FirebaseAuth mAuth;
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         // Make sure this is before calling super.onCreate
-        //TODO: Fix me :) splash screen setTheme(R.style.AppTheme);
+        setTheme(R.style.AppTheme);
 
         super.onCreate(savedInstanceState);
-        Timber.i("%s starting", ACTIVITY_TAG);
-        Timber.i("%s starting", ACTIVITY_TAG);
+        Log.i("%s starting", ACTIVITY_TAG);
 
-        // Timber Logger
-        if (BuildConfig.DEBUG) {
-            Timber.plant(new Timber.DebugTree());
-        }
+        FirebaseApp.initializeApp(this);
+        mAuth = FirebaseAuth.getInstance();
 
-        SharedPreferences preferences =  getSharedPreferences("my_preferences", MODE_PRIVATE);
+        SharedPreferences preferences =  getSharedPreferences(MY_PREFERENCES, MODE_PRIVATE);
 
         if(!preferences.getBoolean("onboarding_complete", false)){
             Intent onboarding = new Intent(this, OnBoardingActivity.class);
@@ -100,9 +104,22 @@ public class BaseActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item)
     {
-        Timber.i("Item selected: %s", item.toString());
+        Log.i("Item selected: %s", item.toString());
         replaceContentContainer(item.getItemId(), getSupportFragmentManager());
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        // Check if user is signed in (non-null) and update UI accordingly.
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        if(currentUser == null){
+            // send user to login page
+            Intent login = new Intent(this, LoginActivity.class);
+            startActivity(login);
+            return;
+        }
     }
 }
