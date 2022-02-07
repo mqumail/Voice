@@ -1,12 +1,25 @@
 package app.com.muhammad.voice.ui.settings;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.ListView;
+
+import java.util.HashSet;
+import java.util.Set;
 
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import app.com.muhammad.voice.R;
+import app.com.muhammad.voice.databinding.FragmentSettingsBinding;
+import app.com.muhammad.voice.utils.MainAdapter;
+
+import static android.content.Context.MODE_PRIVATE;
+import static android.view.View.GONE;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -24,6 +37,14 @@ public class SettingsFragment extends Fragment
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+
+    private ListView localCitiesList;
+    private Animation animation;
+
+    private FragmentSettingsBinding binding;
+    private SettingsViewModel viewModel;
+
+    private static final String MY_PREFERENCES = "my_preferences";
 
     public SettingsFragment()
     {
@@ -63,8 +84,70 @@ public class SettingsFragment extends Fragment
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState)
     {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_settings, container, false);
+        viewModel = new ViewModelProvider(this).get(SettingsViewModel.class);
+        binding = FragmentSettingsBinding.inflate(inflater, container, false);
+        View root = binding.getRoot();
+
+        SharedPreferences sharedPreferences = this.getActivity().getSharedPreferences(MY_PREFERENCES, MODE_PRIVATE);
+
+        localCitiesList = binding.localCitiesListView;
+
+        binding.buttonUpdateLocalCity.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                binding.viewsLocalCitiesUpdate.setVisibility(GONE);
+                binding.editTextLocalCities.setVisibility(View.VISIBLE);
+            }
+        });
+
+        binding.buttonEnterLocalCity.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                String localCity = binding.enterLocalCityEditText.getText().toString();
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+
+                Set<String> updatedLocalCities = new HashSet<>();
+                updatedLocalCities.add(localCity);
+
+                editor.putStringSet("localCities", updatedLocalCities);
+                editor.apply();
+
+                binding.editTextLocalCities.setVisibility(GONE);
+                binding.viewsLocalCitiesUpdate.setVisibility(View.VISIBLE);
+            }
+        });
+
+        binding.buttonAddLocalCity.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                // hide the other two views (Already rendered with visibility gone for the other two views)
+                binding.viewsLocalCitiesAdd.setVisibility(GONE);
+                binding.editTextLocalCities.setVisibility(View.VISIBLE);
+            }
+        });
+
+        // get local cities from SP, if none are found, hide the ListView and show only a textView with button to add a home city.
+        // if home city is already added, then show a button to update
+        Set<String> localCities = sharedPreferences.getStringSet("localCities", null);
+
+        if (localCities == null) {
+            // no cities, show add views
+            binding.viewsLocalCitiesAdd.setVisibility(View.VISIBLE);
+        } else {
+            String[] localCitiesArray = localCities.toArray(new String[0]);
+            MainAdapter adapter = new MainAdapter(SettingsFragment.this, localCitiesArray);
+            animation = AnimationUtils.loadAnimation(getActivity(), R.anim.animation1);
+            localCitiesList.setAdapter(adapter);
+            binding.viewsLocalCitiesUpdate.setVisibility(View.VISIBLE);
+        }
+
+        return root;
     }
 
     @Override
