@@ -29,6 +29,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
+            android:visibility="gone"
             android:id="@+id/views_local_cities_add">
 
             <TextView
@@ -118,5 +119,6 @@
                 android:text="Save"
                 android:textColor="@color/cardview_light_background"/>
         </LinearLayout>
+
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

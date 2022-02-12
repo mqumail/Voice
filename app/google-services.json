@@ -8,20 +8,12 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:496533077048:android:492750dcea65e6b4",
+        "mobilesdk_app_id": "1:496533077048:android:e175e5a4333c833297facd",
         "android_client_info": {
           "package_name": "app.com.muhammad.voice"
         }
       },
       "oauth_client": [
-        {
-          "client_id": "496533077048-ir2ofu3kh5a6jth4rc8gfgg9t94n95s2.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "app.com.muhammad.voice",
-            "certificate_hash": "24683344d9bff1e8513baa2646510c0758c5ab53"
-          }
-        },
         {
           "client_id": "496533077048-sqe9qnc4cippmaudv53g9iu2trm9nvfc.apps.googleusercontent.com",
           "client_type": 3
@@ -29,24 +21,17 @@
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyBMNN3OlDe49m1D9-YCW_yTBYAOFq03Ass"
+          "current_key": "AIzaSyA6EQMxZXkCmy1R3gTl4g9s3X-lAn0SsME"
         }
       ],
       "services": {
-        "analytics_service": {
-          "status": 1
-        },
         "appinvite_service": {
-          "status": 2,
           "other_platform_oauth_client": [
             {
               "client_id": "496533077048-sqe9qnc4cippmaudv53g9iu2trm9nvfc.apps.googleusercontent.com",
               "client_type": 3
             }
           ]
-        },
-        "ads_service": {
-          "status": 2
         }
       }
     }

@@ -89,7 +89,6 @@ public class SettingsFragment extends Fragment
         View root = binding.getRoot();
 
         SharedPreferences sharedPreferences = this.getActivity().getSharedPreferences(MY_PREFERENCES, MODE_PRIVATE);
-
         localCitiesList = binding.localCitiesListView;
 
         binding.buttonUpdateLocalCity.setOnClickListener(new View.OnClickListener()
