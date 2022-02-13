@@ -13,6 +13,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -79,7 +80,9 @@ public class SignUpActivity extends AppCompatActivity  {
                             // Sign in success, update UI with the signed-in user's information
                             Log.d(ACTIVITY_TAG, "createUserWithEmail:success");
                             saveUserInfo(email, userName);
-                        } else {
+                        }
+                        else {
+                            FirebaseUser user = mAuth.getCurrentUser();
                             // If sign in fails, display a message to the user.
                             Log.w(ACTIVITY_TAG, "createUserWithEmail:failure", task.getException());
                             Toast.makeText(SignUpActivity.this, "Authentication failed.",

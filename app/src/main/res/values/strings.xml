@@ -72,8 +72,12 @@
     <string name="search_title">Search for a Place</string>
     <string name="check_in_search_hint">Search here</string>
     <string name="onBoarding_label">On Boarding</string>
-    <string name="title_onBoarding_on">Raise your voice &amp; discover local gems</string>
-    <string name="subheading_onboarding_one">Find experiments happening nearby</string>
+    <string name="title_onBoarding_one">Raise your voice &amp; discover local gems!</string>
+    <string name="subheading_onBoarding_one">Share you favorites spots in town &amp; Get to know new ones!</string>
     <string name="get_started">GET STARTED</string>
+    <string name="title_onBoarding_two">Press the plus button, bottom-right of the home screen, to Check In</string>
+    <string name="subheading_onBoarding_two">* See what the fuss is all about \n* Read reviews by locals or tourists \n* Finally Check In and Share.</string>
+    <string name="title_onBoarding_three">We care about your privacy!</string>
+    <string name="subheading_onBoarding_three">* Your data is protected with us \n* You can be Anonymous when making a Check In</string>
 
 </resources>

@@ -1,35 +1,68 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="24dp"
     android:gravity="center"
     >
 
-    <androidx.appcompat.widget.AppCompatImageView
+    <ImageView
         android:id="@+id/VoiceLogo"
-        android:layout_width="match_parent"
-        android:layout_height="200dp"
+        android:layout_width="258dp"
+        android:layout_height="282dp"
         android:layout_gravity="center"
-        app:srcCompat="@drawable/ic_baseline_lock_24" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.496"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.127"
+        app:srcCompat="@drawable/ic_baseline_lock_24"/>
 
-    <androidx.appcompat.widget.AppCompatTextView
+
+    <ImageView
+        android:id="@+id/VoiceRibbon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:paddingTop="50dp"
         android:layout_gravity="center"
-        android:text="We care about your privacy!"
-        android:textSize="24sp"
-        android:lineSpacingExtra="8sp"
-        />
+        android:src="@drawable/ic_color_bar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/VoiceLogo"
+        app:layout_constraintVertical_bias="0.23" />
 
-    <androidx.appcompat.widget.AppCompatTextView
-        android:layout_width="265dp"
+    <TextView
+        android:id="@+id/title_onBoarding_three"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
+        android:gravity="center_horizontal"
+        android:fontFamily="@font/google_sans_medium"
         android:lineSpacingExtra="8sp"
-        android:text="* When you check in to a place, we encrypt your location before storing it \n* You can choose to stay annonymous when making a check in for added security"
-        android:textSize="16sp" />
+        android:paddingTop="50dp"
+        android:text="@string/title_onBoarding_three"
+        android:textColor="@color/colorDescText"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/VoiceLogo"
+        app:layout_constraintVertical_bias="0.338" />
 
-</LinearLayout>
+    <TextView
+        android:layout_width="248dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="left"
+        android:fontFamily="@font/google_sans_medium"
+        android:lineSpacingExtra="8sp"
+        android:text="@string/subheading_onBoarding_three"
+        android:textColor="@color/colorDescText"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/title_onBoarding_three"
+        app:layout_constraintVertical_bias="0.177" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

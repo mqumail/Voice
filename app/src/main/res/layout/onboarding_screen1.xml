@@ -1,35 +1,69 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical" android:layout_width="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="24dp"
     android:gravity="center"
-    >
+    android:orientation="vertical"
+    android:padding="24dp">
 
-    <androidx.appcompat.widget.AppCompatImageView
+    <ImageView
         android:id="@+id/VoiceLogo"
-        android:layout_width="match_parent"
-        android:layout_height="200dp"
+        android:layout_width="258dp"
+        android:layout_height="282dp"
         android:layout_gravity="center"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.496"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.127"
         app:srcCompat="@drawable/ic_voice_logo" />
 
-    <androidx.appcompat.widget.AppCompatTextView
-        android:layout_width="228dp"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:lineSpacingExtra="8sp"
-        android:paddingTop="50dp"
-        android:text="@string/title_onBoarding_on"
-        android:textSize="24sp" />
-
-    <androidx.appcompat.widget.AppCompatTextView
+    <ImageView
+        android:id="@+id/VoiceRibbon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:textSize="16sp"
-        android:lineSpacingExtra="8sp"
-        android:text="@string/subheading_onboarding_one"
-        />
+        android:src="@drawable/ic_color_bar"
+        app:layout_constraintBottom_toTopOf="@+id/appCompatTextView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/VoiceLogo"
+        app:layout_constraintVertical_bias="0.23" />
 
-</LinearLayout>
+    <TextView
+        android:id="@+id/appCompatTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:fontFamily="@font/google_sans_medium"
+        android:lineSpacingExtra="8sp"
+        android:text="@string/title_onBoarding_one"
+        android:textColor="@color/colorDescText"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/VoiceLogo"
+        app:layout_constraintVertical_bias="0.626" />
+
+    <TextView
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:fontFamily="@font/google_sans_medium"
+        android:gravity="center_horizontal"
+        android:lineSpacingExtra="8sp"
+        android:text="@string/subheading_onBoarding_one"
+        android:textColor="@color/colorDescText"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/appCompatTextView"
+        app:layout_constraintVertical_bias="0.177" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
