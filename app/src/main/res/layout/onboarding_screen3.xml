@@ -9,7 +9,7 @@
     >
 
     <ImageView
-        android:id="@+id/VoiceLogo"
+        android:id="@+id/LockLogo"
         android:layout_width="258dp"
         android:layout_height="282dp"
         android:layout_gravity="center"
@@ -19,7 +19,8 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.127"
-        app:srcCompat="@drawable/ic_baseline_lock_24"/>
+        app:srcCompat="@drawable/ic_twotone_lock_24"
+        app:tint="#A8B679" />
 
 
     <ImageView
@@ -30,7 +31,7 @@
         android:src="@drawable/ic_color_bar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/VoiceLogo"
+        app:layout_constraintTop_toBottomOf="@+id/LockLogo"
         app:layout_constraintVertical_bias="0.23" />
 
     <TextView
@@ -40,14 +41,13 @@
         android:gravity="center_horizontal"
         android:fontFamily="@font/google_sans_medium"
         android:lineSpacingExtra="8sp"
-        android:paddingTop="50dp"
         android:text="@string/title_onBoarding_three"
         android:textColor="@color/colorDescText"
         android:textSize="18sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/VoiceLogo"
+        app:layout_constraintTop_toBottomOf="@+id/LockLogo"
         app:layout_constraintVertical_bias="0.338" />
 
     <TextView
