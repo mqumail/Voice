@@ -6,7 +6,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
-import com.ogaclejapan.smarttablayout.SmartTabLayout;
+import com.google.android.material.tabs.TabLayout;
 
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
@@ -19,18 +19,19 @@ import app.com.muhammad.voice.ui.onboarding.OnBoardingFragment3;
 public class OnBoardingActivity extends FragmentActivity {
 
     private ViewPager pager;
-    private SmartTabLayout indicator;
+    private TabLayout tabLayout;
     private Button skip;
     private Button next;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_onboarding);
 
-        pager = (ViewPager)findViewById(R.id.pager);
-        indicator = (SmartTabLayout)findViewById(R.id.indicator);
+        pager = (ViewPager) findViewById(R.id.pager);
+        tabLayout = (TabLayout) findViewById(R.id.indicator);
+
+
         skip = (Button) findViewById(R.id.skip);
         next = (Button) findViewById(R.id.next);
 
@@ -52,23 +53,22 @@ public class OnBoardingActivity extends FragmentActivity {
         };
 
         pager.setAdapter(adapter);
+        tabLayout.setupWithViewPager(pager);
 
-        indicator.setViewPager(pager);
-
-        indicator.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
-
-            @Override
-            public void onPageSelected(int position) {
-                if(position == 2){
-                    skip.setVisibility(View.GONE);
-                    next.setText("Done");
-                } else {
-                    skip.setVisibility(View.VISIBLE);
-                    next.setText("Next");
-                }
-            }
-
-        });
+//        tabLayout.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
+//
+//            @Override
+//            public void onPageSelected(int position) {
+//                if(position == 2){
+//                    skip.setVisibility(View.GONE);
+//                    next.setText("Done");
+//                } else {
+//                    skip.setVisibility(View.VISIBLE);
+//                    next.setText("Next");
+//                }
+//            }
+//
+//        });
 
         skip.setOnClickListener(new View.OnClickListener() {
             @Override

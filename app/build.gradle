@@ -49,9 +49,7 @@ dependencies {
     // Google's Material Design
     implementation 'com.google.android.material:material:1.5.0'
 
-
-
-    //implementation 'com.google.gms:google-services:4.3.10'
+    implementation 'com.google.gms:google-services:4.3.10'
 
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
