@@ -1,57 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="match_parent">
 
-    <androidx.viewpager.widget.ViewPager
+    <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/pager"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:id="@+id/navigation">
-
-        <androidx.appcompat.widget.AppCompatButton
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.5"
-            android:text="Skip"
-            android:id="@+id/skip"
-            />
-
-        <androidx.appcompat.widget.AppCompatButton
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.5"
-            android:text="Next"
-            android:id="@+id/next"
-            />
-    </LinearLayout>
-
-<!--    <com.ogaclejapan.smarttablayout.SmartTabLayout-->
-<!--        android:id="@+id/"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:layout_above="@+id/navigation"-->
-<!--        android:layout_marginBottom="20dp"-->
-<!--        android:layout_centerHorizontal="true"-->
-<!--        app:stl_dividerThickness="0dp"-->
-<!--        app:stl_indicatorColor="#1e88e5"-->
-<!--        />-->
-
     <com.google.android.material.tabs.TabLayout
-        android:id="@+id/indicator"
-        android:layout_alignParentBottom="true"
+        android:id="@+id/tabLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:tabBackground="@drawable/tab_selector"
+        android:layout_alignParentBottom="true"
+        app:layout_constraintBottom_toBottomOf="@+id/pager"
         app:tabGravity="center"
-        app:tabIndicatorHeight="0dp"/>
+        app:tabIndicator="@drawable/tab_indicator_default"
+        app:tabIndicatorHeight="0dp" />
 
-
-
-</RelativeLayout>
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/button_continue_onboard"
+        android:background="@drawable/button_action"
+        android:text="Continue.."
+        app:layout_constraintBottom_toBottomOf="@+id/pager"
+        app:layout_constraintEnd_toEndOf="@+id/tabLayout"
+        app:layout_constraintStart_toStartOf="@+id/tabLayout"
+        android:visibility="gone"/>
+</androidx.constraintlayout.widget.ConstraintLayout>

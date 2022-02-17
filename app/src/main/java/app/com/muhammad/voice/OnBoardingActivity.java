@@ -7,37 +7,39 @@ import android.view.View;
 import android.widget.Button;
 
 import com.google.android.material.tabs.TabLayout;
+import com.google.android.material.tabs.TabLayoutMediator;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
-import androidx.fragment.app.FragmentStatePagerAdapter;
-import androidx.viewpager.widget.ViewPager;
+import androidx.viewpager2.adapter.FragmentStateAdapter;
+import androidx.viewpager2.widget.ViewPager2;
+
 import app.com.muhammad.voice.ui.onboarding.OnBoardingFragment1;
 import app.com.muhammad.voice.ui.onboarding.OnBoardingFragment2;
 import app.com.muhammad.voice.ui.onboarding.OnBoardingFragment3;
 
 public class OnBoardingActivity extends FragmentActivity {
 
-    private ViewPager pager;
+    private ViewPager2 pager;
     private TabLayout tabLayout;
-    private Button skip;
+    private Button continueHome;
     private Button next;
+    private FragmentStateAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_onboarding);
 
-        pager = (ViewPager) findViewById(R.id.pager);
-        tabLayout = (TabLayout) findViewById(R.id.indicator);
+        pager = findViewById(R.id.pager);
+        tabLayout = findViewById(R.id.tabLayout);
+        continueHome = findViewById(R.id.button_continue_onboard);
 
-
-        skip = (Button) findViewById(R.id.skip);
-        next = (Button) findViewById(R.id.next);
-
-        FragmentStatePagerAdapter adapter = new FragmentStatePagerAdapter(getSupportFragmentManager()) {
+        adapter = new FragmentStateAdapter(this) {
+            @NonNull
             @Override
-            public Fragment getItem(int position) {
+            public Fragment createFragment(int position) {
                 switch (position) {
                     case 0 : return new OnBoardingFragment1();
                     case 1 : return new OnBoardingFragment2();
@@ -47,50 +49,49 @@ public class OnBoardingActivity extends FragmentActivity {
             }
 
             @Override
-            public int getCount() {
+            public int getItemCount() {
                 return 3;
             }
         };
 
         pager.setAdapter(adapter);
-        tabLayout.setupWithViewPager(pager);
+        new TabLayoutMediator(tabLayout, pager,
+                (tab, position) -> tab.setIcon(R.drawable.tab_indicator_default)).attach();
 
-//        tabLayout.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
-//
-//            @Override
-//            public void onPageSelected(int position) {
-//                if(position == 2){
-//                    skip.setVisibility(View.GONE);
-//                    next.setText("Done");
-//                } else {
-//                    skip.setVisibility(View.VISIBLE);
-//                    next.setText("Next");
-//                }
-//            }
-//
-//        });
-
-        skip.setOnClickListener(new View.OnClickListener() {
+        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
-            public void onClick(View v) {
-                finishOnboarding();
+            public void onTabSelected(TabLayout.Tab tab) {
+                if (tab.getPosition() == 2) {
+                    tabLayout.setVisibility(View.GONE);
+                    continueHome.setVisibility(View.VISIBLE);
+                }
+                tab.setIcon(R.drawable.tab_indicator_selected);
             }
-        });
 
-        next.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
-                if(pager.getCurrentItem() == 2){
-                    finishOnboarding();
-                } else {
-                    pager.setCurrentItem(pager.getCurrentItem() + 1, true);
+            public void onTabUnselected(TabLayout.Tab tab) {
+                tab.setIcon(R.drawable.tab_indicator_default);
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+                tab.setIcon(R.drawable.tab_indicator_selected);
+                if (tab.getPosition() == 2) {
+                    tabLayout.setVisibility(View.GONE);
+                    continueHome.setVisibility(View.VISIBLE);
                 }
             }
         });
 
+        continueHome.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finishOnboard();
+            }
+        });
     }
 
-    private void finishOnboarding() {
+    private void finishOnboard() {
         SharedPreferences preferences =
                 getSharedPreferences("my_preferences", MODE_PRIVATE);
 

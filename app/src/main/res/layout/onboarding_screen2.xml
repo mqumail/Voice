@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:theme="@style/Theme.Material3.Dark.NoActionBar"
     android:padding="24dp"
     android:gravity="center"
     >
@@ -12,14 +13,15 @@
         android:layout_width="258dp"
         android:layout_height="282dp"
         android:layout_gravity="center"
+        android:src="@drawable/ic_marker_man"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.496"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.127"
-        app:srcCompat="@drawable/ic_marker_man"
-        app:tint="#F2CF24" />
+        app:tint="#F2CF24"
+        android:contentDescription="@string/voiceManIconContentDescription"/>
 
     <ImageView
         android:id="@+id/VoiceRibbon"
@@ -30,7 +32,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/VoiceManLogo"
-        app:layout_constraintVertical_bias="0.23" />
+        app:layout_constraintVertical_bias="0.23"
+        android:contentDescription="@string/voiceRibbonContentDescription"/>
 
     <TextView
         android:id="@+id/title_onBoarding_two"
@@ -40,7 +43,7 @@
         android:fontFamily="@font/google_sans_medium"
         android:lineSpacingExtra="8sp"
         android:text="@string/title_onBoarding_two"
-        android:textColor="@color/colorDescText"
+        android:textColor="#78909C"
         android:textSize="18sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -51,11 +54,11 @@
     <TextView
         android:layout_width="250dp"
         android:layout_height="wrap_content"
-        android:layout_gravity="left"
+        android:layout_gravity="start"
         android:fontFamily="@font/google_sans_medium"
         android:lineSpacingExtra="8sp"
         android:text="@string/subheading_onBoarding_two"
-        android:textColor="@color/colorDescText"
+        android:textColor="#78909C"
         android:textSize="14sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

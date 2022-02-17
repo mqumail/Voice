@@ -10,16 +10,16 @@
 
     <ImageView
         android:id="@+id/VoiceLogo"
-        android:layout_width="258dp"
+        android:layout_width="match_parent"
         android:layout_height="282dp"
         android:layout_gravity="center"
+        android:src="@drawable/ic_voice_logo"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.496"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.127"
-        app:srcCompat="@drawable/ic_voice_logo" />
+        app:layout_constraintVertical_bias="0.127" />
 
     <ImageView
         android:id="@+id/VoiceRibbon"
@@ -31,7 +31,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/VoiceLogo"
-        app:layout_constraintVertical_bias="0.23" />
+        app:layout_constraintVertical_bias="0.23"
+        android:contentDescription="@string/voiceRibbonContentDescription"/>
 
     <TextView
         android:id="@+id/appCompatTextView"
@@ -41,7 +42,7 @@
         android:fontFamily="@font/google_sans_medium"
         android:lineSpacingExtra="8sp"
         android:text="@string/title_onBoarding_one"
-        android:textColor="@color/colorDescText"
+        android:textColor="#78909C"
         android:textSize="18sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -57,7 +58,7 @@
         android:gravity="center_horizontal"
         android:lineSpacingExtra="8sp"
         android:text="@string/subheading_onBoarding_one"
-        android:textColor="@color/colorDescText"
+        android:textColor="#78909C"
         android:textSize="14sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
