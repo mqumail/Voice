@@ -80,6 +80,9 @@ public class SignUpActivity extends AppCompatActivity  {
                             // Sign in success, update UI with the signed-in user's information
                             Log.d(ACTIVITY_TAG, "createUserWithEmail:success");
                             saveUserInfo(email, userName);
+
+                            //TODO: let user know they signed in succesfully and that they are signed in as: username
+                            //      maybe use toast
                         }
                         else {
                             FirebaseUser user = mAuth.getCurrentUser();

@@ -79,5 +79,9 @@
     <string name="subheading_onBoarding_two">* See what the fuss is all about \n* Read reviews by locals or tourists \n* Finally Check In and Share.</string>
     <string name="title_onBoarding_three">We care about your privacy!</string>
     <string name="subheading_onBoarding_three">* Your data is protected with us \n* You can be Anonymous when making a Check In</string>
+    <string name="securityLockContentDescription">securityLock</string>
+    <string name="voiceRibbonContentDescription">voiceRibbon</string>
+    <string name="voiceManIconContentDescription">VoiceManIcon</string>
+    <string name="voiceLogoContentDescription">voiceLogo</string>
 
 </resources>
