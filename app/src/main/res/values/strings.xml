@@ -61,14 +61,7 @@
     <string name="check_in_fab_description">Starts the Check In Cycle</string>
     <string name="menu_check_in">Check In</string>
     <string name="title_activity_check_in">CheckInActivity</string>
-    <!-- Strings used for fragments for navigation -->
-    <string name="first_fragment_label">First Fragment</string>
-    <string name="second_fragment_label">Second Fragment</string>
-    <string name="next">Next</string>
-    <string name="previous">Previous</string>
 
-    <string name="hello_first_fragment">Hello first fragment</string>
-    <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
     <string name="search_title">Search for a Place</string>
     <string name="check_in_search_hint">Search here</string>
     <string name="onBoarding_label">On Boarding</string>
@@ -76,12 +69,17 @@
     <string name="subheading_onBoarding_one">Share you favorites spots in town &amp; Get to know new ones!</string>
     <string name="get_started">GET STARTED</string>
     <string name="title_onBoarding_two">Press the plus button, bottom-right of the home screen, to Check In</string>
-    <string name="subheading_onBoarding_two">* See what the fuss is all about \n* Read reviews by locals or tourists \n* Finally Check In and Share.</string>
+    <string name="subheading_onBoarding_two">See what the fuss is all about \nRead reviews by locals or tourists \nFinally Check In and Share</string>
     <string name="title_onBoarding_three">We care about your privacy!</string>
-    <string name="subheading_onBoarding_three">* Your data is protected with us \n* You can be Anonymous when making a Check In</string>
+    <string name="subheading_onBoarding_three">Your data is protected with us \nYou can be Anonymous when making a Check In</string>
     <string name="securityLockContentDescription">securityLock</string>
     <string name="voiceRibbonContentDescription">voiceRibbon</string>
     <string name="voiceManIconContentDescription">VoiceManIcon</string>
     <string name="voiceLogoContentDescription">voiceLogo</string>
+    <string name="my_hometown_prompt">MY HOMETOWN 🏠</string>
+    <string name="update_your_local_city">* Update your local city!</string>
+    <string name="update">UPDATE</string>
+    <string name="enter_your_current_city">Enter your current city.</string>
+    <string name="add_local_city_prompt">* Check In as a Local, add your current home city!</string>
 
 </resources>

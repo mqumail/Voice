@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:gravity="center"
-    android:orientation="vertical"
+    android:background="@color/background"
     android:padding="24dp">
 
     <ImageView
@@ -39,10 +40,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
+        android:gravity="center"
         android:fontFamily="@font/google_sans_medium"
         android:lineSpacingExtra="8sp"
         android:text="@string/title_onBoarding_one"
-        android:textColor="#78909C"
+        android:textColor="@color/primary_text"
         android:textSize="18sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -54,11 +56,11 @@
         android:layout_width="250dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
+        android:gravity="center"
         android:fontFamily="@font/google_sans_medium"
-        android:gravity="center_horizontal"
         android:lineSpacingExtra="8sp"
         android:text="@string/subheading_onBoarding_one"
-        android:textColor="#78909C"
+        android:textColor="@color/secondary_text"
         android:textSize="14sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

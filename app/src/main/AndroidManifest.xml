@@ -6,7 +6,6 @@
     <application
         android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
-        android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
@@ -20,8 +19,7 @@
         <activity
             android:name=".BaseActivity"
             android:exported="true"
-            android:label="@string/app_name"
-            android:theme="@style/splashScreenTheme">
+            android:theme="@style/AppTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -30,13 +28,11 @@
         </activity>
         <activity
             android:name=".SignUpActivity"
-            android:label="@string/settings_label"
             android:screenOrientation="fullSensor"
-            android:theme="@style/CitiesTheme"
+            android:theme="@style/AppTheme"
             android:windowSoftInputMode="adjustPan|stateVisible|stateHidden" />
         <activity
             android:name=".OnBoardingActivity"
-            android:label="@string/onBoarding_label"
             android:screenOrientation="fullSensor" />
 
     </application>

@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="50dp"
-    android:background="@color/backgroundNew"
+    android:background="@color/background"
     tools:context=".LoginActivity">
 
     <ImageView
@@ -30,7 +30,7 @@
             android:hint="Email"
             android:ems="10"
             android:inputType="textEmailAddress"
-            android:textSize="22sp"
+            android:fontFamily="@font/google_sans_medium"
             />
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -50,29 +50,32 @@
             android:hint="Password"
             android:ems="10"
             android:inputType="textPassword"
-            android:textSize="22sp"
+            android:fontFamily="@font/google_sans_medium"
             />
     </com.google.android.material.textfield.TextInputLayout>
 
     <Button
         android:id="@+id/button_login"
-        android:layout_width="match_parent"
+        android:layout_width="125dp"
         android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:paddingStart="20dp"
+        android:paddingEnd="20dp"
+        android:background="@drawable/button_get_started"
         android:text="Login"
-        android:textSize="22sp"
-        android:textColor="#ffffff"
-        android:layout_marginTop="40dp"
-        android:background="@drawable/button_rounded"/>
+        android:textColor="@color/primary_dark"
+        android:layout_marginTop="40dp"/>
 
     <Button
         android:id="@+id/button_register"
-        android:layout_width="match_parent"
+        android:layout_width="125dp"
         android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:paddingStart="20dp"
+        android:paddingEnd="20dp"
+        android:background="@drawable/button_get_started"
         android:text="Register"
-        android:textSize="22sp"
-        android:textColor="#ffffff"
-        android:layout_marginTop="10dp"
-        android:background="@drawable/button_rounded"
-        />
+        android:textColor="@color/primary_dark"
+        android:layout_marginTop="10dp" />
 
 </LinearLayout>

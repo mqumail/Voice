@@ -3,33 +3,38 @@
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <!-- Customize your theme here. -->
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorAccent</item>
-        <item name="android:textColor">@color/colorBodyText</item>
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryDark">@color/primary_dark</item>
+        <item name="colorAccent">@color/primary_dark</item>
+        <item name="android:textColor">@color/primary_text</item>
     </style>
 
     <style name="SplashTheme" parent="AppTheme">
         <!-- Customize your theme here. -->
-        <item name="colorPrimary">@color/colorPrimaryDark</item>
-        <item name="colorPrimaryDark">#eeeff3</item>
-        <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryDark">@color/primary_dark</item>
+        <item name="colorAccent">@color/primary_dark</item>
         <item name="android:statusBarColor" tools:targetApi="lollipop">#eeeff3</item>
         <item name="android:windowLightStatusBar" tools:targetApi="m">false</item>
     </style>
 
+    <style name="HideToolBar" parent="AppTheme">
+        <item name="colorPrimary">@color/background</item>
+        <item name="windowActionBarOverlay">true</item>
+    </style>
+
     <style name="CitiesTheme" parent="Theme.AppCompat.Light.DarkActionBar">
-        <item name="colorPrimary">@color/colorPrimaryDark</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorAccent</item>
-        <item name="android:textColor">@color/colorBodyText</item>
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryDark">@color/primary_dark</item>
+        <item name="colorAccent">@color/primary_dark</item>
+        <item name="android:textColor">@color/primary_text</item>
     </style>
 
     <style name="CitiesUpdateTheme" parent="Theme.AppCompat.Light.DarkActionBar">
-        <item name="colorPrimary">@color/colorPrimaryDark</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorAccent</item>
-        <item name="android:textColor">@color/colorBodyText</item>
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryDark">@color/primary_dark</item>
+        <item name="colorAccent">@color/primary_dark</item>
+        <item name="android:textColor">@color/primary_text</item>
     </style>
 
     <style name="splashScreenTheme" parent="Theme.AppCompat.Light.NoActionBar">

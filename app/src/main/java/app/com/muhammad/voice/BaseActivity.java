@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
 
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.FirebaseApp;
@@ -47,44 +48,67 @@ public class BaseActivity extends AppCompatActivity implements NavigationView.On
         // Make sure this is before calling super.onCreate
         setTheme(R.style.AppTheme);
 
+        //TODO: Maybe a bug, after the onboardingactivity is finished, it calls the baseactivity again,
+        // should go drirectly to the osmFragment
         super.onCreate(savedInstanceState);
         Log.i("%s starting", ACTIVITY_TAG);
-
-        FirebaseApp.initializeApp(this);
-        mAuth = FirebaseAuth.getInstance();
-
-        SharedPreferences preferences =  getSharedPreferences(MY_PREFERENCES, MODE_PRIVATE);
-
-        if(!preferences.getBoolean("onboarding_complete", false)){
-            Intent onboarding = new Intent(this, OnBoardingActivity.class);
-            startActivity(onboarding);
-
-            finish();
-            return;
-        }
 
         binding = ActivityBaseBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        navHostFragment = (NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
-
+        //toolbar
         toolbar = findViewById(R.id.toolbar_base);
         setSupportActionBar(toolbar);
 
+        //drawer
         drawer = binding.baseDrawerLayout;
         appBarConfiguration = new AppBarConfiguration.
                 Builder(R.id.osmFragment,
                 R.id.profileFragment,
                 R.id.settingsFragment)
-        .setOpenableLayout(drawer)
-        .build();
+                .setOpenableLayout(drawer)
+                .build();
 
+        binding.menuButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (!drawer.isDrawerOpen(GravityCompat.START)) {
+                    drawer.openDrawer(GravityCompat.START);
+                } else {
+                    drawer.closeDrawer(GravityCompat.START);
+                }
+            }
+        });
+
+        //UIs
         navigationView = binding.baseNavView;
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
 
         navigationView.setNavigationItemSelectedListener(this);
+
+        // Firebase
+        FirebaseApp.initializeApp(this);
+        mAuth = FirebaseAuth.getInstance();
+
+        //Fragment OSM - UIs
+        navHostFragment = (NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
+
+        if (showOnboard()) return;
+    }
+
+    private boolean showOnboard() {
+        SharedPreferences preferences =  getSharedPreferences(MY_PREFERENCES, MODE_PRIVATE);
+
+        if(!preferences.getBoolean("onboard_complete", false)){
+            Intent onboard = new Intent(this, OnBoardingActivity.class);
+            startActivity(onboard);
+
+            finish();
+            return true;
+        }
+        return false;
     }
 
     @Override
@@ -117,9 +141,9 @@ public class BaseActivity extends AppCompatActivity implements NavigationView.On
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if(currentUser == null){
             // send user to login page
+            // TODO: When this intent is sent, it also checks for permissions. Its too early. Dont show it, wait
             Intent login = new Intent(this, LoginActivity.class);
             startActivity(login);
-            return;
         }
     }
 }

@@ -24,7 +24,6 @@ public class OnBoardingActivity extends FragmentActivity {
     private ViewPager2 pager;
     private TabLayout tabLayout;
     private Button continueHome;
-    private Button next;
     private FragmentStateAdapter adapter;
 
     @Override
@@ -35,7 +34,6 @@ public class OnBoardingActivity extends FragmentActivity {
         pager = findViewById(R.id.pager);
         tabLayout = findViewById(R.id.tabLayout);
         continueHome = findViewById(R.id.button_continue_onboard);
-
         adapter = new FragmentStateAdapter(this) {
             @NonNull
             @Override
@@ -47,7 +45,6 @@ public class OnBoardingActivity extends FragmentActivity {
                     default: return null;
                 }
             }
-
             @Override
             public int getItemCount() {
                 return 3;
@@ -61,10 +58,6 @@ public class OnBoardingActivity extends FragmentActivity {
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
-                if (tab.getPosition() == 2) {
-                    tabLayout.setVisibility(View.GONE);
-                    continueHome.setVisibility(View.VISIBLE);
-                }
                 tab.setIcon(R.drawable.tab_indicator_selected);
             }
 
@@ -76,10 +69,6 @@ public class OnBoardingActivity extends FragmentActivity {
             @Override
             public void onTabReselected(TabLayout.Tab tab) {
                 tab.setIcon(R.drawable.tab_indicator_selected);
-                if (tab.getPosition() == 2) {
-                    tabLayout.setVisibility(View.GONE);
-                    continueHome.setVisibility(View.VISIBLE);
-                }
             }
         });
 
@@ -96,7 +85,7 @@ public class OnBoardingActivity extends FragmentActivity {
                 getSharedPreferences("my_preferences", MODE_PRIVATE);
 
         preferences.edit()
-                .putBoolean("onboarding_complete",true).apply();
+                .putBoolean("onboard_complete",true).apply();
 
         Intent main = new Intent(this, BaseActivity.class);
         startActivity(main);

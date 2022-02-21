@@ -7,16 +7,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.ListView;
-
-import java.util.HashSet;
-import java.util.Set;
+import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import app.com.muhammad.voice.R;
 import app.com.muhammad.voice.databinding.FragmentSettingsBinding;
-import app.com.muhammad.voice.utils.MainAdapter;
 
 import static android.content.Context.MODE_PRIVATE;
 import static android.view.View.GONE;
@@ -38,7 +34,7 @@ public class SettingsFragment extends Fragment
     private String mParam1;
     private String mParam2;
 
-    private ListView localCitiesList;
+    private TextView localCity;
     private Animation animation;
 
     private FragmentSettingsBinding binding;
@@ -89,7 +85,7 @@ public class SettingsFragment extends Fragment
         View root = binding.getRoot();
 
         SharedPreferences sharedPreferences = this.getActivity().getSharedPreferences(MY_PREFERENCES, MODE_PRIVATE);
-        localCitiesList = binding.localCitiesListView;
+        localCity = binding.localCityTextView;
 
         binding.buttonUpdateLocalCity.setOnClickListener(new View.OnClickListener()
         {
@@ -106,17 +102,21 @@ public class SettingsFragment extends Fragment
             @Override
             public void onClick(View v)
             {
-                String localCity = binding.enterLocalCityEditText.getText().toString();
-                SharedPreferences.Editor editor = sharedPreferences.edit();
+                String localCityText = binding.enterLocalCityEditText.getText().toString();
 
-                Set<String> updatedLocalCities = new HashSet<>();
-                updatedLocalCities.add(localCity);
+                if (localCityText.equals("")) {
+                    binding.enterLocalCityEditText.setError("Required.");
 
-                editor.putStringSet("localCities", updatedLocalCities);
-                editor.apply();
+                } else {
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.putString("localCity", localCityText);
+                    editor.apply();
 
-                binding.editTextLocalCities.setVisibility(GONE);
-                binding.viewsLocalCitiesUpdate.setVisibility(View.VISIBLE);
+                    localCity.setText(localCityText);
+
+                    binding.editTextLocalCities.setVisibility(GONE);
+                    binding.viewsLocalCitiesUpdate.setVisibility(View.VISIBLE);
+                }
             }
         });
 
@@ -133,16 +133,13 @@ public class SettingsFragment extends Fragment
 
         // get local cities from SP, if none are found, hide the ListView and show only a textView with button to add a home city.
         // if home city is already added, then show a button to update
-        Set<String> localCities = sharedPreferences.getStringSet("localCities", null);
-
-        if (localCities == null) {
+        String localCitySP = sharedPreferences.getString("localCity", null);
+        if (localCitySP.equals("")) {
             // no cities, show add views
             binding.viewsLocalCitiesAdd.setVisibility(View.VISIBLE);
         } else {
-            String[] localCitiesArray = localCities.toArray(new String[0]);
-            MainAdapter adapter = new MainAdapter(SettingsFragment.this, localCitiesArray);
             animation = AnimationUtils.loadAnimation(getActivity(), R.anim.animation1);
-            localCitiesList.setAdapter(adapter);
+            localCity.setText(localCitySP);
             binding.viewsLocalCitiesUpdate.setVisibility(View.VISIBLE);
         }
 
