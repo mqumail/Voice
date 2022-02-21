@@ -13,10 +13,9 @@
     app:layout_constraintBottom_toBottomOf="parent"
     app:layout_constraintEnd_toEndOf="parent"
     app:layout_constraintStart_toStartOf="parent"
-    android:background="@color/colorBackground">
+    android:background="@color/primary_light">
 
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
+    <LinearLayout
         android:id="@+id/marker_info"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -49,7 +48,7 @@
             android:paddingEnd="16dp"
             android:paddingStart="16dp"
             android:paddingTop="16dp"
-            android:textColor="@color/colorPrimaryText"
+            android:textColor="@color/primary_text"
             android:textSize="@dimen/titleTextSize" />
 
         <TextView
@@ -62,13 +61,11 @@
             android:paddingEnd="16dp"
             android:paddingStart="16dp"
             android:paddingBottom="16dp"
-            android:textColor="@color/colorDescText"
+            android:textColor="@color/secondary_text"
             android:textSize="@dimen/bodyTextSize" />
     </LinearLayout>
 
     <LinearLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
         android:id="@+id/local_info"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -93,7 +90,7 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:text="-"
-            android:textColor="@color/colorPrimaryDark"
+            android:textColor="@color/primary_dark"
             android:textSize="20sp"
             android:textStyle="bold"/>
 
@@ -113,7 +110,7 @@
             android:layout_marginEnd="8dp"
             android:gravity="end"
             android:text="-"
-            android:textColor="@color/colorFocus"
+            android:textColor="@color/accent"
             android:textSize="16sp"
             android:textStyle="bold"/>
 
@@ -128,8 +125,6 @@
 
 
     <LinearLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
         android:id="@+id/tourist_info"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -146,7 +141,8 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/local_info"
         app:layout_constraintHorizontal_bias="0"
-        app:layout_constraintVertical_bias="0">
+        app:layout_constraintVertical_bias="0"
+        android:focusable="true">
 
         <TextView
             android:id="@+id/touristNumber"
@@ -154,7 +150,7 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:text="-"
-            android:textColor="@color/colorPrimaryDark"
+            android:textColor="@color/primary_dark"
             android:textSize="20sp"
             android:textStyle="bold"/>
 
@@ -174,7 +170,7 @@
             android:layout_marginEnd="8dp"
             android:gravity="end"
             android:text="-"
-            android:textColor="@color/colorFocus"
+            android:textColor="@color/accent"
             android:textSize="16sp"
             android:textStyle="bold"/>
 
@@ -188,8 +184,6 @@
     </LinearLayout>
 
     <LinearLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
         android:id="@+id/comment_info"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -207,7 +201,8 @@
         app:layout_constraintHorizontal_bias="0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tourist_info"
-        app:layout_constraintVertical_bias="0">
+        app:layout_constraintVertical_bias="0"
+        android:focusable="true">
 
         <TextView
             android:id="@+id/commentNumber"
@@ -215,7 +210,7 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:text="-"
-            android:textColor="@color/colorPrimaryDark"
+            android:textColor="@color/primary_dark"
             android:textSize="20sp"
             android:textStyle="bold"/>
 
@@ -230,8 +225,6 @@
     </LinearLayout>
 
     <LinearLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
         android:id="@+id/button_area_place_details"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -257,7 +250,7 @@
             android:layout_marginTop="8dp"
             android:layout_marginEnd="16dp"
             android:layout_weight="1"
-            android:textColor="@color/colorFocus"
+            android:textColor="@color/accent"
             android:text="Close"/>
 
         <Button
@@ -268,7 +261,7 @@
             android:layout_marginTop="8dp"
             android:layout_marginEnd="16dp"
             android:layout_weight="1"
-            android:textColor="@color/colorPrimaryText"
+            android:textColor="@color/primary_text"
             android:background="@drawable/button_action_popup"
             android:text="Reviews"/>
 
@@ -282,7 +275,4 @@
             android:background="@drawable/button_action_popup"
             android:text="Guest Book"/>
     </LinearLayout>
-
-
-
 </androidx.constraintlayout.widget.ConstraintLayout>

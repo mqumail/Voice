@@ -5,11 +5,10 @@
     android:id="@+id/info_window"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorBackground" >
+    android:background="@color/primary_light" >
 
 
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
+    <LinearLayout
         android:id="@+id/marker_info"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -32,7 +31,7 @@
             android:gravity="start"
             android:maxLines="1"
             android:textAppearance="@style/TextAppearance.AppCompat.Headline"
-            android:textColor="@color/colorPrimaryText"
+            android:textColor="@color/primary_text"
             android:textSize="20sp" />
 
         <TextView
@@ -42,7 +41,7 @@
             android:ellipsize="end"
             android:gravity="start"
             android:maxLines="1"
-            android:textColor="@color/colorDescText"
+            android:textColor="@color/secondary_text"
             android:textSize="16sp" />
     </LinearLayout>
 
@@ -99,7 +98,7 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:text="31"
-            android:textColor="@color/colorPrimaryDark"
+            android:textColor="@color/primary_text"
             android:textSize="20sp"
             android:textStyle="bold" />
 
@@ -119,7 +118,7 @@
             android:layout_marginEnd="8dp"
             android:gravity="end"
             android:text="27"
-            android:textColor="@color/colorFocus"
+            android:textColor="@color/accent"
             android:textSize="16sp"
             android:textStyle="bold" />
 
@@ -155,7 +154,7 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:text="12"
-            android:textColor="@color/colorPrimaryDark"
+            android:textColor="@color/primary_text"
             android:textSize="20sp"
             android:textStyle="bold" />
 
@@ -175,7 +174,7 @@
             android:layout_marginEnd="8dp"
             android:gravity="end"
             android:text="8"
-            android:textColor="@color/colorFocus"
+            android:textColor="@color/accent"
             android:textSize="16sp"
             android:textStyle="bold" />
 
@@ -213,7 +212,7 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:text="7"
-            android:textColor="@color/colorPrimaryDark"
+            android:textColor="@color/primary_text"
             android:textSize="20sp"
             android:textStyle="bold" />
 
@@ -233,8 +232,8 @@
             android:paddingEnd="8dp"
             android:paddingStart="8dp"
             android:layout_marginStart="16dp"
-            android:textColor="@color/colorDescText"
-            android:background="@color/colorAccent"
+            android:textColor="@color/primary_text"
+            android:background="@color/accent"
             android:text="Post a Review"/>
     </LinearLayout>
 

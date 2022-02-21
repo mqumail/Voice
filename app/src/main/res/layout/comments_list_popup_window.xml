@@ -2,7 +2,6 @@
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/place_comments_popup"
     android:background="#26000000"
     android:layout_width="match_parent"
@@ -11,7 +10,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/colorBackground"
+        android:background="@color/primary_light"
         android:elevation="3dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -19,12 +18,11 @@
         app:layout_constraintHorizontal_bias="0"
         app:layout_constraintVertical_bias="0" >
 
-        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-            xmlns:app="http://schemas.android.com/apk/res-auto"
+        <LinearLayout
             android:id="@+id/marker_info"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="#ffffff"
+            android:background="@color/primary_light"
             android:orientation="vertical"
             android:elevation="1dp"
             app:layout_constraintEnd_toEndOf="parent"
@@ -53,7 +51,7 @@
                 android:paddingTop="16dp"
                 android:paddingEnd="16dp"
                 android:paddingStart="16dp"
-                android:textColor="@color/colorPrimaryText"
+                android:textColor="@color/primary_text"
                 android:textSize="@dimen/titleTextSize" />
 
             <TextView
@@ -67,7 +65,7 @@
                 android:paddingBottom="16dp"
                 android:text="@string/title_comments_list_popoup"
                 android:maxLines="1"
-                android:textColor="@color/colorDescText"
+                android:textColor="@color/secondary_text"
                 android:textSize="@dimen/bodyTextSize" />
         </LinearLayout>
 
@@ -82,7 +80,7 @@
             android:paddingBottom="16dp"
             android:foregroundGravity="top"
             android:orientation="vertical"
-            android:background="#ffffff"
+            android:background="@color/primary_light"
             android:elevation="1dp"
             app:layout_constraintTop_toBottomOf="@id/marker_info"
             app:layout_constraintBottom_toTopOf="@id/button_area_place_reviews"
@@ -91,8 +89,6 @@
         </androidx.recyclerview.widget.RecyclerView>
 
         <LinearLayout
-            xmlns:android="http://schemas.android.com/apk/res/android"
-            xmlns:app="http://schemas.android.com/apk/res-auto"
             android:id="@+id/button_area_place_reviews"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -116,7 +112,7 @@
                 android:layout_height="40dp"
                 android:layout_marginBottom="8dp"
                 android:layout_marginTop="8dp"
-                android:textColor="@color/colorFocus"
+                android:textColor="@color/accent"
                 android:text="@string/close_button"/>
         </LinearLayout>
 

@@ -8,7 +8,6 @@
     <fragment
         android:id="@+id/osmFragment"
         android:name="app.com.muhammad.voice.ui.openStreetMap.OsmFragment"
-        android:label="fragment_osm"
         tools:layout="@layout/fragment_osm" >
         <action
             android:id="@+id/action_osmFragment_to_profileFragment"
@@ -23,7 +22,6 @@
     <fragment
         android:id="@+id/profileFragment"
         android:name="app.com.muhammad.voice.ui.profile.ProfileFragment"
-        android:label="fragment_profile"
         tools:layout="@layout/fragment_profile" >
         <action
             android:id="@+id/action_profileFragment_to_settingsFragment"
@@ -38,7 +36,6 @@
     <fragment
         android:id="@+id/settingsFragment"
         android:name="app.com.muhammad.voice.ui.settings.SettingsFragment"
-        android:label="fragment_settings"
         tools:layout="@layout/fragment_settings" >
         <action
             android:id="@+id/action_settingsFragment_to_profileFragment"
@@ -53,7 +50,6 @@
     <fragment
         android:id="@+id/checkInFragment"
         android:name="app.com.muhammad.voice.ui.checkIn.CheckInFragment"
-        android:label="fragment_check_in"
         tools:layout="@layout/fragment_check_in" >
         <action
             android:id="@+id/action_checkInFragment_to_profileFragment"

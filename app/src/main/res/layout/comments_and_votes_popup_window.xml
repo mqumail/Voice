@@ -2,8 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:background="#80000000"
+    android:background="@color/primary_light"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -26,7 +25,7 @@
             android:layout_marginEnd="20dp"
             android:layout_marginStart="20dp"
             android:textSize="@dimen/titleTextSize"
-            android:textColor="@color/colorPrimaryText"
+            android:textColor="@color/primary_text"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -40,7 +39,7 @@
             android:layout_marginEnd="20dp"
             android:layout_marginStart="20dp"
             android:textSize="@dimen/bodyTextSize"
-            android:textColor="@color/colorDescText"
+            android:textColor="@color/secondary_text"
             app:layout_constraintTop_toBottomOf="@id/checkinTitle"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -71,14 +70,14 @@
             android:layout_marginBottom="20dp"
             android:maxWidth="230dp"
             android:textSize="@dimen/descTextSize"
-            android:textColor="@color/colorDescText"
+            android:textColor="@color/secondary_text"
             app:layout_constraintTop_toBottomOf="@id/revealTitle"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toStartOf="@id/userVisibilitySwitchButton"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintVertical_bias="0.0" />
 
-        <Switch
+        <com.google.android.material.switchmaterial.SwitchMaterial
             android:id="@+id/userVisibilitySwitchButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -86,7 +85,7 @@
             android:layout_marginEnd="20dp"
             android:layout_marginTop="16dp"
             android:layout_marginStart="20dp"
-            android:textColor="@color/colorAccent2"
+            android:textColor="@color/accent"
             android:ellipsize="end"
             android:gravity="right"
             app:layout_constraintTop_toTopOf="@id/revealTitle"
@@ -118,7 +117,7 @@
             android:layout_marginBottom="40dp"
             android:maxWidth="230dp"
             android:textSize="@dimen/descTextSize"
-            android:textColor="@color/colorDescText"
+            android:textColor="@color/secondary_text"
             app:layout_constraintTop_toBottomOf="@id/upvoteTitle"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toStartOf="@id/upVoteToggleButton"
@@ -153,7 +152,7 @@
             android:layout_marginTop="48dp"
             android:text="@string/comment_tittle"
             android:textSize="@dimen/descTextSize"
-            android:textColor="@color/colorDescText"
+            android:textColor="@color/secondary_text"
             app:layout_constraintTop_toBottomOf="@id/upvoteDesc"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
