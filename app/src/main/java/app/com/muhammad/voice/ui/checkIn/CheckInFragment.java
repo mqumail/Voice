@@ -18,6 +18,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 
 import org.osmdroid.api.IMapController;
@@ -37,10 +38,16 @@ import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.core.content.res.ResourcesCompat;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+
 import app.com.muhammad.voice.R;
 import app.com.muhammad.voice.databinding.FragmentCheckInBinding;
 import app.com.muhammad.voice.utils.CustomInfoWindow;
@@ -103,10 +110,16 @@ public class CheckInFragment extends Fragment
     {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        getActivity().findViewById(R.id.menu_button).setVisibility(View.GONE);
+        getActivity().findViewById(R.id.activity_base_tool_bar).setVisibility(View.GONE);
+
+        binding.toolbarCheckInLayout.toolbarCheckIn.inflateMenu(R.menu.check_in_menu);
     }
 
     @Override
@@ -118,49 +131,21 @@ public class CheckInFragment extends Fragment
         View root = binding.getRoot();
 
         nearByPlacesListView = binding.nearByPlaces;
+        binding.menuButtonCheckIn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                DrawerLayout drawer = getActivity().findViewById(R.id.base_drawer_layout);
+                if (!drawer.isDrawerOpen(GravityCompat.START)) {
+                    drawer.openDrawer(GravityCompat.START);
+                } else {
+                    drawer.closeDrawer(GravityCompat.START);
+                }
+            }
+        });
 
         openStreetMapInit();
 
         return root;
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-
-        inflater.inflate(R.menu.check_in_menu, menu);
-
-        MenuItem searchItem = menu.findItem(R.id.nav_search);
-        SearchManager searchManager = (SearchManager) getActivity().getSystemService(Context.SEARCH_SERVICE);
-
-        if (searchItem != null) {
-            searchView = (SearchView) searchItem.getActionView();
-        }
-        if (searchView != null) {
-            searchView.setSearchableInfo(searchManager.getSearchableInfo(getActivity().getComponentName()));
-
-            queryTextListener = new SearchView.OnQueryTextListener() {
-                @Override
-                public boolean onQueryTextChange(String newText) {
-                    Log.i("onQueryTextChange: %s", newText);
-
-                    return true;
-                }
-                @Override
-                public boolean onQueryTextSubmit(String query) {
-                    Log.i("onQueryTextSubmit: %s", query);
-
-                    //clear all the markers from the map except myoverlay
-
-                    // TODO: Search for whatever the user is requesting
-                    searchOnOsm(query);
-
-                    return true;
-                }
-            };
-            searchView.setOnQueryTextListener(queryTextListener);
-        }
-
-        super.onCreateOptionsMenu(menu, inflater);
     }
 
     private void searchOnOsm(String query) {
@@ -238,19 +223,6 @@ public class CheckInFragment extends Fragment
         });
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.nav_search:
-                // Not implemented here
-                return false;
-            default:
-                break;
-        }
-        searchView.setOnQueryTextListener(queryTextListener);
-        return super.onOptionsItemSelected(item);
-    }
-
     private void openStreetMapInit(){
         ExecutorService executorService = Executors.newSingleThreadExecutor();
         Handler handler = new Handler(Looper.getMainLooper());
@@ -282,8 +254,64 @@ public class CheckInFragment extends Fragment
     }
 
     @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+
+        inflater.inflate(R.menu.check_in_menu, menu);
+
+        MenuItem searchItem = menu.findItem(R.id.nav_search);
+        SearchManager searchManager = (SearchManager) getActivity().getSystemService(Context.SEARCH_SERVICE);
+
+        if (searchItem != null) {
+            searchView = (SearchView) searchItem.getActionView();
+        }
+        if (searchView != null) {
+            searchView.setSearchableInfo(searchManager.getSearchableInfo(getActivity().getComponentName()));
+
+            queryTextListener = new SearchView.OnQueryTextListener() {
+                @Override
+                public boolean onQueryTextChange(String newText) {
+                    Log.i("onQueryTextChange: %s", newText);
+
+                    return true;
+                }
+                @Override
+                public boolean onQueryTextSubmit(String query) {
+                    Log.i("onQueryTextSubmit: %s", query);
+
+                    //clear all the markers from the map except myoverlay
+
+                    // TODO: Search for whatever the user is requesting
+                    searchOnOsm(query);
+
+                    return true;
+                }
+            };
+            searchView.setOnQueryTextListener(queryTextListener);
+        }
+
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.nav_search:
+                // Not implemented here
+                return false;
+            default:
+                break;
+        }
+        searchView.setOnQueryTextListener(queryTextListener);
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
     public void onDestroyView() {
         super.onDestroyView();
+
+        getActivity().findViewById(R.id.menu_button).setVisibility(View.VISIBLE);
+        getActivity().findViewById(R.id.activity_base_tool_bar).setVisibility(View.VISIBLE);
+
         binding = null;
     }
 }

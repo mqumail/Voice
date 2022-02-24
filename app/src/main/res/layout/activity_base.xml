@@ -14,7 +14,8 @@
     <include
         layout="@layout/app_bar_base"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent"
+        android:id="@+id/activity_base_tool_bar"/>
 
     <!--NavHostFragment HERE-->
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -23,12 +24,12 @@
         android:id="@+id/content_container">
 
         <Button
-            android:layout_width="40dp"
-            android:layout_height="40dp"
             android:id="@+id/menu_button"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
             android:background="@drawable/ic_drawer_menu"
             app:layout_constraintStart_toStartOf="@+id/nav_host_fragment"
-            app:layout_constraintTop_toTopOf="@+id/nav_host_fragment" />
+            app:layout_constraintTop_toTopOf="@+id/nav_host_fragment"/>
 
         <fragment
             android:id="@+id/nav_host_fragment"

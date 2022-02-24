@@ -19,9 +19,11 @@
     </style>
 
     <style name="HideToolBar" parent="AppTheme">
-        <item name="colorPrimary">@color/background</item>
-        <item name="windowActionBarOverlay">true</item>
+        <item name="windowNoTitle">true</item>
+        <item name="windowActionBar">false</item>
     </style>
+
+    <style name="Toolbar" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <style name="CitiesTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <item name="colorPrimary">@color/primary</item>

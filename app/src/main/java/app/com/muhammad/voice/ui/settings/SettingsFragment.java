@@ -134,7 +134,7 @@ public class SettingsFragment extends Fragment
         // get local cities from SP, if none are found, hide the ListView and show only a textView with button to add a home city.
         // if home city is already added, then show a button to update
         String localCitySP = sharedPreferences.getString("localCity", null);
-        if (localCitySP.equals("")) {
+        if (localCitySP == null || localCitySP.equals("")) {
             // no cities, show add views
             binding.viewsLocalCitiesAdd.setVisibility(View.VISIBLE);
         } else {
