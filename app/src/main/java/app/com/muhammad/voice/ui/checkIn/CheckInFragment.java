@@ -18,7 +18,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ListView;
 
 import org.osmdroid.api.IMapController;
@@ -40,7 +39,6 @@ import java.util.concurrent.Executors;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.core.view.GravityCompat;
@@ -55,11 +53,6 @@ import app.com.muhammad.voice.utils.CustomInfoWindow;
 import static app.com.muhammad.voice.utils.ConstantsVariables.MY_USER_AGENT;
 import static app.com.muhammad.voice.utils.UiHelperMethods.getBitmapFromVectorDrawable;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link CheckInFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class CheckInFragment extends Fragment
 {
     private CheckInViewModel viewModel;
@@ -72,37 +65,14 @@ public class CheckInFragment extends Fragment
 
     ListView nearByPlacesListView;
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
     public CheckInFragment()
     {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment OsmFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static CheckInFragment newInstance(String param1, String param2)
+    public static CheckInFragment newInstance()
     {
-        CheckInFragment fragment = new CheckInFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
+        return new CheckInFragment();
     }
 
     @Override
@@ -110,16 +80,6 @@ public class CheckInFragment extends Fragment
     {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-    }
-
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-
-        getActivity().findViewById(R.id.menu_button).setVisibility(View.GONE);
-        getActivity().findViewById(R.id.activity_base_tool_bar).setVisibility(View.GONE);
-
-        binding.toolbarCheckInLayout.toolbarCheckIn.inflateMenu(R.menu.check_in_menu);
     }
 
     @Override
@@ -146,6 +106,16 @@ public class CheckInFragment extends Fragment
         openStreetMapInit();
 
         return root;
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        getActivity().findViewById(R.id.menu_button).setVisibility(View.GONE);
+        getActivity().findViewById(R.id.activity_base_tool_bar).setVisibility(View.GONE);
+
+        binding.toolbarCheckInLayout.toolbarCheckIn.inflateMenu(R.menu.check_in_menu);
     }
 
     private void searchOnOsm(String query) {
@@ -255,8 +225,8 @@ public class CheckInFragment extends Fragment
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-
         inflater.inflate(R.menu.check_in_menu, menu);
+        super.onCreateOptionsMenu(menu, inflater);
 
         MenuItem searchItem = menu.findItem(R.id.nav_search);
         SearchManager searchManager = (SearchManager) getActivity().getSystemService(Context.SEARCH_SERVICE);
@@ -271,7 +241,6 @@ public class CheckInFragment extends Fragment
                 @Override
                 public boolean onQueryTextChange(String newText) {
                     Log.i("onQueryTextChange: %s", newText);
-
                     return true;
                 }
                 @Override
@@ -288,8 +257,6 @@ public class CheckInFragment extends Fragment
             };
             searchView.setOnQueryTextListener(queryTextListener);
         }
-
-        super.onCreateOptionsMenu(menu, inflater);
     }
 
     @Override
