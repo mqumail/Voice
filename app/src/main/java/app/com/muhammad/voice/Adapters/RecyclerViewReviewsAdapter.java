@@ -6,21 +6,18 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 
-import app.com.muhammad.voice.DTO.CheckinInfo;
+import app.com.muhammad.voice.DTO.CheckInInfo;
 import app.com.muhammad.voice.R;
 
 public class RecyclerViewReviewsAdapter extends
         RecyclerView.Adapter<RecyclerViewReviewsAdapter.RecyclerViewHolder>
 {
-    private List<CheckinInfo> mDataset;
+    private List<CheckInInfo> mDataset;
 
     // Provide a suitable constructor (depends on the kind of dataset)
-    public RecyclerViewReviewsAdapter(List<CheckinInfo> myDataset) {
+    public RecyclerViewReviewsAdapter(List<CheckInInfo> myDataset) {
         mDataset = myDataset;
     }
 
