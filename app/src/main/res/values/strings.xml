@@ -63,7 +63,8 @@
     <string name="title_activity_check_in">CheckInActivity</string>
 
     <string name="search_title">Search for a Place</string>
-    <string name="check_in_search_hint">Search here</string>
+    <string name="check_in_search_hint">Search</string>
+    <string name="check_in_search_Title">Search Nearby</string>
     <string name="onBoarding_label">On Boarding</string>
     <string name="title_onBoarding_one">Raise your voice &amp; discover local gems!</string>
     <string name="subheading_onBoarding_one">Share you favorites spots in town &amp; Get to know new ones!</string>
@@ -81,5 +82,9 @@
     <string name="update">UPDATE</string>
     <string name="enter_your_current_city">Enter your current city.</string>
     <string name="add_local_city_prompt">* Check In as a Local, add your current home city!</string>
+    <string name="place_list_prompt">Select a place to Check In or view Place details</string>
+    <string name="places_list_prompt_heading">Nearby Places</string>
+    <string name="app_colors_bar">app colors bar</string>
+    <string name="reviews_button">Reviews</string>
 
 </resources>
