@@ -2,36 +2,24 @@ package app.com.muhammad.voice.DTO;
 
 import android.net.Uri;
 
+import androidx.annotation.NonNull;
+
 public class PlaceInfo
 {
-    // IsLocal
-    // IsLocalUpvote
-    // IsTouristUpvote
-    // TotalCheckins - stored in the DB
-    // Save comment, revealOneSelf, up votes also
-
+    @NonNull
+    private String id;
     private String name;
     private String address;
     private String phoneNumber;
-    private String id;
     private Uri websiteUri;
     private double rating;
     private String attributions;
     private String comment;
+    private CheckInInfo checkinInfo;
 
-    private CheckinInfo checkinInfo;
+    public PlaceInfo() { }
 
-    // Delete the bottom ones
-    //private boolean IsIdentifiedCheckIn;
-    //private boolean IsHearted;
-    //private boolean IsLocalCheckIn;
-
-    public PlaceInfo(String name, String address,
-                     String phoneNumber, String id,
-                     Uri websiteUri,
-                     float rating, String attributions,
-                     String comment, boolean IsIdentifiedCheckIn,
-                     boolean IsHearted, boolean IsLocalCheckIn) {
+    public PlaceInfo(String name, String address, String phoneNumber, String id, Uri websiteUri, double rating, String attributions, String comment, CheckInInfo checkinInfo, boolean isIdentifiedCheckIn, boolean isHearted, boolean isLocalCheckIn) {
         this.name = name;
         this.address = address;
         this.phoneNumber = phoneNumber;
@@ -40,13 +28,7 @@ public class PlaceInfo
         this.rating = rating;
         this.attributions = attributions;
         this.comment = comment;
-        //this.IsIdentifiedCheckIn = IsIdentifiedCheckIn;
-        //this.IsHearted = IsHearted;
-        //this.IsLocalCheckIn = IsLocalCheckIn;
-    }
-
-    public PlaceInfo() {
-
+        this.checkinInfo = checkinInfo;
     }
 
     public String getName() {
@@ -105,46 +87,22 @@ public class PlaceInfo
         this.attributions = attributions;
     }
 
-    public String getComment()
-    {
+    public String getComment() {
         return comment;
     }
 
-    public void setComment(String comment)
-    {
+    public void setComment(String comment) {
         this.comment = comment;
     }
 
-    public CheckinInfo getCheckinInfo()
-    {
+    public CheckInInfo getCheckinInfo() {
         return checkinInfo;
     }
 
-    public void setCheckinInfo(CheckinInfo checkinInfo)
-    {
+    public void setCheckinInfo(CheckInInfo checkinInfo) {
         this.checkinInfo = checkinInfo;
     }
 
-    /*public boolean isIdentifiedCheckIn()
-    {
-        return IsIdentifiedCheckIn;
-    }
-
-    public void setIdentifiedCheckIn(boolean anonymousCheckIn) { IsIdentifiedCheckIn = anonymousCheckIn; }
-
-    public boolean isHearted()
-    {
-        return IsHearted;
-    }
-
-    public void setIsHearted(boolean upvote)
-    {
-        IsHearted = upvote;
-    }
-
-    public boolean isLocalCheckIn() { return IsLocalCheckIn; }
-
-    public void setLocalCheckIn(boolean localCheckIn) { IsLocalCheckIn = localCheckIn; }*/
 
     @Override
     public String toString() {
@@ -156,6 +114,8 @@ public class PlaceInfo
                 ", websiteUri=" + websiteUri +
                 ", rating=" + rating +
                 ", attributions='" + attributions + '\'' +
+                ", comment='" + comment + '\'' +
+                ", checkinInfo=" + checkinInfo +
                 '}';
     }
 }

@@ -1,9 +1,14 @@
 package app.com.muhammad.voice.DTO;
 
+import androidx.annotation.NonNull;
+
 import java.time.LocalDateTime;
 
-public class CheckinInfo
+public class CheckInInfo
 {
+    @NonNull
+    private  String id;
+
     private boolean isLocal;
     private boolean isHearted;
     private boolean isIdentifiedCheckIn;
@@ -58,5 +63,15 @@ public class CheckinInfo
     public void setReview(String review)
     {
         this.review = review;
+    }
+
+
+    @NonNull
+    public String getId() {
+        return id;
+    }
+
+    public void setId(@NonNull String id) {
+        this.id = id;
     }
 }

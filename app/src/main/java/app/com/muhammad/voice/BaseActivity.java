@@ -95,7 +95,7 @@ public class BaseActivity extends AppCompatActivity implements NavigationView.On
         //Fragment OSM - UIs
         navHostFragment = (NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
 
-        if (showOnboard()) return;
+        showOnboard();
     }
 
     private boolean showOnboard() {

@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.TextView;
@@ -97,38 +98,30 @@ public class SettingsFragment extends Fragment
             }
         });
 
-        binding.buttonEnterLocalCity.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-                String localCityText = binding.enterLocalCityEditText.getText().toString();
+        binding.buttonEnterLocalCity.setOnClickListener(v -> {
+            String localCityText = binding.enterLocalCityEditText.getText().toString();
 
-                if (localCityText.equals("")) {
-                    binding.enterLocalCityEditText.setError("Required.");
+            if (localCityText.equals("")) {
+                binding.enterLocalCityEditText.setError("Required.");
 
-                } else {
-                    SharedPreferences.Editor editor = sharedPreferences.edit();
-                    editor.putString("localCity", localCityText);
-                    editor.apply();
+            } else {
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putString("localCity", localCityText);
+                editor.apply();
 
-                    localCity.setText(localCityText);
+                localCity.setText(localCityText);
 
-                    binding.editTextLocalCities.setVisibility(GONE);
-                    binding.viewsLocalCitiesUpdate.setVisibility(View.VISIBLE);
-                }
+                binding.editTextLocalCities.setVisibility(GONE);
+                //TODO: hiding keyboard here does not work. figure out to hide keyboard
+                hideSoftKeyboard();
+                binding.viewsLocalCitiesUpdate.setVisibility(View.VISIBLE);
             }
         });
 
-        binding.buttonAddLocalCity.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-                // hide the other two views (Already rendered with visibility gone for the other two views)
-                binding.viewsLocalCitiesAdd.setVisibility(GONE);
-                binding.editTextLocalCities.setVisibility(View.VISIBLE);
-            }
+        binding.buttonAddLocalCity.setOnClickListener(v -> {
+            // hide the other two views (Already rendered with visibility gone for the other two views)
+            binding.viewsLocalCitiesAdd.setVisibility(GONE);
+            binding.editTextLocalCities.setVisibility(View.VISIBLE);
         });
 
         // get local cities from SP, if none are found, hide the ListView and show only a textView with button to add a home city.
@@ -149,5 +142,9 @@ public class SettingsFragment extends Fragment
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+    }
+
+        private void hideSoftKeyboard(){
+        getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
     }
 }
