@@ -1,8 +1,8 @@
 package app.com.muhammad.voice.DTO;
 
-import androidx.annotation.NonNull;
+import com.google.firebase.Timestamp;
 
-import java.time.LocalDateTime;
+import androidx.annotation.NonNull;
 
 public class CheckInInfo
 {
@@ -14,6 +14,15 @@ public class CheckInInfo
     private boolean isIdentifiedCheckIn;
     private String userName;
     private String review;
+    private Timestamp checkInTime;
+
+    public Timestamp getCheckInTime() {
+        return checkInTime;
+    }
+
+    public void setCheckInTime(Timestamp checkInTime) {
+        this.checkInTime = checkInTime;
+    }
 
     public boolean isLocal()
     {

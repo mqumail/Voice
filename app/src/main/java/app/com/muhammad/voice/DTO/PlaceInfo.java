@@ -14,12 +14,11 @@ public class PlaceInfo
     private Uri websiteUri;
     private double rating;
     private String attributions;
-    private String comment;
     private CheckInInfo checkinInfo;
 
     public PlaceInfo() { }
 
-    public PlaceInfo(String name, String address, String phoneNumber, String id, Uri websiteUri, double rating, String attributions, String comment, CheckInInfo checkinInfo, boolean isIdentifiedCheckIn, boolean isHearted, boolean isLocalCheckIn) {
+    public PlaceInfo(String name, String address, String phoneNumber, String id, Uri websiteUri, double rating, String attributions, CheckInInfo checkinInfo, boolean isIdentifiedCheckIn, boolean isHearted, boolean isLocalCheckIn) {
         this.name = name;
         this.address = address;
         this.phoneNumber = phoneNumber;
@@ -27,7 +26,6 @@ public class PlaceInfo
         this.websiteUri = websiteUri;
         this.rating = rating;
         this.attributions = attributions;
-        this.comment = comment;
         this.checkinInfo = checkinInfo;
     }
 
@@ -87,14 +85,6 @@ public class PlaceInfo
         this.attributions = attributions;
     }
 
-    public String getComment() {
-        return comment;
-    }
-
-    public void setComment(String comment) {
-        this.comment = comment;
-    }
-
     public CheckInInfo getCheckinInfo() {
         return checkinInfo;
     }
@@ -114,7 +104,6 @@ public class PlaceInfo
                 ", websiteUri=" + websiteUri +
                 ", rating=" + rating +
                 ", attributions='" + attributions + '\'' +
-                ", comment='" + comment + '\'' +
                 ", checkinInfo=" + checkinInfo +
                 '}';
     }

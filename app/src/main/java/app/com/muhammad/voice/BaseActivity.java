@@ -6,7 +6,6 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
-import android.view.View;
 
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.FirebaseApp;
@@ -69,14 +68,11 @@ public class BaseActivity extends AppCompatActivity implements NavigationView.On
                 .setOpenableLayout(drawer)
                 .build();
 
-        binding.menuButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (!drawer.isDrawerOpen(GravityCompat.START)) {
-                    drawer.openDrawer(GravityCompat.START);
-                } else {
-                    drawer.closeDrawer(GravityCompat.START);
-                }
+        binding.menuButton.setOnClickListener(view -> {
+            if (!drawer.isDrawerOpen(GravityCompat.START)) {
+                drawer.openDrawer(GravityCompat.START);
+            } else {
+                drawer.closeDrawer(GravityCompat.START);
             }
         });
 

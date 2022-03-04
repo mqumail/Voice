@@ -130,44 +130,44 @@
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintVertical_bias="0.0"/>
 
-<!--        <TextView-->
-<!--            android:id="@+id/commentTittleTextView"-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:layout_marginBottom="8dp"-->
-<!--            android:layout_marginEnd="20dp"-->
-<!--            android:layout_marginStart="20dp"-->
-<!--            android:layout_marginTop="48dp"-->
-<!--            android:text="@string/comment_tittle"-->
-<!--            android:textSize="@dimen/descTextSize"-->
-<!--            android:textColor="@color/secondary_text"-->
-<!--            app:layout_constraintTop_toBottomOf="@id/upvoteDesc"-->
-<!--            app:layout_constraintEnd_toEndOf="parent"-->
-<!--            app:layout_constraintStart_toStartOf="parent"-->
-<!--            app:layout_constraintHorizontal_bias="0.0"-->
-<!--            app:layout_constraintVertical_bias="0.0"/>-->
+        <TextView
+            android:id="@+id/commentTittleTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="48dp"
+            android:text="@string/comment_tittle"
+            android:textSize="@dimen/descTextSize"
+            android:textColor="@color/secondary_text"
+            app:layout_constraintTop_toBottomOf="@id/upvoteDesc"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintVertical_bias="0.0"/>
 
-<!--        <EditText-->
-<!--            android:id="@+id/commentEditText"-->
-<!--            android:hint="@string/comment_hint"-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="50dp"-->
-<!--            android:layout_marginBottom="8dp"-->
-<!--            android:layout_marginEnd="20dp"-->
-<!--            android:layout_marginStart="20dp"-->
-<!--            android:layout_marginTop="8dp"-->
-<!--            android:ems="10"-->
-<!--            android:inputType="textMultiLine"-->
-<!--            android:selectAllOnFocus="true"-->
-<!--            android:gravity="top"-->
-<!--            android:singleLine="false"-->
-<!--            android:textSize="@dimen/descTextSize"-->
-<!--            app:layout_constraintTop_toBottomOf="@id/commentTittleTextView"-->
-<!--            app:layout_constraintBottom_toBottomOf="parent"-->
-<!--            app:layout_constraintEnd_toEndOf="parent"-->
-<!--            app:layout_constraintStart_toStartOf="parent"-->
-<!--            app:layout_constraintHorizontal_bias="0.0"-->
-<!--            app:layout_constraintVertical_bias="0.0"/>-->
+        <EditText
+            android:id="@+id/commentEditText"
+            android:hint="@string/comment_hint"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginBottom="8dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="8dp"
+            android:ems="10"
+            android:inputType="textMultiLine"
+            android:selectAllOnFocus="true"
+            android:gravity="top"
+            android:singleLine="false"
+            android:textSize="@dimen/descTextSize"
+            app:layout_constraintTop_toBottomOf="@id/commentTittleTextView"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintVertical_bias="0.0"/>
 
         <Button
             android:id="@+id/finish_check_in_button"
@@ -180,7 +180,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/upvoteDesc" />
+            app:layout_constraintTop_toBottomOf="@+id/commentEditText" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
