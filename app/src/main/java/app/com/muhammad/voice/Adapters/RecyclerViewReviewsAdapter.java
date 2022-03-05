@@ -8,16 +8,16 @@ import android.widget.TextView;
 
 import java.util.List;
 
-import app.com.muhammad.voice.DTO.CheckInInfo;
+import app.com.muhammad.voice.DTO.CheckIn;
 import app.com.muhammad.voice.R;
 
 public class RecyclerViewReviewsAdapter extends
         RecyclerView.Adapter<RecyclerViewReviewsAdapter.RecyclerViewHolder>
 {
-    private List<CheckInInfo> mDataset;
+    private List<CheckIn> mDataset;
 
     // Provide a suitable constructor (depends on the kind of dataset)
-    public RecyclerViewReviewsAdapter(List<CheckInInfo> myDataset) {
+    public RecyclerViewReviewsAdapter(List<CheckIn> myDataset) {
         mDataset = myDataset;
     }
 

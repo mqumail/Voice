@@ -1,10 +1,8 @@
 package app.com.muhammad.voice.DTO;
 
-import com.google.firebase.Timestamp;
-
 import androidx.annotation.NonNull;
 
-public class CheckInInfo
+public class CheckIn
 {
     @NonNull
     private  String id;
@@ -14,13 +12,13 @@ public class CheckInInfo
     private boolean isIdentifiedCheckIn;
     private String userName;
     private String review;
-    private Timestamp checkInTime;
+    private String checkInTime;
 
-    public Timestamp getCheckInTime() {
+    public String getCheckInTime() {
         return checkInTime;
     }
 
-    public void setCheckInTime(Timestamp checkInTime) {
+    public void setCheckInTime(String checkInTime) {
         this.checkInTime = checkInTime;
     }
 

@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.TextView;
@@ -17,6 +16,7 @@ import app.com.muhammad.voice.databinding.FragmentSettingsBinding;
 
 import static android.content.Context.MODE_PRIVATE;
 import static android.view.View.GONE;
+import static app.com.muhammad.voice.utils.UiHelperMethods.hideSoftKeyboard;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -25,7 +25,6 @@ import static android.view.View.GONE;
  */
 public class SettingsFragment extends Fragment
 {
-
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -88,14 +87,9 @@ public class SettingsFragment extends Fragment
         SharedPreferences sharedPreferences = this.getActivity().getSharedPreferences(MY_PREFERENCES, MODE_PRIVATE);
         localCity = binding.localCityTextView;
 
-        binding.buttonUpdateLocalCity.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-                binding.viewsLocalCitiesUpdate.setVisibility(GONE);
-                binding.editTextLocalCities.setVisibility(View.VISIBLE);
-            }
+        binding.buttonUpdateLocalCity.setOnClickListener(v -> {
+            binding.viewsLocalCitiesUpdate.setVisibility(GONE);
+            binding.editTextLocalCities.setVisibility(View.VISIBLE);
         });
 
         binding.buttonEnterLocalCity.setOnClickListener(v -> {
@@ -103,17 +97,14 @@ public class SettingsFragment extends Fragment
 
             if (localCityText.equals("")) {
                 binding.enterLocalCityEditText.setError("Required.");
-
             } else {
+                hideSoftKeyboard(getActivity());
                 SharedPreferences.Editor editor = sharedPreferences.edit();
                 editor.putString("localCity", localCityText);
                 editor.apply();
-
                 localCity.setText(localCityText);
 
                 binding.editTextLocalCities.setVisibility(GONE);
-                //TODO: hiding keyboard here does not work. figure out to hide keyboard
-                hideSoftKeyboard();
                 binding.viewsLocalCitiesUpdate.setVisibility(View.VISIBLE);
             }
         });
@@ -121,6 +112,7 @@ public class SettingsFragment extends Fragment
         binding.buttonAddLocalCity.setOnClickListener(v -> {
             // hide the other two views (Already rendered with visibility gone for the other two views)
             binding.viewsLocalCitiesAdd.setVisibility(GONE);
+            binding.viewsLocalCitiesUpdate.setVisibility(GONE);
             binding.editTextLocalCities.setVisibility(View.VISIBLE);
         });
 
@@ -142,9 +134,5 @@ public class SettingsFragment extends Fragment
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-    }
-
-        private void hideSoftKeyboard(){
-        getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
     }
 }

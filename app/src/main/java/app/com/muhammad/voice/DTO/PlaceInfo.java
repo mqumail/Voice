@@ -4,6 +4,8 @@ import android.net.Uri;
 
 import androidx.annotation.NonNull;
 
+import java.util.ArrayList;
+
 public class PlaceInfo
 {
     @NonNull
@@ -14,11 +16,11 @@ public class PlaceInfo
     private Uri websiteUri;
     private double rating;
     private String attributions;
-    private CheckInInfo checkinInfo;
+    private ArrayList<CheckIn> checkIns;
 
     public PlaceInfo() { }
 
-    public PlaceInfo(String name, String address, String phoneNumber, String id, Uri websiteUri, double rating, String attributions, CheckInInfo checkinInfo, boolean isIdentifiedCheckIn, boolean isHearted, boolean isLocalCheckIn) {
+    public PlaceInfo(String name, String address, String phoneNumber, String id, Uri websiteUri, double rating, String attributions, ArrayList<CheckIn> checkIns, boolean isIdentifiedCheckIn, boolean isHearted, boolean isLocalCheckIn) {
         this.name = name;
         this.address = address;
         this.phoneNumber = phoneNumber;
@@ -26,7 +28,7 @@ public class PlaceInfo
         this.websiteUri = websiteUri;
         this.rating = rating;
         this.attributions = attributions;
-        this.checkinInfo = checkinInfo;
+        this.checkIns = checkIns;
     }
 
     public String getName() {
@@ -85,13 +87,14 @@ public class PlaceInfo
         this.attributions = attributions;
     }
 
-    public CheckInInfo getCheckinInfo() {
-        return checkinInfo;
+    public ArrayList<CheckIn> getCheckIns() {
+        return checkIns;
     }
 
-    public void setCheckinInfo(CheckInInfo checkinInfo) {
-        this.checkinInfo = checkinInfo;
+    public void setCheckIns(ArrayList<CheckIn> checkIns) {
+        this.checkIns = checkIns;
     }
+
 
 
     @Override
@@ -104,7 +107,7 @@ public class PlaceInfo
                 ", websiteUri=" + websiteUri +
                 ", rating=" + rating +
                 ", attributions='" + attributions + '\'' +
-                ", checkinInfo=" + checkinInfo +
+                ", checkIns=" + checkIns +
                 '}';
     }
 }

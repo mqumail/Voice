@@ -10,6 +10,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.location.Location;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -27,18 +28,14 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.switchmaterial.SwitchMaterial;
-import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 
 import org.osmdroid.api.IMapController;
 import org.osmdroid.bonuspack.clustering.RadiusMarkerClusterer;
@@ -54,8 +51,9 @@ import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -66,6 +64,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
@@ -77,7 +76,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import app.com.muhammad.voice.Adapters.RecyclerViewAdapter;
-import app.com.muhammad.voice.DTO.CheckInInfo;
+import app.com.muhammad.voice.DTO.CheckIn;
 import app.com.muhammad.voice.DTO.PlaceInfo;
 import app.com.muhammad.voice.R;
 import app.com.muhammad.voice.databinding.FragmentCheckInBinding;
@@ -100,6 +99,7 @@ public class CheckInFragment extends Fragment implements RecyclerViewAdapter.Ite
     private static final String TAG = "CheckInFragment";
 
     private CollectionReference collectionReference;
+    private DocumentReference checkInDocumentReference;
  
     private FragmentActivity listener;
     private Context CONTEXT;
@@ -164,6 +164,7 @@ public class CheckInFragment extends Fragment implements RecyclerViewAdapter.Ite
     // This event is triggered soon after onCreateView().
     // onViewCreated() is only called if the view returned from onCreateView() is non-null.
     // Any view setup should occur here.  E.g., view lookups and attaching view listeners.
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -211,7 +212,7 @@ public class CheckInFragment extends Fragment implements RecyclerViewAdapter.Ite
         });
         poiCheckInWindow.findViewById(R.id.finish_check_in_button).setOnClickListener(view1 ->
         {
-            Timestamp checkInTime = new Timestamp(new Date());
+            String currentTime = getCurrentTime();
 
             // TODO: when user finish check in, hide view and store the info in a checkin object and save it to Firestore
             poiCheckInWindow.setVisibility(View.GONE);
@@ -221,7 +222,7 @@ public class CheckInFragment extends Fragment implements RecyclerViewAdapter.Ite
             EditText comment = poiCheckInWindow.findViewById(R.id.commentEditText);
 
             PlaceInfo place = new PlaceInfo();
-            CheckInInfo checkinInfo = new CheckInInfo();
+            CheckIn checkIn = new CheckIn();
 
             place.setName(binding.poiCheckInWindow.checkInTitle.getText().toString());
             place.setAddress(binding.poiCheckInWindow.checkInAddress.getText().toString());
@@ -238,41 +239,43 @@ public class CheckInFragment extends Fragment implements RecyclerViewAdapter.Ite
             String email = iterator.next();
             if (!revealUserName.isChecked()){
                 Log.d(TAG, "saveCheckIn: User wishes to check in as anonymous check in.");
-                checkinInfo.setUserName("Anonymous");
+                checkIn.setUserName("Anonymous");
             }
             else if (userName == null || userName.equals("")){
                 Log.d(TAG, "SaveCheckIn: userName is not saved. Will save it as an anonymous check in");
-                checkinInfo.setUserName("Anonymous");
+                checkIn.setUserName("Anonymous");
             }
             else{
-                checkinInfo.setUserName(userName);
+                checkIn.setUserName(userName);
             }
-            checkinInfo.setIdentifiedCheckIn(revealUserName.isChecked());
-            checkinInfo.setHearted(isHearted.isChecked());
-            checkinInfo.setLocal(isLocalCheckIn(place));
-            checkinInfo.setReview(comment.getText().toString());
-            checkinInfo.setCheckInTime(checkInTime);
+            checkIn.setIdentifiedCheckIn(revealUserName.isChecked());
+            checkIn.setHearted(isHearted.isChecked());
+            checkIn.setLocal(isLocalCheckIn(place));
+            checkIn.setReview(comment.getText().toString());
+            checkIn.setCheckInTime(currentTime);
 
-            place.setCheckinInfo(checkinInfo);
-
-            // check if place alredy exits in db
-
-            MyCallBack myCallBack = new MyCallBack()
+            if (place.getCheckIns() == null) {
+                ArrayList<CheckIn> checkIns = new ArrayList<>();
+                checkIns.add(checkIn);
+                place.setCheckIns(checkIns);
+            } else
             {
-                @Override
-                public void onCallback(boolean alreadyExists)
+                place.getCheckIns().add(checkIn);
+            }
+
+            // check if place already exits in db
+            MyCallBack myCallBack = alreadyExists -> {
+                if (alreadyExists)
                 {
-                    if (alreadyExists)
-                    {
-                        updatePlaceInfo(place);
-                    }
-                    else
-                    {
-                        saveCheckIn(place);//todo: store POI list and POI check in as global variables
-                    }
+                    updatePlaceInfo(place);
+                }
+                else
+                {
+                    savePlaceInfo(place);//todo: store POI list and POI check in as global variables
                 }
             };
-            isPlaceAlreadySaved(myCallBack, place.getId(), place.getName());
+            isPlaceInfoSaved(myCallBack, place.getId(), place.getName());
+
 //            // retrieve
 //            database.collection("placesCollection")
 //                    .get()
@@ -292,8 +295,43 @@ public class CheckInFragment extends Fragment implements RecyclerViewAdapter.Ite
         openStreetMapInit();
     }
 
+    private void isPlaceInfoSaved(final MyCallBack myCallBack, String id, CharSequence name)
+    {
+        collectionReference
+                //.whereEqualTo("id", id)
+                .whereEqualTo("name", name)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful())
+                    {
+                        for (QueryDocumentSnapshot document : task.getResult())
+                        {
+                            Log.d(TAG, document.getId() + " => " + document.getData());
+
+                            checkInDocumentReference = document.getReference();
+                        }
+
+                        if (task.getResult().isEmpty())
+                        {
+                            // return false
+                            myCallBack.onCallback(false);
+                        }
+                        else
+                        {
+                            // return true
+                            myCallBack.onCallback(true);
+                        }
+                    }
+                    else
+                    {
+                        // Log that the call to DB failed.
+                        Log.e(TAG, "Call failed to DB");
+                    }
+                });
+    }
+
     // Store the place info in the FireStore
-    private void saveCheckIn(PlaceInfo place)
+    private void savePlaceInfo(PlaceInfo place)
     {
         Map<String, Object> placeCollection = new HashMap<>();
         if (place.getName() != null)
@@ -331,16 +369,16 @@ public class CheckInFragment extends Fragment implements RecyclerViewAdapter.Ite
 
         final Map<String, Object> checkInsCollection = new HashMap<>();
 
-        checkInsCollection.put("id", place.getCheckinInfo().getId());
-        checkInsCollection.put("IsLocal", place.getCheckinInfo().isLocal());
-        checkInsCollection.put("IsHearted", place.getCheckinInfo().isHearted());
-        checkInsCollection.put("IsIdentifiedCheckin", place.getCheckinInfo().isIdentifiedCheckIn());
-        checkInsCollection.put("CheckInTime", place.getCheckinInfo().getCheckInTime());
-        checkInsCollection.put("userName", place.getCheckinInfo().getUserName());
+        checkInsCollection.put("id", place.getCheckIns().get(0).getId());
+        checkInsCollection.put("IsLocal", place.getCheckIns().get(0).isLocal());
+        checkInsCollection.put("IsHearted", place.getCheckIns().get(0).isHearted());
+        checkInsCollection.put("IsIdentifiedCheckin", place.getCheckIns().get(0).isIdentifiedCheckIn());
+        checkInsCollection.put("CheckInTime", place.getCheckIns().get(0).getCheckInTime());
+        checkInsCollection.put("userName", place.getCheckIns().get(0).getUserName());
 
-        if (!place.getCheckinInfo().getReview().equals(""))
+        if (!place.getCheckIns().get(0).getReview().equals(""))
         {
-            checkInsCollection.put("Review", place.getCheckinInfo().getReview());
+            checkInsCollection.put("Review", place.getCheckIns().get(0).getReview());
         }
 
         // Check if the document already exist in DB before adding a new one
@@ -354,104 +392,79 @@ public class CheckInFragment extends Fragment implements RecyclerViewAdapter.Ite
                     collectionReference
                             .document(documentReference.getId())
                             .collection("CheckInsCollection")
-                            .add(checkInsCollection).addOnSuccessListener(documentReference1 -> Log.d(TAG, "DocumentSnapshot added with ID: " + documentReference1.getId())).addOnFailureListener(e -> Log.w(TAG, "Error adding document", e));
+                            .add(checkInsCollection)
+                            .addOnSuccessListener(documentReference1 ->
+                                    Log.d(TAG, "DocumentSnapshot added with ID: " + documentReference1.getId()))
+                            .addOnFailureListener(e ->
+                                    Log.w(TAG, "Error adding document", e));
                 })
                 .addOnFailureListener(e -> Log.w(TAG, "Error adding document", e));
     }
 
-    private void isPlaceAlreadySaved(final MyCallBack myCallBack, String id, CharSequence name)
-    {
-        collectionReference
-                .whereEqualTo("id", id)
-                .whereEqualTo("name", name)
-                .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful())
-                    {
-                        for (QueryDocumentSnapshot document : task.getResult())
-                        {
-                            Log.d(TAG, document.getId() + " => " + document.getData());
-                        }
-
-                        if (task.getResult().isEmpty())
-                        {
-                            // return false
-                            myCallBack.onCallback(false);
-                        }
-                        else
-                        {
-                            // return true
-                            myCallBack.onCallback(true);
-                        }
-                    }
-                    else
-                    {
-                        // Log that the call to DB failed.
-                        Log.e(TAG, "Call failed to DB");
-                    }
-                });
-    }
-
     private void updatePlaceInfo(PlaceInfo place)
     {
-        collectionReference
-                .whereEqualTo("id", place.getId())
-                .whereEqualTo("name", place.getName())
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>()
-                {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task)
-                    {
+        if (checkInDocumentReference != null)
+        {
+            update(place, checkInDocumentReference);
+        } else {
+            collectionReference
+                    //.whereEqualTo("id", place.getId())
+                    .whereEqualTo("name", place.getName())
+                    .get()
+                    .addOnCompleteListener(task -> {
                         for (DocumentSnapshot document : task.getResult().getDocuments())
                         {
                             DocumentReference docReference = document.getReference();
-                            final Map<String, Object> CheckInsCollection = new HashMap<>();
-
-                            CheckInsCollection.put("IsLocal", place.getCheckinInfo().isLocal());
-                            CheckInsCollection.put("IsHearted", place.getCheckinInfo().isHearted());
-                            CheckInsCollection.put("IsIdentifiedCheckin", place.getCheckinInfo().isIdentifiedCheckIn());
-                            CheckInsCollection.put("CheckInTime", place.getCheckinInfo().getCheckInTime());
-
-                            if (!place.getCheckinInfo().getReview().equals(""))
-                            {
-                                CheckInsCollection.put("Review", place.getCheckinInfo().getReview());
-                            }
-
-
-                            if (place.getCheckinInfo().isIdentifiedCheckIn())
-                            {
-                                if(place.getCheckinInfo() != null && !place.getCheckinInfo().getUserName().isEmpty())
-                                {
-                                        // Append the username to the old name
-                                        CheckInsCollection.put("UserName", place.getCheckinInfo().getUserName());
-                                }
-                            }
-
-                            docReference
-                                    .collection("CheckInsCollection")
-                                    .add(CheckInsCollection)
-                                    .addOnSuccessListener(new OnSuccessListener<DocumentReference>()
-                                    {
-                                        @Override
-                                        public void onSuccess(DocumentReference documentReference)
-                                        {
-                                            Log.d(TAG, "DocumentSnapshot added with ID: " + documentReference.getId());
-                                        }
-                                    })
-                                    .addOnFailureListener(new OnFailureListener()
-                                    {
-                                        @Override
-                                        public void onFailure(@NonNull Exception e)
-                                        {
-                                            Log.w(TAG, "Error adding document", e);
-                                        }
-                                    });
+                            update(place, docReference);
                         }
+                    });
+        }
+
+
+    }
+
+    private void update(PlaceInfo place, DocumentReference docReference) {
+        final Map<String, Object> CheckInsCollection = new HashMap<>();
+        CheckInsCollection.put("IsLocal", place.getCheckIns().get(0).isLocal());
+        CheckInsCollection.put("IsHearted", place.getCheckIns().get(0).isHearted());
+        CheckInsCollection.put("IsIdentifiedCheckin", place.getCheckIns().get(0).isIdentifiedCheckIn());
+        CheckInsCollection.put("CheckInTime", place.getCheckIns().get(0).getCheckInTime());
+
+        if (!place.getCheckIns().get(0).getReview().equals(""))
+        {
+            CheckInsCollection.put("Review", place.getCheckIns().get(0).getReview());
+        }
+
+
+        if (place.getCheckIns().get(0).isIdentifiedCheckIn())
+        {
+            if(place.getCheckIns().get(0) != null && !place.getCheckIns().get(0).getUserName().isEmpty())
+            {
+                // Append the username to the old name
+                CheckInsCollection.put("UserName", place.getCheckIns().get(0).getUserName());
+            }
+        }
+
+        docReference
+                .collection("CheckInsCollection")
+                .add(CheckInsCollection)
+                .addOnSuccessListener(new OnSuccessListener<DocumentReference>()
+                {
+                    @Override
+                    public void onSuccess(DocumentReference documentReference)
+                    {
+                        Log.d(TAG, "DocumentSnapshot added with ID: " + documentReference.getId());
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener()
+                {
+                    @Override
+                    public void onFailure(@NonNull Exception e)
+                    {
+                        Log.w(TAG, "Error adding document", e);
                     }
                 });
     }
-
 
 //    private void PlaceExistsInDB(final MyCallBack myCallBack, String id, CharSequence name)
 //    {
@@ -508,6 +521,7 @@ public class CheckInFragment extends Fragment implements RecyclerViewAdapter.Ite
 
     private void searchNearby(String query) {
 
+        //TODO: Maybe show a spinner or loading bar that search is happening because user is not sure what is happening
         ExecutorService service = Executors.newSingleThreadExecutor();
         Handler handler = new Handler(Looper.getMainLooper());
 
@@ -733,6 +747,21 @@ public class CheckInFragment extends Fragment implements RecyclerViewAdapter.Ite
         binding.poiListPopupWindow.poiListPopupWindow.setVisibility(View.INVISIBLE);
         binding.poiDetailPopupWindow.placeDetailsPopupWindow.setVisibility(View.VISIBLE);
     }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    private String getCurrentTime() {
+
+        //Want to return this: April 1st, 2022 11:44 A.M.
+
+        String europeanDatePattern = "dd MMMM, yyyy hh:mm a";
+        DateTimeFormatter europeanDateFormatter = DateTimeFormatter.ofPattern(europeanDatePattern);
+
+        LocalDateTime currentDate = LocalDateTime.now();
+
+        String formattedCurrentDate = europeanDateFormatter.format(currentDate);
+
+        return formattedCurrentDate;
+}
 
     // Fragment setup reference: https://guides.codepath.com/android/creating-and-using-fragments
 }
