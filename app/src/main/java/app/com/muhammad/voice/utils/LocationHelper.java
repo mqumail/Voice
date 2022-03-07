@@ -116,7 +116,9 @@ public class LocationHelper
     }
 
     public static void removeListener() {
-        locationManager.removeUpdates(listener);
+        if (locationManager != null ) {
+            locationManager.removeUpdates(listener);
+        }
     }
 
     public static GeoPoint getLatLong(PlaceInfo place, Context context) throws IOException {
