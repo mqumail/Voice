@@ -26,16 +26,23 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
+//import com.google.api.core.ApiFunction;
+//import com.google.api.core.ApiFutureCallback;
+//import com.google.api.core.ApiFutures;
+
 import com.google.android.material.switchmaterial.SwitchMaterial;
+//import com.google.auth.oauth2.GoogleCredentials;
+//import com.google.cloud.firestore.Firestore;
+//import com.google.cloud.firestore.FirestoreOptions;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import org.osmdroid.api.IMapController;
 import org.osmdroid.bonuspack.clustering.RadiusMarkerClusterer;
@@ -54,6 +61,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -99,6 +107,8 @@ public class CheckInFragment extends Fragment implements RecyclerViewAdapter.Ite
     private static final String TAG = "CheckInFragment";
 
     private CollectionReference collectionReference;
+    //private com.google.cloud.firestore.CollectionReference newCollectionReference;
+
     private DocumentReference checkInDocumentReference;
  
     private FragmentActivity listener;
@@ -111,6 +121,7 @@ public class CheckInFragment extends Fragment implements RecyclerViewAdapter.Ite
     private SearchView searchView = null;
     private SearchView.OnQueryTextListener queryTextListener;
     private ArrayList<POI> POIs;
+    private ArrayList<PlaceInfo> places;
 
     private RecyclerView nearByPlacesRecyclerView;
     private RecyclerViewAdapter nearbyPOIsAdapter;
@@ -119,6 +130,7 @@ public class CheckInFragment extends Fragment implements RecyclerViewAdapter.Ite
     private Location location;
 
     private FirebaseFirestore database;
+    //private Firestore database;
 
     SharedPreferences preferences;
     final String PREFERENCE_KEY = "my_preferences";
@@ -174,7 +186,19 @@ public class CheckInFragment extends Fragment implements RecyclerViewAdapter.Ite
 
         //Collection reference - Firestore
         database = FirebaseFirestore.getInstance();
-        collectionReference = database.collection("placesCollection");
+//
+//        FirestoreOptions firestoreOptions = null;
+//        try {
+//            firestoreOptions = FirestoreOptions.getDefaultInstance().toBuilder()
+//                    .setProjectId("Project ID")
+//                    .setCredentials(GoogleCredentials.getApplicationDefault())
+//                    .build();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//        database = firestoreOptions.getService();
+//
+//        newCollectionReference = database.collection("placesCollection");
 
         //Views
         LinearLayout poiListPopupWindow = binding.poiListPopupWindow.poiListPopupWindow;
@@ -267,6 +291,8 @@ public class CheckInFragment extends Fragment implements RecyclerViewAdapter.Ite
             MyCallBack myCallBack = alreadyExists -> {
                 if (alreadyExists)
                 {
+                    // TODO: This is big
+                    // before checkin, make sure this user does not have more checkins for this place
                     updatePlaceInfo(place);
                 }
                 else
@@ -291,7 +317,7 @@ public class CheckInFragment extends Fragment implements RecyclerViewAdapter.Ite
 //                        }
 //                    });
         });
-        location = getLastKnownLocation(CONTEXT);//getCurrentUserLocation(CONTEXT);
+        location = getLastKnownLocation(CONTEXT);
         openStreetMapInit();
     }
 
@@ -372,7 +398,7 @@ public class CheckInFragment extends Fragment implements RecyclerViewAdapter.Ite
         checkInsCollection.put("id", place.getCheckIns().get(0).getId());
         checkInsCollection.put("IsLocal", place.getCheckIns().get(0).isLocal());
         checkInsCollection.put("IsHearted", place.getCheckIns().get(0).isHearted());
-        checkInsCollection.put("IsIdentifiedCheckin", place.getCheckIns().get(0).isIdentifiedCheckIn());
+        checkInsCollection.put("IsIdentifiedCheckIn", place.getCheckIns().get(0).isIdentifiedCheckIn());
         checkInsCollection.put("CheckInTime", place.getCheckIns().get(0).getCheckInTime());
         checkInsCollection.put("userName", place.getCheckIns().get(0).getUserName());
 
@@ -388,6 +414,8 @@ public class CheckInFragment extends Fragment implements RecyclerViewAdapter.Ite
                 .add(placeCollection)
                 .addOnSuccessListener(documentReference -> {
                     Log.d(TAG, "DocumentSnapshot added with ID: " + documentReference.getId());
+
+                    place.setId(documentReference.getId());
 
                     collectionReference
                             .document(documentReference.getId())
@@ -420,14 +448,16 @@ public class CheckInFragment extends Fragment implements RecyclerViewAdapter.Ite
                     });
         }
 
-
     }
 
     private void update(PlaceInfo place, DocumentReference docReference) {
+        // This is needed and also in Save because it will help reference later
+        place.setId(docReference.getId());
+
         final Map<String, Object> CheckInsCollection = new HashMap<>();
         CheckInsCollection.put("IsLocal", place.getCheckIns().get(0).isLocal());
         CheckInsCollection.put("IsHearted", place.getCheckIns().get(0).isHearted());
-        CheckInsCollection.put("IsIdentifiedCheckin", place.getCheckIns().get(0).isIdentifiedCheckIn());
+        CheckInsCollection.put("IsIdentifiedCheckIn", place.getCheckIns().get(0).isIdentifiedCheckIn());
         CheckInsCollection.put("CheckInTime", place.getCheckIns().get(0).getCheckInTime());
 
         if (!place.getCheckIns().get(0).getReview().equals(""))
@@ -448,22 +478,8 @@ public class CheckInFragment extends Fragment implements RecyclerViewAdapter.Ite
         docReference
                 .collection("CheckInsCollection")
                 .add(CheckInsCollection)
-                .addOnSuccessListener(new OnSuccessListener<DocumentReference>()
-                {
-                    @Override
-                    public void onSuccess(DocumentReference documentReference)
-                    {
-                        Log.d(TAG, "DocumentSnapshot added with ID: " + documentReference.getId());
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener()
-                {
-                    @Override
-                    public void onFailure(@NonNull Exception e)
-                    {
-                        Log.w(TAG, "Error adding document", e);
-                    }
-                });
+                .addOnSuccessListener(documentReference -> Log.d(TAG, "DocumentSnapshot added with ID: " + documentReference.getId()))
+                .addOnFailureListener(e -> Log.w(TAG, "Error adding document", e));
     }
 
 //    private void PlaceExistsInDB(final MyCallBack myCallBack, String id, CharSequence name)
@@ -542,73 +558,100 @@ public class CheckInFragment extends Fragment implements RecyclerViewAdapter.Ite
 
                     // Get Bounding box around the pois
                     BoundingBox poIsBoundingBox = LocationHelper.getPOIsBoundingBox(POIs);
+                    places = new ArrayList<>();
 
-                    // TODO: Populate the list
-                    ArrayList<PlaceInfo> places = new ArrayList<>();
+                    //TODO: Goto the DB, get the collection of Places
+                    // use the collection to get checkIns collection
+                    // attach that to the places list
 
-                    for (POI poi: POIs) {
-                        PlaceInfo place = new PlaceInfo();
-                        place.setName(poi.mType);
-                        place.setAddress(poi.mLocation.toString());
-                        place.setRating(poi.mRank);
+                    if (collectionReference != null) {
+                        collectionReference
+                                .get()
+                                .addOnCompleteListener(task -> {
+                                    for (DocumentSnapshot document : task.getResult().getDocuments())
+                                    {
+//                                      document.getReference().collection("CheckInsCollection").get().addOnCompleteListener();
+                                        DocumentReference documentReference = document.getReference();
+                                    }
+                                });
+//                    ApiFutures.addCallback(future, new ApiFutureCallback<String>() {
+//                        @Override
+//                        public void onSuccess(String result) {
+//                            System.out.println("Operation completed with result: " + result);
+//                        }
+//
+//                        @Override
+//                        public void onFailure(Throwable t) {
+//                            System.out.println("Operation failed with error: " + t);
+//                        }
+//                    });
+                        for (POI poi: POIs) {
+                            PlaceInfo place = new PlaceInfo();
+                            place.setName(poi.mType);
+                            place.setAddress(poi.mLocation.toString());
+                            place.setRating(poi.mRank);
+                            place.setId(String.valueOf(poi.mId));
 
-                        places.add(place);
-                    }
-
-                    nearByPlacesRecyclerView = binding.poiListPopupWindow.usersRevealedListRecyclerView;
-                    nearbyPOIsAdapter = new RecyclerViewAdapter(getActivity(), places, this);
-                    nearByPlacesRecyclerView.setAdapter(nearbyPOIsAdapter);
-                    nearByPlacesRecyclerView.setLayoutManager(new LinearLayoutManager(CONTEXT));
-
-                    //TODO:
-                    // 1) Remove clusters, show individual markers
-                    // 2) Customize the markers drawable: use small with icon for restaurant, bar, church etc
-                    // 3) When the user clicks search, zoom to a BB which fits all POIs and set the zoom to around 17.0 (ref: Google Maps)
-                    // -DONE- 4) Optimize this fragment with its methods and calls to osm APIs
-                    // -DONE- 5) Attach the list (recyclerView) and populate the list with the POIs from the API
-                    // 6) Set onClickListener when the user clicks on an item in the list and then show details about the place in an info window
-                    // 7) Find a better map design (icons, roads, colors, buildings, etc.)
-                    // 8) Check to see if the new way will give us different terrains and night mode map
-
-                    //Clusters
-                    RadiusMarkerClusterer poiMarkerCluster = new RadiusMarkerClusterer(CONTEXT);
-                    if (POIs.size() > 1) {
-                        Bitmap clusterIcon = getBitmapFromVectorDrawable(CONTEXT, R.drawable.marker_cluster);
-                        poiMarkerCluster.setIcon(clusterIcon);
-
-                        // CLuster Design
-                        poiMarkerCluster.getTextPaint().setColor(Color.DKGRAY);
-                        poiMarkerCluster.getTextPaint().setTextSize(12 * getResources().getDisplayMetrics().density); //taking into account the screen density
-                        poiMarkerCluster.mAnchorU = Marker.ANCHOR_RIGHT;
-                        poiMarkerCluster.mAnchorV = Marker.ANCHOR_BOTTOM;
-                        poiMarkerCluster.mTextAnchorV = 0.40f;
-
-                        map.getOverlays().add(poiMarkerCluster);
-                    }
-
-                    //Drop Pins
-                    Drawable poiIcon = ResourcesCompat.getDrawable(getResources(), R.drawable.ic_marker_man, null);
-                    for (POI poi : POIs){
-                        Marker poiMarker = new Marker(map);
-                        poiMarker.setTitle(poi.mType != null ? poi.mType : "No Name");
-                        poiMarker.setSnippet(poi.mDescription != null ? poi.mDescription : "No Description");
-                        poiMarker.setPosition(poi.mLocation);
-                        poiMarker.setIcon(poiIcon);
-                        if (poi.mThumbnail != null){
-                            poiMarker.setImage(new BitmapDrawable(poi.mThumbnail));
+                            places.add(place);
                         }
-                        // TODO: Here is where we set the custom Window
-                        poiMarker.setInfoWindow(new CustomInfoWindow(map));
-                        poiMarker.setRelatedObject(poi);
-                        poiMarkerCluster.add(poiMarker);
+
+                        nearByPlacesRecyclerView = binding.poiListPopupWindow.usersRevealedListRecyclerView;
+                        nearbyPOIsAdapter = new RecyclerViewAdapter(getActivity(), places, this);
+                        nearByPlacesRecyclerView.setAdapter(nearbyPOIsAdapter);
+                        nearByPlacesRecyclerView.setLayoutManager(new LinearLayoutManager(CONTEXT));
+
+                        //TODO:
+                        // 1) Remove clusters, show individual markers
+                        // 2) Customize the markers drawable: use small with icon for restaurant, bar, church etc
+                        // 3) When the user clicks search, zoom to a BB which fits all POIs and set the zoom to around 17.0 (ref: Google Maps)
+                        // -DONE- 4) Optimize this fragment with its methods and calls to osm APIs
+                        // -DONE- 5) Attach the list (recyclerView) and populate the list with the POIs from the API
+                        // 6) Set onClickListener when the user clicks on an item in the list and then show details about the place in an info window
+                        // 7) Find a better map design (icons, roads, colors, buildings, etc.)
+                        // 8) Check to see if the new way will give us different terrains and night mode map
+
+                        //Clusters
+                        RadiusMarkerClusterer poiMarkerCluster = new RadiusMarkerClusterer(CONTEXT);
+                        if (POIs.size() > 1) {
+                            Bitmap clusterIcon = getBitmapFromVectorDrawable(CONTEXT, R.drawable.marker_cluster);
+                            poiMarkerCluster.setIcon(clusterIcon);
+
+                            // CLuster Design
+                            poiMarkerCluster.getTextPaint().setColor(Color.DKGRAY);
+                            poiMarkerCluster.getTextPaint().setTextSize(12 * getResources().getDisplayMetrics().density); //taking into account the screen density
+                            poiMarkerCluster.mAnchorU = Marker.ANCHOR_RIGHT;
+                            poiMarkerCluster.mAnchorV = Marker.ANCHOR_BOTTOM;
+                            poiMarkerCluster.mTextAnchorV = 0.40f;
+
+                            map.getOverlays().add(poiMarkerCluster);
+                        }
+
+                        //Drop Pins
+                        Drawable poiIcon = ResourcesCompat.getDrawable(getResources(), R.drawable.ic_marker_man, null);
+                        for (POI poi : POIs){
+                            Marker poiMarker = new Marker(map);
+                            poiMarker.setTitle(poi.mType != null ? poi.mType : "No Name");
+                            poiMarker.setSnippet(poi.mDescription != null ? poi.mDescription : "No Description");
+                            poiMarker.setPosition(poi.mLocation);
+                            poiMarker.setIcon(poiIcon);
+                            if (poi.mThumbnail != null){
+                                poiMarker.setImage(new BitmapDrawable(poi.mThumbnail));
+                            }
+                            // TODO: Here is where we set the custom Window
+                            poiMarker.setInfoWindow(new CustomInfoWindow(map));
+                            poiMarker.setRelatedObject(poi);
+                            poiMarkerCluster.add(poiMarker);
+                        }
+
+                        IMapController mapController = map.getController();
+                        mapController.setZoom(17.0);
+                        map.zoomToBoundingBox(poIsBoundingBox, true);
+                        map.invalidate();
+
+                        binding.poiListPopupWindow.poiListPopupWindow.setVisibility(View.VISIBLE);
+                    } else {
+                        Toast.makeText(CONTEXT, "Unable to retrieve any data. Please try again later.", Toast.LENGTH_SHORT).show();
                     }
-
-                    IMapController mapController = map.getController();
-                    mapController.setZoom(17.0);
-                    map.zoomToBoundingBox(poIsBoundingBox, true);
-                    map.invalidate();
-
-                    binding.poiListPopupWindow.poiListPopupWindow.setVisibility(View.VISIBLE);
                 });
             }
         });
@@ -718,18 +761,18 @@ public class CheckInFragment extends Fragment implements RecyclerViewAdapter.Ite
         // Also zoom to the marker after showing the popup window
         LinearLayout linearLayout = binding.poiDetailPopupWindow.placeDetailsPopupWindow;
 
-        TextView name = linearLayout.findViewById(R.id.namePlaceDetail);
+        TextView nameView = linearLayout.findViewById(R.id.namePlaceDetail);
         TextView addressView = linearLayout.findViewById(R.id.addressPlaceDetail);
-        TextView localVisitors = linearLayout.findViewById(R.id.localNumber);
-        TextView localLikes = linearLayout.findViewById(R.id.localUpvotes);
-        TextView touristVisitors = linearLayout.findViewById(R.id.touristNumber);
-        TextView touristLikes = linearLayout.findViewById(R.id.touristUpvotes);
+        TextView localVisitorsView = linearLayout.findViewById(R.id.localNumber);
+        TextView localLikesView = linearLayout.findViewById(R.id.localUpvotes);
+        TextView touristVisitorsView = linearLayout.findViewById(R.id.touristNumber);
+        TextView touristLikesView = linearLayout.findViewById(R.id.touristUpvotes);
 
-        POI place = POIs.get(position);
+        POI poi = POIs.get(position);
 
         List<Address> addresses = null;
         try {
-            addresses = getAddresses(place, CONTEXT);
+            addresses = getAddresses(poi, CONTEXT);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -741,8 +784,10 @@ public class CheckInFragment extends Fragment implements RecyclerViewAdapter.Ite
 //        String postalCode = addresses.get(0).getPostalCode();
         String knownName = addresses.get(0).getFeatureName(); // Only if available else return NULL
 
-        name.setText(place.mType != null ? place.mType : knownName);
+        nameView.setText(poi.mType != null ? poi.mType : knownName);
         addressView.setText(address);
+
+        //localVisitorsView.setText();
 
         binding.poiListPopupWindow.poiListPopupWindow.setVisibility(View.INVISIBLE);
         binding.poiDetailPopupWindow.placeDetailsPopupWindow.setVisibility(View.VISIBLE);

@@ -1,5 +1,6 @@
 apply plugin: 'com.android.application'
 apply plugin: 'com.google.gms.google-services'
+apply plugin: 'project-report'
 
 android {
     compileSdkVersion 31
@@ -75,8 +76,21 @@ dependencies {
     // Declare the dependency for the Cloud Firestore library
     // When using the BoM, you don't specify versions in Firebase library dependencies
     implementation 'com.google.firebase:firebase-firestore'
+
+    // Firestore ApiFuture used instead of Task (Async calls)
+//    implementation('com.google.api-client:google-api-client:1.32.1') {
+//        exclude(group: "proto-google-common-protos", module: "com.google.api.Advice")
+//        exclude(group: "proto-google-common-protos", module: "com.google.api.AdviceOrBuilder")
+//        exclude group: "com.google.api.grpc", module: "proto-google-common-protos"
+//    }
+//
+//    //Google Cloud Firestore
+//    implementation('com.google.cloud:google-cloud-firestore:2.6.1') {
+//        exclude group: "com.google.firebase", module: "protolite-well-known-types"
+//    }
 }
 
 repositories {
     mavenCentral()
+    //google()
 }

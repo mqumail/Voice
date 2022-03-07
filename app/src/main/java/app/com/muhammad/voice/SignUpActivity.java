@@ -11,6 +11,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -60,9 +61,11 @@ public class SignUpActivity extends AppCompatActivity  {
             @Override
             public void onClick(View v)
             {
-                String email = binding.emailRegister.getText().toString();
-                String password = binding.passwordRegister.getText().toString();
-                String userName = binding.usernameRegister.getText().toString();
+                // TODO: Run validation here. This can happen after thesis is done
+
+                String email = emailEditText.getText().toString();
+                String password = passwordEditText.getText().toString();
+                String userName = userNameEditText.getText().toString();
                 signUp(email, password, userName);
 
                 continueHome();
@@ -80,9 +83,6 @@ public class SignUpActivity extends AppCompatActivity  {
                             // Sign in success, update UI with the signed-in user's information
                             Log.d(ACTIVITY_TAG, "createUserWithEmail:success");
                             saveUserInfo(email, userName);
-
-                            //TODO: let user know they signed in succesfully and that they are signed in as: username
-                            //      maybe use toast
                         }
                         else {
                             FirebaseUser user = mAuth.getCurrentUser();
@@ -101,6 +101,30 @@ public class SignUpActivity extends AppCompatActivity  {
         userInfo.add(userName);
         SharedPreferences preferences = getSharedPreferences("my_preferences", MODE_PRIVATE);
         preferences.edit().putStringSet("user-info",userInfo).apply();
+
+
+        //TODO: Let user know they have signed up successfully
+        // - small text: tell them what was stored (??)
+        // - Positive option, continue as 'USERNAME'
+
+        Toast.makeText(this, "Registration Successful! Continuing as: " + userName,
+                Toast.LENGTH_SHORT).show();
+
+        // TODO: Fix me bug with themes
+        //notifyUser(email, userName);
+    }
+
+    private void notifyUser(String email, String userName) {
+        new MaterialAlertDialogBuilder(SignUpActivity.this)
+                .setTitle("You are registered!")
+                .setMessage("You signed up using: " + email)
+                .setPositiveButton("Continue as: " + userName, (dialogInterface, i) -> {
+
+                })
+                .setNegativeButton("Sign in as another user", (dialogInterface, i) -> {
+
+                })
+                .show();
     }
 
     public void continueHome()

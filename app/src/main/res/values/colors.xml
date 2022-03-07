@@ -13,4 +13,13 @@
     <color name="divider">#BDBDBD</color>
 
     <color name="semi_transparent">#CCFFFFFF</color>
+
+    <color name="my_app_primary_variant_color">#212121</color>
+    <color name="my_app_secondary_variant_color">#757575</color>
+    <color name="my_app_surface_color">@color/background</color>
+    <color name="my_app_color_on_primary">#BDBDBD</color>
+    <color name="my_app_color_on_secondary">#212121</color>
+    <color name="my_app_color_on_background">#757575</color>
+    <color name="my_app_color_on_error">#FFFFFF</color>
+    <color name="my_app_color_on_surface">#BDBDBD</color>
 </resources>
