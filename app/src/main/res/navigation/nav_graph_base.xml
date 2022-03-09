@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph_base"
+    app:startDestination="@id/osmFragment">
+
+    <fragment
+        android:id="@+id/osmFragment"
+        android:name="app.com.muhammad.voice.ui.openStreetMap.OsmFragment"
+        tools:layout="@layout/fragment_osm" >
+        <action
+            android:id="@+id/action_osmFragment_to_profileFragment"
+            app:destination="@id/profileFragment" />
+        <action
+            android:id="@+id/action_osmFragment_to_settingsFragment"
+            app:destination="@id/settingsFragment" />
+        <action
+            android:id="@+id/action_osmFragment_to_checkInFragment"
+            app:destination="@id/checkInFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/profileFragment"
+        android:name="app.com.muhammad.voice.ui.profile.ProfileFragment"
+        tools:layout="@layout/fragment_profile" >
+        <action
+            android:id="@+id/action_profileFragment_to_settingsFragment"
+            app:destination="@id/settingsFragment" />
+        <action
+            android:id="@+id/action_profileFragment_to_osmFragment"
+            app:destination="@id/osmFragment" />
+        <action
+            android:id="@+id/action_profileFragment_to_checkInFragment"
+            app:destination="@id/checkInFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="app.com.muhammad.voice.ui.settings.SettingsFragment"
+        tools:layout="@layout/fragment_settings" >
+        <action
+            android:id="@+id/action_settingsFragment_to_profileFragment"
+            app:destination="@id/profileFragment" />
+        <action
+            android:id="@+id/action_settingsFragment_to_osmFragment"
+            app:destination="@id/osmFragment" />
+        <action
+            android:id="@+id/action_settingsFragment_to_checkInFragment"
+            app:destination="@id/checkInFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/checkInFragment"
+        android:name="app.com.muhammad.voice.ui.checkIn.CheckInFragment"
+        tools:layout="@layout/fragment_check_in" >
+        <action
+            android:id="@+id/action_checkInFragment_to_profileFragment"
+            app:destination="@id/profileFragment" />
+        <action
+            android:id="@+id/action_checkInFragment_to_osmFragment"
+            app:destination="@id/osmFragment" />
+        <action
+            android:id="@+id/action_checkInFragment_to_settingsFragment"
+            app:destination="@id/settingsFragment" />
+    </fragment>
+</navigation>

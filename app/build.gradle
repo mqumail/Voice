@@ -1,0 +1,116 @@
+apply plugin: 'com.android.application'
+apply plugin: 'com.google.gms.google-services'
+apply plugin: 'project-report'
+
+android {
+    compileSdkVersion 31
+    defaultConfig {
+        applicationId "app.com.muhammad.voice"
+        minSdkVersion 25
+        targetSdkVersion 31
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
+        multiDexEnabled true
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    buildFeatures {
+        viewBinding true
+    }
+    dataBinding{
+        enabled true
+    }
+    packagingOptions {
+//        pickFirst 'google/protobuf/type.proto'
+//        pickFirst 'META-INF/DEPENDENCIES' 'META-INF/INDEX.LIST'
+//        pickFirst 'google/protobuf/timestamp.proto'
+//        pickFirst 'google/protobuf/duration.proto'
+        pickFirst 'META-INF/*'
+//        pickFirst '/com/google/api/grpc/proto-google-common-protos/*'
+//        pickFirst '/com/google/firebase/protolite-well-known-types/*'
+        //pickFirst ''
+    }
+
+    //exclude group: "com.google.firebase", module: "protolite-well-known-types"
+    //        exclude(group: "proto-google-common-protos", module: "com.google.api.Advice")
+//        exclude(group: "proto-google-common-protos", module: "com.google.api.AdviceOrBuilder")
+//        exclude group: "com.google.api.grpc", module: "proto-google-common-protos"
+}
+
+dependencies {
+    implementation 'com.google.firebase:firebase-auth:21.0.1'
+    def fragment_version = "1.4.0"
+    def activity_version = "1.4.0"
+
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+    implementation 'androidx.appcompat:appcompat:1.4.1'
+    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.4.0'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.0'
+    implementation 'androidx.navigation:navigation-fragment:2.3.5'
+    implementation 'androidx.navigation:navigation-ui:2.3.5'
+    implementation 'androidx.media:media:1.4.3'
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.3'
+    implementation 'androidx.multidex:multidex:2.0.1'
+    implementation 'androidx.recyclerview:recyclerview:1.2.1'
+    implementation "androidx.activity:activity:$activity_version"
+    implementation "androidx.fragment:fragment:$fragment_version"
+
+    // Google's Material Design
+    implementation 'com.google.android.material:material:1.5.0'
+
+    implementation 'com.google.gms:google-services:4.3.10'
+
+    testImplementation 'junit:junit:4.13.2'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.3'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
+
+    //osm
+    implementation 'org.osmdroid:osmdroid-android:6.1.10'
+    implementation 'org.osmdroid:osmdroid-wms:6.1.6'
+    implementation 'org.osmdroid:osmdroid-mapsforge:6.1.6'
+    implementation 'org.osmdroid:osmdroid-geopackage:6.1.6'
+
+    //osmBonusPack
+    implementation 'com.github.MKergall:osmbonuspack:6.7.0'
+
+    //SmartTabLayout
+    implementation 'com.ogaclejapan.smarttablayout:library:1.2.1@aar'
+
+    // Firebase BoM
+    implementation platform('com.google.firebase:firebase-bom:29.0.4')
+
+    implementation 'com.google.firebase:firebase-analytics'
+
+    // Declare the dependency for the Cloud Firestore library
+    // When using the BoM, you don't specify versions in Firebase library dependencies
+    implementation 'com.google.firebase:firebase-firestore'
+
+    // Firestore ApiFuture used instead of Task (Async calls)
+    implementation('com.google.api-client:google-api-client:1.32.1') {
+        exclude group: "com.google.protobuf", module: "protobuf-javalite"
+        //exclude group: "com.google.protobuf", module: "protobuf-java"
+    }
+
+    //Google Cloud Firestore
+    implementation('com.google.cloud:google-cloud-firestore') {
+        exclude group: "com.google.api.grpc", module: "proto-google-common-protos"
+    }
+
+    // Firestore client SDK
+    implementation 'com.google.firebase:firebase-firestore'
+
+    // Declare the dependency for the Cloud Storage library
+    // When using the BoM, you don't specify versions in Firebase library dependencies
+    implementation 'com.google.firebase:firebase-storage'
+}
+
+repositories {
+    mavenCentral()
+}

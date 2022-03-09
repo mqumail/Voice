@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "496533077048",
+    "firebase_url": "https://voice-dc16d.firebaseio.com",
+    "project_id": "voice-dc16d",
+    "storage_bucket": "voice-dc16d.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:496533077048:android:e175e5a4333c833297facd",
+        "android_client_info": {
+          "package_name": "app.com.muhammad.voice"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "496533077048-sqe9qnc4cippmaudv53g9iu2trm9nvfc.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA6EQMxZXkCmy1R3gTl4g9s3X-lAn0SsME"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "496533077048-sqe9qnc4cippmaudv53g9iu2trm9nvfc.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="wrap_content"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:id="@+id/poi_list_popup_window"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@color/background"
+        android:focusable="true"
+        android:elevation="3dp"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <ImageView
+            android:id="@+id/coloBar_place_details"
+            android:layout_width="match_parent"
+            android:layout_height="10dp"
+            android:layout_margin="0dp"
+            android:scaleType="fitXY"
+            android:src="@drawable/ic_color_bar"
+            app:srcCompat="@drawable/ic_color_bar" />
+
+        <TextView
+            android:id="@+id/revealedUserNameTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/places_list_prompt_heading"
+            android:textColor="@color/primary_text"
+            android:textSize="22sp"
+            android:gravity="center_horizontal"/>
+
+        <TextView
+            android:id="@+id/revealedUserAddressTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/place_list_prompt"
+            android:textColor="@color/secondary_text"
+            android:textSize="@dimen/bodyTextSize"
+            android:gravity="center_horizontal"/>
+
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/users_revealed_list_recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:layout_marginTop="4dp"
+            android:background="@color/background"
+            android:elevation="1dp"
+            android:foregroundGravity="top"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toTopOf="@id/button_area_place_reveal_list"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/marker_info" />
+
+        <LinearLayout
+            android:id="@+id/button_area_place_reveal_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:background="@color/background"
+            android:elevation="1dp"
+            android:gravity="end"
+            android:orientation="horizontal"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/users_revealed_list_recycler_view"
+            app:layout_constraintVertical_bias="0">
+
+            <Button
+                android:id="@+id/close_button_poi_list"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"
+                android:background="@drawable/button_get_started"
+                android:text="@string/close_button"
+                android:textColor="@color/primary_dark" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
