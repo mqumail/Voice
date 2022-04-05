@@ -1,12 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
+<FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@+id/osm_fragment_frame_layout_container"
     tools:context=".ui.openStreetMap.OsmFragment">
 
     <FrameLayout
+        android:id="@+id/osm_fragment_frame_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -15,18 +18,51 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/check_in_FAB"
-            android:layout_width="56dp"
-            android:layout_height="56dp"
-            android:layout_gravity="bottom|end"
-            android:layout_marginEnd="16dp"
-            android:layout_marginBottom="16dp"
-            android:backgroundTint="@color/primary_dark"
-            android:contentDescription="@string/check_in_fab_description"
-            android:elevation="10dp"
-            android:foreground="@drawable/ic_add_24"
-            android:text="@string/check_in_button"
-            tools:ignore="ImageContrastCheck" />
+        <include
+            android:id="@+id/poi_detail_popup_window_osm"
+            layout="@layout/place_details_info_window_osm"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:visibility="gone" />
+
     </FrameLayout>
-</androidx.constraintlayout.widget.ConstraintLayout>
+
+    <ImageButton
+        android:id="@+id/currentLocationButton"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:layout_gravity="end"
+        android:layout_marginEnd="16dp"
+        android:layout_marginTop="16dp"
+        android:backgroundTint="@color/full_transparent"
+        android:padding="16dp"
+        android:src="@drawable/ic_twotone_my_location_48" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/check_in_FAB"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:layout_gravity="bottom|end"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:backgroundTint="@color/primary_dark"
+        android:contentDescription="@string/check_in_fab_description"
+        android:elevation="10dp"
+        android:foreground="@drawable/ic_add_24"
+        android:text="@string/check_in_button"
+        tools:ignore="ImageContrastCheck" />
+
+    <ProgressBar
+        android:visibility="gone"
+        android:id="@+id/progress_circular_osm_placeDetail"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center"
+        android:layout_marginVertical="150dp"
+        android:foregroundGravity="center_vertical"
+        app:layout_constraintBottom_toBottomOf="@+id/osm_fragment_frame_layout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+</FrameLayout>

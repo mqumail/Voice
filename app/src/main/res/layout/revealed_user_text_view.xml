@@ -10,6 +10,6 @@
         android:layout_height="match_parent"
         android:gravity="center_horizontal"
         android:padding="10dp"
-        android:text="@string/toursit_visitors_place_details"
+        android:text="@string/tourist_visitors_place_details"
         android:textColor="@color/secondary_text" />
 </FrameLayout>

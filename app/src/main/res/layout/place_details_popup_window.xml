@@ -9,7 +9,7 @@
         android:id="@+id/place_details_popup_window"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@color/background"
+        android:background="@drawable/image_background"
         android:focusable="true"
         android:elevation="3dp"
         android:orientation="vertical"
@@ -21,7 +21,6 @@
             android:id="@+id/marker_info"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/background"
             android:elevation="1dp"
             android:orientation="vertical"
             app:layout_constraintEnd_toEndOf="parent"
@@ -71,7 +70,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:background="#ffffff"
             android:clickable="true"
             android:elevation="1dp"
             android:orientation="horizontal"
@@ -91,7 +89,7 @@
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:text="-"
-                android:textColor="@color/primary_dark"
+                android:textColor="@color/accent"
                 android:textSize="20sp"
                 android:textStyle="bold" />
 
@@ -129,7 +127,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:background="#ffffff"
             android:clickable="true"
             android:elevation="1dp"
             android:focusable="true"
@@ -150,7 +147,7 @@
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:text="-"
-                android:textColor="@color/primary_dark"
+                android:textColor="@color/accent"
                 android:textSize="20sp"
                 android:textStyle="bold" />
 
@@ -160,7 +157,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:layout_weight="1"
-                android:text="@string/toursit_visitors_place_details"
+                android:text="@string/tourist_visitors_place_details"
                 android:textSize="16sp" />
 
             <TextView
@@ -183,53 +180,49 @@
                 android:src="@drawable/ic_favorite" />
         </LinearLayout>
 
-<!--        <LinearLayout-->
-<!--            android:id="@+id/comment_info"-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:layout_marginTop="4dp"-->
-<!--            android:background="#ffffff"-->
-<!--            android:clickable="true"-->
-<!--            android:elevation="1dp"-->
-<!--            android:focusable="true"-->
-<!--            android:orientation="horizontal"-->
-<!--            android:paddingStart="16dp"-->
-<!--            android:paddingTop="16dp"-->
-<!--            android:paddingEnd="16dp"-->
-<!--            android:paddingBottom="16dp"-->
-<!--            app:layout_constraintBottom_toBottomOf="parent"-->
-<!--            app:layout_constraintEnd_toEndOf="parent"-->
-<!--            app:layout_constraintHorizontal_bias="0"-->
-<!--            app:layout_constraintStart_toStartOf="parent"-->
-<!--            app:layout_constraintTop_toBottomOf="@id/tourist_info"-->
-<!--            app:layout_constraintVertical_bias="0">-->
+        <LinearLayout
+            android:id="@+id/reviews_check_in_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:clickable="true"
+            android:orientation="horizontal"
+            android:padding="16dp"
+            >
 
-<!--            <TextView-->
-<!--                android:id="@+id/commentNumber"-->
-<!--                android:layout_width="wrap_content"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:gravity="center"-->
-<!--                android:text="-"-->
-<!--                android:textColor="@color/primary_dark"-->
-<!--                android:textSize="20sp"-->
-<!--                android:textStyle="bold" />-->
+            <TextView
+                android:id="@+id/reviews_count_check_in"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0"
+                android:textColor="@color/accent"
+                android:textSize="20sp"
+                android:textStyle="bold" />
 
-<!--            <TextView-->
-<!--                android:id="@+id/commentDesc"-->
-<!--                android:layout_width="0dp"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:layout_marginStart="8dp"-->
-<!--                android:layout_weight="1"-->
-<!--                android:text="@string/review_place_details"-->
-<!--                android:textSize="16sp" />-->
-<!--        </LinearLayout>-->
+            <TextView
+                android:id="@+id/reviews_check_in"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:text="@string/title_comments_list_popoup"
+                android:textSize="16sp" />
+
+            <Button
+                android:id="@+id/reviews_check_in_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:background="@drawable/button_get_started"
+                android:text="@string/view_comments_osm"
+                android:textColor="@color/primary_dark" />
+        </LinearLayout>
 
         <LinearLayout
             android:id="@+id/button_area_place_details"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:background="@color/background"
             android:elevation="1dp"
             android:gravity="end"
             android:orientation="horizontal"
@@ -241,7 +234,7 @@
             app:layout_constraintTop_toBottomOf="@id/comment_info">
 
             <Button
-                android:id="@+id/close_button"
+                android:id="@+id/close_button_place_detail"
                 android:layout_width="wrap_content"
                 android:layout_height="40dp"
                 android:layout_margin="8dp"
@@ -262,4 +255,12 @@
         </LinearLayout>
 
     </LinearLayout>
+
+    <include
+        android:visibility="gone"
+        android:id="@+id/place_comments_list_popup_check_in"
+        layout="@layout/comments_list_popup_window"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom" />
 </androidx.constraintlayout.widget.ConstraintLayout>

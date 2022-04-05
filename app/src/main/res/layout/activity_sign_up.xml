@@ -8,7 +8,7 @@
     android:orientation="vertical"
     android:gravity="center_vertical"
     android:padding="50dp"
-    android:background="@color/background"
+    android:background="@drawable/image_background"
     tools:context=".SignUpActivity">
 
     <com.google.android.material.textfield.TextInputLayout

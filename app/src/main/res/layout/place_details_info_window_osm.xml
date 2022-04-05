@@ -10,7 +10,7 @@
         android:id="@+id/place_details_popup_window_osm"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@color/background"
+        android:background="@drawable/image_background"
         android:focusable="true"
         android:elevation="3dp"
         android:orientation="vertical"
@@ -22,7 +22,6 @@
             android:id="@+id/marker_info_osm"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/background"
             android:elevation="1dp"
             android:orientation="vertical"
             app:layout_constraintEnd_toEndOf="parent"
@@ -72,7 +71,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:background="#ffffff"
             android:clickable="true"
             android:elevation="1dp"
             android:orientation="horizontal"
@@ -130,7 +128,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:background="#ffffff"
             android:clickable="true"
             android:elevation="1dp"
             android:focusable="true"
@@ -183,13 +180,52 @@
                 android:scaleType="fitCenter"
                 android:src="@drawable/ic_favorite" />
         </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/reviews_osm_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:clickable="true"
+            android:orientation="horizontal"
+            android:padding="16dp"
+            >
+
+            <TextView
+                android:id="@+id/reviews_count_osm"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0"
+                android:textColor="@color/accent"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/reviews_osm"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:text="@string/title_comments_list_popoup"
+                android:textSize="16sp" />
+
+            <Button
+                android:id="@+id/reviews_osm_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:background="@drawable/button_get_started"
+                android:text="@string/view_comments_osm"
+                android:textColor="@color/primary_dark" />
+
+
+        </LinearLayout>
         
         <LinearLayout
             android:id="@+id/button_area_place_details_osm"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:background="@color/background"
             android:elevation="1dp"
             android:gravity="end"
             android:orientation="horizontal"
@@ -222,5 +258,13 @@
         </LinearLayout>
 
     </LinearLayout>
+
+    <include
+        android:visibility="gone"
+        android:id="@+id/place_comments_list_popup"
+        layout="@layout/comments_list_popup_window"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom" />
 
 </LinearLayout>
