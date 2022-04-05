@@ -6,7 +6,7 @@ android {
     compileSdkVersion 31
     defaultConfig {
         applicationId "app.com.muhammad.voice"
-        minSdkVersion 28
+        minSdkVersion 26
         targetSdkVersion 31
         versionCode 1
         versionName "1.0"
@@ -70,7 +70,7 @@ dependencies {
     implementation 'com.ogaclejapan.smarttablayout:library:1.2.1@aar'
 
     // Firebase BoM
-    implementation platform('com.google.firebase:firebase-bom:29.0.4')
+    implementation platform('com.google.firebase:firebase-bom:29.3.0')
 
     implementation 'com.google.firebase:firebase-auth'
     implementation 'com.google.firebase:firebase-database'
@@ -96,6 +96,8 @@ dependencies {
 
     //Lottie Animation
     implementation 'com.airbnb.android:lottie:3.4.0'
+
+    implementation 'androidx.core:core-splashscreen:1.0.0-beta02'
 }
 
 repositories {
