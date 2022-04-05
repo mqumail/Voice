@@ -41,7 +41,7 @@
     <string name="title_comments_list_popoup">Reviews</string>
     <string name="close_button">Close</string>
     <string name="review_place_details">Reviews</string>
-    <string name="toursit_visitors_place_details">Tourist Visitors</string>
+    <string name="tourist_visitors_place_details">Tourist Visitors</string>
     <string name="local_visitors_place_details">Local Visitors</string>
     <string name="guest_book_title">Guest Book</string>
     <string name="title_activity_main2">MainActivity2</string>
@@ -63,16 +63,16 @@
     <string name="title_activity_check_in">CheckInActivity</string>
 
     <string name="search_title">Search for a Place</string>
-    <string name="check_in_search_hint">Search</string>
+    <string name="check_in_search_hint">Search nearby..</string>
     <string name="check_in_search_Title">Search Nearby</string>
     <string name="onBoarding_label">On Boarding</string>
-    <string name="title_onBoarding_one">Raise your voice &amp; discover local gems!</string>
-    <string name="subheading_onBoarding_one">Share you favorites spots in town &amp; Get to know new ones!</string>
+    <string name="title_onBoarding_one">Raise your Voice &amp; let the world know!</string>
+    <string name="subheading_onBoarding_one">Share you favorites spots in town &amp; discover new spots when you Travel!</string>
     <string name="get_started">GET STARTED</string>
-    <string name="title_onBoarding_two">Press the plus button, bottom-right of the home screen, to Check In</string>
-    <string name="subheading_onBoarding_two">See what the fuss is all about \nRead reviews by locals or tourists \nFinally Check In and Share</string>
-    <string name="title_onBoarding_three">We care about your privacy!</string>
-    <string name="subheading_onBoarding_three">Your data is protected with us \nYou can be Anonymous when making a Check In</string>
+    <string name="title_onBoarding_two">As a tourist, Discover exciting places near you!</string>
+    <string name="subheading_onBoarding_two">See what all the hype is about \nRead reviews by locals or other tourists \nFinally Check In and share your experience!</string>
+    <string name="title_onBoarding_three">Want to Check-In or Search Anonymously?</string>
+    <string name="subheading_onBoarding_three">Great, you can choose to be Anonymous! \nYour data is protected with us</string>
     <string name="securityLockContentDescription">securityLock</string>
     <string name="voiceRibbonContentDescription">voiceRibbon</string>
     <string name="voiceManIconContentDescription">VoiceManIcon</string>
@@ -86,5 +86,13 @@
     <string name="places_list_prompt_heading">Nearby Places</string>
     <string name="app_colors_bar">app colors bar</string>
     <string name="reviews_button">Reviews</string>
+    <string name="current_location_fab_description">"Current location "</string>
+    <string name="location_permission_denied">Location Permission Denied!</string>
+    <string name="location_permission_available">Location Permission Granted!</string>
+    <string name="location_permission_required">To search for places near you, we need your permission!</string>
+    <string name="ok">Ok</string>
+    <string name="location_unavailable">Location Unavailable!</string>
+    <string name="show_list">Show List</string>
+    <string name="view_comments_osm">VIEW</string>
 
 </resources>
