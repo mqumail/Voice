@@ -1,24 +1,28 @@
 package app.com.muhammad.voice.Adapters;
 
-import androidx.recyclerview.widget.RecyclerView;
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
 
 import app.com.muhammad.voice.DTO.CheckIn;
 import app.com.muhammad.voice.R;
 
-public class RecyclerViewReviewsAdapter extends
-        RecyclerView.Adapter<RecyclerViewReviewsAdapter.RecyclerViewHolder>
+public class RecyclerViewReviewsAdapter extends RecyclerView.Adapter<RecyclerViewReviewsAdapter.RecyclerViewHolder>
 {
-    private List<CheckIn> mDataset;
+    private List<CheckIn> mData;
+    private LayoutInflater mInflater;
+
 
     // Provide a suitable constructor (depends on the kind of dataset)
-    public RecyclerViewReviewsAdapter(List<CheckIn> myDataset) {
-        mDataset = myDataset;
+    public RecyclerViewReviewsAdapter(Context context, List<CheckIn> mData) {
+        this.mInflater = LayoutInflater.from(context);
+        this.mData = mData;
     }
 
     // Provide a reference to the views for each data item
@@ -39,44 +43,35 @@ public class RecyclerViewReviewsAdapter extends
         }
     }
 
+    // parent activity will implement this method to respond to click events
+    public interface OnCommentsListener {
+        void onCommentClick(View view, int position);
+    }
+
     // Create new views (invoked by the layout manager)
     @Override
-    public RecyclerViewReviewsAdapter.RecyclerViewHolder onCreateViewHolder(ViewGroup parent,
-                                                                            int viewType) {
+    public RecyclerViewReviewsAdapter.RecyclerViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         // create a new view
-        View v = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.reviews_custom_view, parent, false);
-
-        RecyclerViewHolder vh = new RecyclerViewHolder(v);
-        return vh;
+        View view = mInflater.inflate(R.layout.reviews_custom_view, parent, false);
+        return new RecyclerViewHolder(view);
     }
 
     // Replace the contents of a view (invoked by the layout manager)
     @Override
     public void onBindViewHolder(RecyclerViewHolder holder, int position)
     {
-//        CheckinInfo checkinInfo = mDataset.get(position);
-//        Date date = checkinInfo.getCheckInTime().toDate();
-//        SimpleDateFormat dateFormatter = new SimpleDateFormat("dd MMM, yyyy");
-//        try {
-//            date = dateFormatter.parse(String.valueOf(checkinInfo.getCheckInTime()));
-//        } catch (ParseException e) {
-//            e.printStackTrace();
-//        }
-
-
+        CheckIn checkIn = mData.get(position);
         TextView userNameTextView = holder.userName;
         TextView reviewTextView = holder.review;
         TextView checkInDateTextView = holder.checkInDate;
-
-//        userNameTextView.setText(checkinInfo.getUserName());
-//        reviewTextView.setText(checkinInfo.getReview());
-//        checkInDateTextView.setText(dateFormatter.format(date));
+        userNameTextView.setText(checkIn.getUserName());
+        reviewTextView.setText(checkIn.getReview());
+        checkInDateTextView.setText(checkIn.getCheckInTime());
     }
 
     // Return the size of your dataset (invoked by the layout manager)
     @Override
     public int getItemCount() {
-        return mDataset.size();
+        return mData.size();
     }
 }
