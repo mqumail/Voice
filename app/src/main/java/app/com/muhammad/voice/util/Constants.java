@@ -2,7 +2,11 @@ package app.com.muhammad.voice.util;
 
 import org.osmdroid.util.BoundingBox;
 
+import app.com.muhammad.voice.BuildConfig;
+
 public class Constants {
+
+    public static final String MY_USER_AGENT = BuildConfig.APPLICATION_ID;
 
     public static final String MAP_VIEW_OBJECT = "mapViewObject";
     public static final String OSM_FRAGMENT = "OsmFragment";
