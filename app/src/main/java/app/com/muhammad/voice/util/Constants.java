@@ -18,11 +18,16 @@ public class Constants {
     public static final String LOCAL_CITY_KEY = "localCityKey";
     public static final String SHOW_ON_BOARD_KEY = "ShowOnBoardKey";
 
-    public static final double STARTING_ZOOM_LEVEL = 5.0;
-    public static final double MIDDLE_ZOOM_LEVEL = 17.0;
+    // osmDroid zoom levels: https://wiki.openstreetmap.org/wiki/Zoom_levels
+    public static final double CONTINENT_ZOOM = 4.0;
+    public static final double CITY_ZOOM = 15.0;
+    public static final double MIDDLE_ZOOM = 16.0;
+    public static final double USER_ZOOM = 17.0;
+
     public static final BoundingBox EUROPE_BB = new BoundingBox(59.534318,51.064453,31.203405,-11.162109);
 
     public static final String PLACE_TO_CHECK_IN = "PlaceToCheckIn";
+    public static final String PLACE_ADDRESS = "PlaceAddress";
 
 
     // Firestore collection's name
