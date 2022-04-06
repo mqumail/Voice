@@ -1,9 +1,8 @@
-package app.com.muhammad.voice.utils;
+package app.com.muhammad.voice.util;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
-import android.widget.Toast;
 
 public abstract class SharedPreferencesManagement {
     protected SharedPreferences preferences;

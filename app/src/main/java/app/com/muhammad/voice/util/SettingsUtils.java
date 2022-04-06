@@ -1,4 +1,4 @@
-package app.com.muhammad.voice.utils;
+package app.com.muhammad.voice.util;
 
 import android.content.Context;
 import android.widget.ArrayAdapter;
