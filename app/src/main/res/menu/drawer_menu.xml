@@ -11,20 +11,18 @@
             android:icon="@drawable/ic_favorite_border"
             android:title="@string/menu_osm" />
         <item
+            android:id="@+id/nav_check_in"
+            android:icon="@drawable/osm_ic_center_map"
+            android:title="@string/menu_check_in"/>
+        <item
             android:id="@+id/nav_profile"
             android:icon="@drawable/person"
             android:title="@string/menu_profile" />
+
         <item
             android:id="@+id/nav_settings"
             android:icon="@drawable/osm_ic_follow_me"
             android:title="@string/menu_settings"
             app:showAsAction="never"/>
-        <item
-            android:id="@+id/nav_check_in"
-            android:icon="@drawable/osm_ic_center_map"
-            android:title="@string/menu_check_in"
-            android:visible="false"/>
-<!--        TODO: Maybe remove check in from navigation-->
-
     </group>
 </menu>

@@ -2,20 +2,18 @@ package app.com.muhammad.voice;
 
 import android.content.Intent;
 import android.os.Bundle;
-import androidx.core.app.NavUtils;
-import androidx.appcompat.app.AppCompatActivity;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.NavUtils;
+
 import java.util.ArrayList;
 
-import app.com.muhammad.voice.utils.LocalCity;
-import app.com.muhammad.voice.utils.SettingsUtils;
-import app.com.muhammad.voice.utils.UserInformation;
+import app.com.muhammad.voice.util.SettingsUtils;
 
 public class ProfileSettingsActivity extends AppCompatActivity  {
 

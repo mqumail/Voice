@@ -1,7 +1,22 @@
 package app.com.muhammad.voice.ui.checkIn;
 
+import static android.content.Context.MODE_PRIVATE;
+import static app.com.muhammad.voice.Database.FirestoreFirebaseClient.getInstance;
+import static app.com.muhammad.voice.util.Constants.MY_PREFERENCES;
+import static app.com.muhammad.voice.util.Constants.MY_USER_AGENT;
+import static app.com.muhammad.voice.util.Constants.PLACE_ADDRESS;
+import static app.com.muhammad.voice.util.Constants.PLACE_TO_CHECK_IN;
+import static app.com.muhammad.voice.util.Constants.USER_INFO_KEY;
+import static app.com.muhammad.voice.util.Constants.USER_ZOOM;
+import static app.com.muhammad.voice.util.LocationHelper.allowedToCheckIn;
+import static app.com.muhammad.voice.util.LocationHelper.distanceToFromCurrentLocation;
+import static app.com.muhammad.voice.util.LocationHelper.getAddresses;
+import static app.com.muhammad.voice.util.LocationHelper.getLastKnownLocation;
+import static app.com.muhammad.voice.util.LocationHelper.getLatLong;
+import static app.com.muhammad.voice.util.LocationHelper.zoomToLocation;
+import static app.com.muhammad.voice.util.UiHelperMethods.getBitmapFromVectorDrawable;
+
 import android.app.Activity;
-import android.app.SearchManager;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -17,51 +32,56 @@ import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
-//import com.google.api.core.ApiFunction;
-//import com.google.api.core.ApiFutureCallback;
-//import com.google.api.core.ApiFutures;
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.widget.SearchView;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.content.res.ResourcesCompat;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.switchmaterial.SwitchMaterial;
-//import com.google.auth.oauth2.GoogleCredentials;
-//import com.google.cloud.firestore.Firestore;
-//import com.google.cloud.firestore.FirestoreOptions;
-import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 
 import org.osmdroid.api.IMapController;
 import org.osmdroid.bonuspack.clustering.RadiusMarkerClusterer;
+import org.osmdroid.bonuspack.location.GeoNamesPOIProvider;
 import org.osmdroid.bonuspack.location.OverpassAPIProvider;
 import org.osmdroid.bonuspack.location.POI;
 import org.osmdroid.config.Configuration;
+import org.osmdroid.config.IConfigurationProvider;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.BoundingBox;
 import org.osmdroid.util.GeoPoint;
+import org.osmdroid.views.CustomZoomButtonsController;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
+import java.io.File;
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -71,73 +91,59 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.SearchView;
-import androidx.appcompat.widget.Toolbar;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.core.content.res.ResourcesCompat;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
-import androidx.lifecycle.ViewModelProvider;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import app.com.muhammad.voice.Adapters.RecyclerViewAdapter;
+import app.com.muhammad.voice.Adapters.PlacesRecyclerAdapter;
+import app.com.muhammad.voice.Adapters.RecyclerViewReviewsAdapter;
+import app.com.muhammad.voice.BaseActivity;
 import app.com.muhammad.voice.DTO.CheckIn;
 import app.com.muhammad.voice.DTO.PlaceInfo;
+import app.com.muhammad.voice.Database.FirestoreFirebaseClient;
+import app.com.muhammad.voice.Database.callbacks.FirebaseCheckInsCallback;
 import app.com.muhammad.voice.R;
 import app.com.muhammad.voice.databinding.FragmentCheckInBinding;
-import app.com.muhammad.voice.utils.CustomInfoWindow;
-import app.com.muhammad.voice.utils.LocationHelper;
-import app.com.muhammad.voice.utils.MyCallBack;
-
-import static android.content.Context.MODE_PRIVATE;
-import static app.com.muhammad.voice.utils.ConstantsVariables.MY_USER_AGENT;
-import static app.com.muhammad.voice.utils.LocationHelper.getAddresses;
-import static app.com.muhammad.voice.utils.LocationHelper.getLastKnownLocation;
-import static app.com.muhammad.voice.utils.LocationHelper.getLatLong;
-import static app.com.muhammad.voice.utils.LocationHelper.removeListener;
-import static app.com.muhammad.voice.utils.UiHelperMethods.getBitmapFromVectorDrawable;
+import app.com.muhammad.voice.ui.openStreetMap.OsmFragment;
+import app.com.muhammad.voice.util.CustomInfoWindow;
+import app.com.muhammad.voice.util.LocationHelper;
 
 // Ref: OnItemClickListener - https://www.youtube.com/watch?v=69C1ljfDvl0
-public class CheckInFragment extends Fragment implements RecyclerViewAdapter.ItemClickListener
+public class CheckInFragment extends Fragment implements PlacesRecyclerAdapter.OnPlaceListener
 {
-    private static final String MY_PREFERENCES = "my_preferences";
-    private static final String TAG = "CheckInFragment";
-
-    private CollectionReference collectionReference;
-    //private com.google.cloud.firestore.CollectionReference newCollectionReference;
-
-    private DocumentReference checkInDocumentReference;
- 
-    private FragmentActivity listener;
-    private Context CONTEXT;
-
-    private CheckInViewModel viewModel;
-    private FragmentCheckInBinding binding;
-    private MapView map;
-
-    private SearchView searchView = null;
-    private SearchView.OnQueryTextListener queryTextListener;
-    private ArrayList<POI> POIs;
-    private ArrayList<PlaceInfo> places;
-
-    private RecyclerView nearByPlacesRecyclerView;
-    private RecyclerViewAdapter nearbyPOIsAdapter;
-
-    private LocationHelper locationHandler;
-    private Location location;
-
-    private FirebaseFirestore database;
-    //private Firestore database;
-
-    SharedPreferences preferences;
-    final String PREFERENCE_KEY = "my_preferences";
+    private static final String TAG = "TK_CheckInFragment";
 
     public CheckInFragment()
     {
         // Required empty public constructor
+    }
+
+    //Variables
+    private Context CONTEXT;
+    private FragmentCheckInBinding binding;
+    private RecyclerView mRecyclerView;
+    private PlacesRecyclerAdapter mPlacesRecyclerAdapter;
+    private FirestoreFirebaseClient client;
+    private ArrayList<PlaceInfo> checkedInPlacesInfo;
+    private ArrayList<POI> POIs;
+    private Location location;
+    private SearchView searchView;
+    private ImageButton locationButton;
+    private Button commentCloseButton;
+    private Button closeListButton;
+    private Button showListButton;
+
+
+    //Views
+    private LinearLayout poiListPopupWindow;
+    private LinearLayout poiDetailPopupWindow;
+    private ConstraintLayout poiCheckInWindow;
+    private ConstraintLayout commentsView;
+    private Button commentOpenButton;
+    private MapView map;
+
+    //Buttons
+    private Button menuButtonMain;
+    private FloatingActionButton checkInFAB;
+
+    public static CheckInFragment newInstance() {
+        return new CheckInFragment();
     }
 
     // This event fires 1st, before creation of fragment or any views
@@ -147,7 +153,6 @@ public class CheckInFragment extends Fragment implements RecyclerViewAdapter.Ite
     public void onAttach(Context context) {
         super.onAttach(context);
         if (context instanceof Activity){
-            this.listener = (FragmentActivity) context;
             CONTEXT = context;
         }
     }
@@ -158,17 +163,58 @@ public class CheckInFragment extends Fragment implements RecyclerViewAdapter.Ite
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
-        //Do Init here
     }
 
     // The onCreateView method is called when Fragment should create its View object hierarchy,
     // either dynamically or via XML layout inflation.
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState) {
-        viewModel = new ViewModelProvider(this).get(CheckInViewModel.class);
         binding = FragmentCheckInBinding.inflate(inflater, parent, false);
         View root = binding.getRoot();
+
+        //Variables init
+        map = binding.mapCheckIn;
+        location = getLastKnownLocation(requireContext());
+        checkInFAB = getActivity().findViewById(R.id.check_in_FAB);
+        menuButtonMain = getActivity().findViewById(R.id.menu_button);
+        poiListPopupWindow = binding.poiListPopupWindow.poiListPopupWindow;
+        poiDetailPopupWindow = binding.poiDetailPopupWindow.placeDetailsPopupWindow;
+        poiCheckInWindow = binding.poiCheckInWindow.placeCheckInWindow;
+        searchView = binding.searchViewCheckIn;
+        locationButton = getActivity().findViewById(R.id.currentLocationButton);
+        commentsView = binding.poiDetailPopupWindow.placeCommentsListPopupCheckIn.placeCommentsPopup;
+        commentOpenButton = binding.poiDetailPopupWindow.reviewsCheckInButton;
+        commentCloseButton = binding.poiDetailPopupWindow.placeCommentsListPopupCheckIn.closeButton;
+        closeListButton = binding.poiListPopupWindow.closeButtonPoiListPopup;
+        showListButton = binding.poiListPopupWindow.showButtonPoiList;
+        client = getInstance(CONTEXT);
+
+        openStreetMapInit();
+
+        //Arrange views visibilities
+        menuButtonMain.setVisibility(View.GONE);
+        checkInFAB.setVisibility(View.GONE);
+
+        binding.menuButtonCheckIn.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ((BaseActivity)getActivity()).handleDrawer();
+            }
+        });
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                binding.progressCircularCheckInPlaceList.setVisibility(View.VISIBLE);
+                searchNearby(query);
+                searchView.clearFocus();
+                return false;
+            }
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return false;
+            }
+        });
 
         return root;
     }
@@ -180,180 +226,186 @@ public class CheckInFragment extends Fragment implements RecyclerViewAdapter.Ite
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        checkInFAB.setVisibility(View.GONE);
+        locationButton.setVisibility(View.GONE);
 
-        //ActionBar
-        Toolbar toolbar = binding.toolbarCheckInLayout.toolbarCheckIn;
+        Bundle arguments = getArguments();
+        if (null != arguments)
+        {
+            checkedInPlacesInfo = (ArrayList<PlaceInfo>) arguments.get("Places");
+            if (checkedInPlacesInfo == null) {
+                String place = arguments.getString(PLACE_TO_CHECK_IN);
+                String address = arguments.getString(PLACE_ADDRESS);
 
-        //Collection reference - Firestore
-        database = FirebaseFirestore.getInstance();
-//
-//        FirestoreOptions firestoreOptions = null;
-//        try {
-//            firestoreOptions = FirestoreOptions.getDefaultInstance().toBuilder()
-//                    .setProjectId("Project ID")
-//                    .setCredentials(GoogleCredentials.getApplicationDefault())
-//                    .build();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//        database = firestoreOptions.getService();
-//
-//        newCollectionReference = database.collection("placesCollection");
+                TextView name = poiCheckInWindow.findViewById(R.id.check_in_title);
+                name.setText(place);
+                TextView placeAddress = poiCheckInWindow.findViewById(R.id.check_in_address);
+                placeAddress.setText(address);
+                poiCheckInWindow.setVisibility(View.VISIBLE);
 
-        //Views
-        LinearLayout poiListPopupWindow = binding.poiListPopupWindow.poiListPopupWindow;
-        LinearLayout poiDetailPopupWindow = binding.poiDetailPopupWindow.placeDetailsPopupWindow;
-        ConstraintLayout poiCheckInWindow = binding.poiCheckInWindow.placeCheckInWindow;
-        Button closeButton = binding.poiListPopupWindow.closeButtonPoiList;
+                poiListPopupWindow.setVisibility(View.INVISIBLE);
+                poiDetailPopupWindow.setVisibility(View.INVISIBLE);
+                binding.searchViewCheckIn.setVisibility(View.INVISIBLE);
+            } else {
+                poiCheckInWindow.setVisibility(View.GONE);
+                poiListPopupWindow.setVisibility(View.GONE);
+                poiDetailPopupWindow.setVisibility(View.GONE);
+            }
+        }
+        else
+        {
+            poiCheckInWindow.setVisibility(View.GONE);
+            poiListPopupWindow.setVisibility(View.GONE);
+            poiDetailPopupWindow.setVisibility(View.GONE);
+        }
 
-        ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
-        toolbar.inflateMenu(R.menu.check_in_menu);
 
-        //Arranging views
-        poiListPopupWindow.setVisibility(View.GONE);
-        poiDetailPopupWindow.setVisibility(View.GONE);
-        poiCheckInWindow.setVisibility(View.GONE);
-        getActivity().findViewById(R.id.menu_button).setVisibility(View.GONE);
-        getActivity().findViewById(R.id.activity_base_tool_bar).setVisibility(View.GONE);
+        commentOpenButton.setOnClickListener(view13 -> {
+            TextView namePlaceDetails = poiDetailPopupWindow.findViewById(R.id.namePlaceDetail);
+            TextView namePlace = commentsView.findViewById(R.id.place_name_comments_list);
+            namePlace.setText(namePlaceDetails.getText());
+            poiDetailPopupWindow.setVisibility(View.GONE);
+            commentsView.setVisibility(View.VISIBLE);
+        });
+
+        commentCloseButton.setOnClickListener(view12 -> {
+            poiDetailPopupWindow.setVisibility(View.VISIBLE);
+            commentsView.setVisibility(View.GONE);
+        });
 
         //When user clicks the close button of the list, close the list
-        closeButton.setOnClickListener(view1 -> poiListPopupWindow.setVisibility(View.GONE));
 
-        poiDetailPopupWindow.findViewById(R.id.close_button).setOnClickListener(view1 -> poiDetailPopupWindow.setVisibility(View.GONE));
+        closeListButton.setOnClickListener(view1 -> {
+            showListButton.setVisibility(View.VISIBLE);
+            poiListPopupWindow.setVisibility(View.INVISIBLE);
+        });
+        //When user clicks the show list button, show the list again
+        showListButton.setOnClickListener(view2 -> {
+            poiListPopupWindow.setVisibility(View.VISIBLE);
+            showListButton.setVisibility(View.INVISIBLE);
+        });
+
+        poiDetailPopupWindow.findViewById(R.id.close_button_place_detail).setOnClickListener(view1 -> poiDetailPopupWindow.setVisibility(View.GONE));
+
         poiDetailPopupWindow.findViewById(R.id.check_in_button).setOnClickListener(view1 ->
         {
-            poiDetailPopupWindow.setVisibility(View.GONE);
             TextView placeName = poiCheckInWindow.findViewById(R.id.check_in_title);
             TextView placeAddress = poiCheckInWindow.findViewById(R.id.check_in_address);
 
             TextView name = poiDetailPopupWindow.findViewById(R.id.namePlaceDetail);
             TextView addressView = poiDetailPopupWindow.findViewById(R.id.addressPlaceDetail);
-
-            placeName.setText(name.getText());
-            placeAddress.setText(addressView.getText());
-
-            poiCheckInWindow.setVisibility(View.VISIBLE);
+            try {
+                if (allowedToCheckIn(addressView.getText().toString(), CONTEXT)) {
+                    poiDetailPopupWindow.setVisibility(View.GONE);
+                    placeName.setText(name.getText());
+                    placeAddress.setText(addressView.getText());
+                    poiCheckInWindow.setVisibility(View.VISIBLE);
+                } else {
+                    Toast.makeText(CONTEXT, "Please move closer to: " + name.getText() + " to make a Check-In!", Toast.LENGTH_SHORT).show();
+                }
+            } catch (IOException exception) {
+                exception.printStackTrace();
+            }
         });
+
         poiCheckInWindow.findViewById(R.id.finish_check_in_button).setOnClickListener(view1 ->
         {
             String currentTime = getCurrentTime();
+            location = getLastKnownLocation(CONTEXT);
 
-            // TODO: when user finish check in, hide view and store the info in a checkin object and save it to Firestore
             poiCheckInWindow.setVisibility(View.GONE);
 
             SwitchMaterial revealUserName = poiCheckInWindow.findViewById(R.id.userVisibilitySwitchButton);
             ToggleButton isHearted = poiCheckInWindow.findViewById(R.id.upVoteToggleButton);
             EditText comment = poiCheckInWindow.findViewById(R.id.commentEditText);
 
-            PlaceInfo place = new PlaceInfo();
-            CheckIn checkIn = new CheckIn();
+            //get ids of places
+            client.getPlacesInfo(firestorePlaces -> {
+                Log.d(TAG, "getPlacesCallBack: Got places. Size is " + firestorePlaces.size());
 
-            place.setName(binding.poiCheckInWindow.checkInTitle.getText().toString());
-            place.setAddress(binding.poiCheckInWindow.checkInAddress.getText().toString());
+                checkedInPlacesInfo = firestorePlaces;
 
-//            place.setPhoneNumber();
-//            place.setWebsiteUri();
-//            place.setRating();
-//            place.setAttributions();
-
-            SharedPreferences preferences =  CONTEXT.getSharedPreferences(MY_PREFERENCES, MODE_PRIVATE);
-            Set<String> userInfo = preferences.getStringSet("user-info", null);
-            Iterator<String> iterator = userInfo.iterator();
-            String userName = iterator.next();
-            String email = iterator.next();
-            if (!revealUserName.isChecked()){
-                Log.d(TAG, "saveCheckIn: User wishes to check in as anonymous check in.");
-                checkIn.setUserName("Anonymous");
-            }
-            else if (userName == null || userName.equals("")){
-                Log.d(TAG, "SaveCheckIn: userName is not saved. Will save it as an anonymous check in");
-                checkIn.setUserName("Anonymous");
-            }
-            else{
-                checkIn.setUserName(userName);
-            }
-            checkIn.setIdentifiedCheckIn(revealUserName.isChecked());
-            checkIn.setHearted(isHearted.isChecked());
-            checkIn.setLocal(isLocalCheckIn(place));
-            checkIn.setReview(comment.getText().toString());
-            checkIn.setCheckInTime(currentTime);
-
-            if (place.getCheckIns() == null) {
-                ArrayList<CheckIn> checkIns = new ArrayList<>();
-                checkIns.add(checkIn);
-                place.setCheckIns(checkIns);
-            } else
-            {
-                place.getCheckIns().add(checkIn);
-            }
-
-            // check if place already exits in db
-            MyCallBack myCallBack = alreadyExists -> {
-                if (alreadyExists)
-                {
-                    // TODO: This is big
-                    // before checkin, make sure this user does not have more checkins for this place
-                    updatePlaceInfo(place);
+                PlaceInfo place = new PlaceInfo();
+                CheckIn checkIn = new CheckIn();
+                place.setName(binding.poiCheckInWindow.checkInTitle.getText().toString());
+                place.setAddress(binding.poiCheckInWindow.checkInAddress.getText().toString());
+                SharedPreferences preferences =  CONTEXT.getSharedPreferences(MY_PREFERENCES, MODE_PRIVATE);
+                Set<String> userInfo = preferences.getStringSet(USER_INFO_KEY, null);
+                String userName = "Anonymous";
+                String email = "";
+                if (userInfo != null) {
+                    Iterator<String> iterator = userInfo.iterator();
+                    email = iterator.next();
+                    userName = iterator.next();
                 }
-                else
-                {
-                    savePlaceInfo(place);//todo: store POI list and POI check in as global variables
-                }
-            };
-            isPlaceInfoSaved(myCallBack, place.getId(), place.getName());
 
-//            // retrieve
-//            database.collection("placesCollection")
-//                    .get()
-//                    .addOnCompleteListener(task -> {
-//                        if (task.isSuccessful()) {
-//                            for (QueryDocumentSnapshot document : task.getResult()) {
-//                                Log.d(TAG, document.getId() + " => " + document.getData());
-//
-//                                //TODO: Drop pins on the map
-//                            }
-//                        } else {
-//                            Log.w(TAG, "Error getting documents.", task.getException());
-//                        }
-//                    });
+                if (!revealUserName.isChecked()){
+                    Log.d(TAG, "TK_saveCheckIn: User wishes to check in as anonymous check in.");
+                    checkIn.setUserName("Anonymous");
+                }
+                else if (userName == null || userName.equals("")){
+                    Log.d(TAG, "TK_SaveCheckIn: userName is not saved. Will save it as an anonymous check in");
+                    checkIn.setUserName("Anonymous");
+                }
+                else{
+                    checkIn.setUserName(userName);
+                }
+                checkIn.setIdentifiedCheckIn(revealUserName.isChecked());
+                checkIn.setHearted(isHearted.isChecked());
+                checkIn.setLocal(isLocalCheckIn(place));
+                checkIn.setReview(comment.getText().toString());
+                checkIn.setCheckInTime(currentTime);
+
+                if (place.getCheckIns() == null) {
+                    ArrayList<CheckIn> checkIns = new ArrayList<>();
+                    checkIns.add(checkIn);
+                    place.setCheckIns(checkIns);
+                } else
+                {
+                    place.getCheckIns().add(checkIn);
+                }
+
+                //set id
+                boolean firstCheckIn = true;
+                for (PlaceInfo placeInfo : checkedInPlacesInfo) {
+                    if (placeInfo.getName() != null) {
+                        if (placeInfo.getName().equals(place.getName())) {
+                            place.setId(placeInfo.getId() != null ? placeInfo.getId() : null);
+                            updatePlaceCheckIns(place);
+                            firstCheckIn = false;
+                            break;
+                        }
+                        else {
+                            Log.d(TAG, "TK_getPlacesCallBack: New Check In! Details not yet known, get it from overpassAPI!");
+                        }
+                    }
+                }
+                if (firstCheckIn) {
+                    savePlaceInfo(place);
+                    Toast.makeText(CONTEXT, "Checked-In successfully at: " + place.getName(), Toast.LENGTH_SHORT).show();}
+
+                switchFragment(OsmFragment.newInstance());
+            });
         });
-        location = getLastKnownLocation(CONTEXT);
-        openStreetMapInit();
     }
 
-    private void isPlaceInfoSaved(final MyCallBack myCallBack, String id, CharSequence name)
+    private void updatePlaceCheckIns(PlaceInfo place)
     {
-        collectionReference
-                //.whereEqualTo("id", id)
-                .whereEqualTo("name", name)
-                .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful())
-                    {
-                        for (QueryDocumentSnapshot document : task.getResult())
-                        {
-                            Log.d(TAG, document.getId() + " => " + document.getData());
+        final Map<String, Object> checkInsCollection = new HashMap<>();
 
-                            checkInDocumentReference = document.getReference();
-                        }
+        checkInsCollection.put("id", place.getCheckIns().get(0).getId());
+        checkInsCollection.put("local", place.getCheckIns().get(0).isLocal());
+        checkInsCollection.put("hearted", place.getCheckIns().get(0).isHearted());
+        checkInsCollection.put("identifiedCheckIn", place.getCheckIns().get(0).isIdentifiedCheckIn());
+        checkInsCollection.put("checkInTime", place.getCheckIns().get(0).getCheckInTime());
+        checkInsCollection.put("userName", place.getCheckIns().get(0).getUserName());
 
-                        if (task.getResult().isEmpty())
-                        {
-                            // return false
-                            myCallBack.onCallback(false);
-                        }
-                        else
-                        {
-                            // return true
-                            myCallBack.onCallback(true);
-                        }
-                    }
-                    else
-                    {
-                        // Log that the call to DB failed.
-                        Log.e(TAG, "Call failed to DB");
-                    }
-                });
+        if (!place.getCheckIns().get(0).getReview().equals(""))
+        {
+            checkInsCollection.put("review", place.getCheckIns().get(0).getReview());
+        }
+
+        client.updateCheckInsDocument(checkInsCollection, place);
     }
 
     // Store the place info in the FireStore
@@ -383,149 +435,38 @@ public class CheckInFragment extends Fragment implements RecyclerViewAdapter.Ite
 
         ///Place
         com.google.firebase.firestore.GeoPoint latLong = null;
-        try { 
+        try {
             latLong = getLatLong(place, CONTEXT);
         } catch (IOException e) {
             e.printStackTrace();
         }
-        
-        
-        placeCollection.put("LatLng", new com.google.firebase.firestore.GeoPoint(latLong.getLatitude(), latLong.getLongitude()));
-        placeCollection.put("Rating", place.getRating());
+
+        placeCollection.put("latLng", new com.google.firebase.firestore.GeoPoint(latLong.getLatitude(), latLong.getLongitude()));
+        placeCollection.put("rating", place.getRating());
 
         final Map<String, Object> checkInsCollection = new HashMap<>();
 
         checkInsCollection.put("id", place.getCheckIns().get(0).getId());
-        checkInsCollection.put("IsLocal", place.getCheckIns().get(0).isLocal());
-        checkInsCollection.put("IsHearted", place.getCheckIns().get(0).isHearted());
-        checkInsCollection.put("IsIdentifiedCheckIn", place.getCheckIns().get(0).isIdentifiedCheckIn());
-        checkInsCollection.put("CheckInTime", place.getCheckIns().get(0).getCheckInTime());
+        checkInsCollection.put("local", place.getCheckIns().get(0).isLocal());
+        checkInsCollection.put("hearted", place.getCheckIns().get(0).isHearted());
+        checkInsCollection.put("identifiedCheckIn", place.getCheckIns().get(0).isIdentifiedCheckIn());
+        checkInsCollection.put("checkInTime", place.getCheckIns().get(0).getCheckInTime());
         checkInsCollection.put("userName", place.getCheckIns().get(0).getUserName());
 
         if (!place.getCheckIns().get(0).getReview().equals(""))
         {
-            checkInsCollection.put("Review", place.getCheckIns().get(0).getReview());
+            checkInsCollection.put("review", place.getCheckIns().get(0).getReview());
         }
 
-        // Check if the document already exist in DB before adding a new one
-        // If one exists already then just update the check in information
-        // Add a new document with a generated ID
-        collectionReference
-                .add(placeCollection)
-                .addOnSuccessListener(documentReference -> {
-                    Log.d(TAG, "DocumentSnapshot added with ID: " + documentReference.getId());
-
-                    place.setId(documentReference.getId());
-
-                    collectionReference
-                            .document(documentReference.getId())
-                            .collection("CheckInsCollection")
-                            .add(checkInsCollection)
-                            .addOnSuccessListener(documentReference1 ->
-                                    Log.d(TAG, "DocumentSnapshot added with ID: " + documentReference1.getId()))
-                            .addOnFailureListener(e ->
-                                    Log.w(TAG, "Error adding document", e));
-                })
-                .addOnFailureListener(e -> Log.w(TAG, "Error adding document", e));
+        client.savePlace(placeCollection, checkInsCollection);
     }
-
-    private void updatePlaceInfo(PlaceInfo place)
-    {
-        if (checkInDocumentReference != null)
-        {
-            update(place, checkInDocumentReference);
-        } else {
-            collectionReference
-                    //.whereEqualTo("id", place.getId())
-                    .whereEqualTo("name", place.getName())
-                    .get()
-                    .addOnCompleteListener(task -> {
-                        for (DocumentSnapshot document : task.getResult().getDocuments())
-                        {
-                            DocumentReference docReference = document.getReference();
-                            update(place, docReference);
-                        }
-                    });
-        }
-
-    }
-
-    private void update(PlaceInfo place, DocumentReference docReference) {
-        // This is needed and also in Save because it will help reference later
-        place.setId(docReference.getId());
-
-        final Map<String, Object> CheckInsCollection = new HashMap<>();
-        CheckInsCollection.put("IsLocal", place.getCheckIns().get(0).isLocal());
-        CheckInsCollection.put("IsHearted", place.getCheckIns().get(0).isHearted());
-        CheckInsCollection.put("IsIdentifiedCheckIn", place.getCheckIns().get(0).isIdentifiedCheckIn());
-        CheckInsCollection.put("CheckInTime", place.getCheckIns().get(0).getCheckInTime());
-
-        if (!place.getCheckIns().get(0).getReview().equals(""))
-        {
-            CheckInsCollection.put("Review", place.getCheckIns().get(0).getReview());
-        }
-
-
-        if (place.getCheckIns().get(0).isIdentifiedCheckIn())
-        {
-            if(place.getCheckIns().get(0) != null && !place.getCheckIns().get(0).getUserName().isEmpty())
-            {
-                // Append the username to the old name
-                CheckInsCollection.put("UserName", place.getCheckIns().get(0).getUserName());
-            }
-        }
-
-        docReference
-                .collection("CheckInsCollection")
-                .add(CheckInsCollection)
-                .addOnSuccessListener(documentReference -> Log.d(TAG, "DocumentSnapshot added with ID: " + documentReference.getId()))
-                .addOnFailureListener(e -> Log.w(TAG, "Error adding document", e));
-    }
-
-//    private void PlaceExistsInDB(final MyCallBack myCallBack, String id, CharSequence name)
-//    {
-//        mCollectionReference
-//                .whereEqualTo("id", id)
-//                .whereEqualTo("name", name)
-//                .get()
-//                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>()
-//                {
-//                    @Override
-//                    public void onComplete(@NonNull Task<QuerySnapshot> task)
-//                    {
-//                        if (task.isSuccessful())
-//                        {
-//                            for (QueryDocumentSnapshot document : task.getResult())
-//                            {
-//                                Log.d(TAG, document.getId() + " => " + document.getData());
-//                            }
-//
-//                            if (task.getResult().isEmpty())
-//                            {
-//                                // return false
-//                                myCallBack.onCallback(false);
-//                            }
-//                            else
-//                            {
-//                                // return true
-//                                myCallBack.onCallback(true);
-//                            }
-//                        }
-//                        else
-//                        {
-//                            // Log that the call to DB failed.
-//                            Log.e(TAG, "Call failed to DB");
-//                        }
-//                    }
-//                });
-//    }
 
     private boolean isLocalCheckIn(PlaceInfo place) {
         // TODO: Instead of just checking the names of the cities, also check the cities ID for example, there is Weimar in Germany and Also in Texas USA
         SharedPreferences preferences =  CONTEXT.getSharedPreferences(MY_PREFERENCES, MODE_PRIVATE);
         String localCity = preferences.getString("localCity", null);
         if (localCity == null || localCity.equals("")) {
-            Log.d(TAG, "CheckIfLocalCheckIn: localCity is not saved. Skipping checking if check in is local and saving CheckIn as tourist check in");
+            Log.d(TAG, "TK_CheckIfLocalCheckIn: localCity is not saved. Skipping checking if check in is local and saving CheckIn as tourist check in");
             return false;
         }
         String address = place.getAddress();
@@ -545,193 +486,172 @@ public class CheckInFragment extends Fragment implements RecyclerViewAdapter.Ite
             Configuration.getInstance().load(CONTEXT, PreferenceManager.getDefaultSharedPreferences(CONTEXT));
             Configuration.getInstance().setUserAgentValue(MY_USER_AGENT);
 
+            BoundingBox currentLocationBB = LocationHelper.getCurrentLocationBoundingBox(location);
+//            String urlNew = "http://api.geonames.org/findNearbyPOIsOSM?lat=37.451&lng=-122.18&username=demo";
+//            GeoNamesPOIProvider poiProvider = new GeoNamesPOIProvider("moh_themoh");
+//            poiProvider.getPOIInside(currentLocationBB, 100);
+            GeoNamesPOIProvider geoNamesPOIProvider = new GeoNamesPOIProvider("moh_themoh");
+            ArrayList<POI> poisGeo = geoNamesPOIProvider.getPOIInside(currentLocationBB, 15);
+
+            //Log.i(TAG, "searchNearby: returned " + poisGeo.size());
+
             OverpassAPIProvider overpassAPIProvider = new OverpassAPIProvider();
             //TODO: Hard coded, use and/or to use multiple tags.
-            BoundingBox currentLocationBB = LocationHelper.getCurrentLocationBoundingBox(location);
-            String url = overpassAPIProvider.urlForPOISearch("amenity=bar", currentLocationBB, 10, 15);
+            String url = overpassAPIProvider.urlForPOISearch("amenity="+query, currentLocationBB, 100, 10);
 
             // Get POIs
             POIs = overpassAPIProvider.getPOIsFromUrl(url);
-
-            if (POIs != null && POIs.size() > 0){
                 handler.post(() -> {
 
+                    if (POIs == null || POIs.size() == 0){
+                        binding.progressCircularCheckInPlaceList.setVisibility(View.GONE);
+                        Toast.makeText(CONTEXT, "Could not find any places with: " + query +". Please refine your search.", Toast.LENGTH_SHORT).show();
+                        return;
+                    } else {
+                        POIs.size();
+                    }
                     // Get Bounding box around the pois
                     BoundingBox poIsBoundingBox = LocationHelper.getPOIsBoundingBox(POIs);
-                    places = new ArrayList<>();
 
                     //TODO: Goto the DB, get the collection of Places
                     // use the collection to get checkIns collection
                     // attach that to the places list
 
-                    if (collectionReference != null) {
-                        collectionReference
-                                .get()
-                                .addOnCompleteListener(task -> {
-                                    for (DocumentSnapshot document : task.getResult().getDocuments())
-                                    {
-//                                      document.getReference().collection("CheckInsCollection").get().addOnCompleteListener();
-                                        DocumentReference documentReference = document.getReference();
-                                    }
-                                });
-//                    ApiFutures.addCallback(future, new ApiFutureCallback<String>() {
-//                        @Override
-//                        public void onSuccess(String result) {
-//                            System.out.println("Operation completed with result: " + result);
-//                        }
-//
-//                        @Override
-//                        public void onFailure(Throwable t) {
-//                            System.out.println("Operation failed with error: " + t);
-//                        }
-//                    });
-                        for (POI poi: POIs) {
-                            PlaceInfo place = new PlaceInfo();
-                            place.setName(poi.mType);
-                            place.setAddress(poi.mLocation.toString());
-                            place.setRating(poi.mRank);
-                            place.setId(String.valueOf(poi.mId));
-
-                            places.add(place);
+                    ArrayList<PlaceInfo> overpassApiPlacesInfo = new ArrayList<>();
+                    for (POI poi: POIs) {
+                        PlaceInfo place = new PlaceInfo();
+                        com.google.firebase.firestore.GeoPoint geoPoint =
+                                new com.google.firebase.firestore.GeoPoint(poi.mLocation.getLatitude(), poi.mLocation.getLongitude());
+                        place.setLatLng(geoPoint);
+                        List<Address> addresses = new ArrayList<>();
+                        try {
+                             addresses = getAddresses(poi, CONTEXT);
+                        } catch (IOException exception) {
+                            exception.printStackTrace();
                         }
 
-                        nearByPlacesRecyclerView = binding.poiListPopupWindow.usersRevealedListRecyclerView;
-                        nearbyPOIsAdapter = new RecyclerViewAdapter(getActivity(), places, this);
-                        nearByPlacesRecyclerView.setAdapter(nearbyPOIsAdapter);
-                        nearByPlacesRecyclerView.setLayoutManager(new LinearLayoutManager(CONTEXT));
+                        String address = "Not Known";
+                        String knownName = "Unknown";
 
-                        //TODO:
-                        // 1) Remove clusters, show individual markers
-                        // 2) Customize the markers drawable: use small with icon for restaurant, bar, church etc
-                        // 3) When the user clicks search, zoom to a BB which fits all POIs and set the zoom to around 17.0 (ref: Google Maps)
-                        // -DONE- 4) Optimize this fragment with its methods and calls to osm APIs
-                        // -DONE- 5) Attach the list (recyclerView) and populate the list with the POIs from the API
-                        // 6) Set onClickListener when the user clicks on an item in the list and then show details about the place in an info window
-                        // 7) Find a better map design (icons, roads, colors, buildings, etc.)
-                        // 8) Check to see if the new way will give us different terrains and night mode map
-
-                        //Clusters
-                        RadiusMarkerClusterer poiMarkerCluster = new RadiusMarkerClusterer(CONTEXT);
-                        if (POIs.size() > 1) {
-                            Bitmap clusterIcon = getBitmapFromVectorDrawable(CONTEXT, R.drawable.marker_cluster);
-                            poiMarkerCluster.setIcon(clusterIcon);
-
-                            // CLuster Design
-                            poiMarkerCluster.getTextPaint().setColor(Color.DKGRAY);
-                            poiMarkerCluster.getTextPaint().setTextSize(12 * getResources().getDisplayMetrics().density); //taking into account the screen density
-                            poiMarkerCluster.mAnchorU = Marker.ANCHOR_RIGHT;
-                            poiMarkerCluster.mAnchorV = Marker.ANCHOR_BOTTOM;
-                            poiMarkerCluster.mTextAnchorV = 0.40f;
-
-                            map.getOverlays().add(poiMarkerCluster);
+                        if (addresses != null && addresses.size() > 0 && addresses.get(0).getAddressLine(0) != null) {
+                            address = addresses.get(0).getAddressLine(0);
+                            knownName = addresses.get(0).getFeatureName(); // Only if available else return NULL
+                        } else {
+                            Log.e(TAG, "onPlaceClick: Unable to get street address for the: " + poi.mId + " Location: " + poi.mLocation);
                         }
-
-                        //Drop Pins
-                        Drawable poiIcon = ResourcesCompat.getDrawable(getResources(), R.drawable.ic_marker_man, null);
-                        for (POI poi : POIs){
-                            Marker poiMarker = new Marker(map);
-                            poiMarker.setTitle(poi.mType != null ? poi.mType : "No Name");
-                            poiMarker.setSnippet(poi.mDescription != null ? poi.mDescription : "No Description");
-                            poiMarker.setPosition(poi.mLocation);
-                            poiMarker.setIcon(poiIcon);
-                            if (poi.mThumbnail != null){
-                                poiMarker.setImage(new BitmapDrawable(poi.mThumbnail));
-                            }
-                            // TODO: Here is where we set the custom Window
-                            poiMarker.setInfoWindow(new CustomInfoWindow(map));
-                            poiMarker.setRelatedObject(poi);
-                            poiMarkerCluster.add(poiMarker);
-                        }
-
-                        IMapController mapController = map.getController();
-                        mapController.setZoom(17.0);
-                        map.zoomToBoundingBox(poIsBoundingBox, true);
-                        map.invalidate();
-
-                        binding.poiListPopupWindow.poiListPopupWindow.setVisibility(View.VISIBLE);
-                    } else {
-                        Toast.makeText(CONTEXT, "Unable to retrieve any data. Please try again later.", Toast.LENGTH_SHORT).show();
+                        place.setName(poi.mType);
+                        place.setAddress(address);
+                        place.setRating(poi.mRank);
+                        overpassApiPlacesInfo.add(place);
                     }
+                    Collections.sort(overpassApiPlacesInfo, new Comparator<PlaceInfo>(){
+                        @Override
+                        public int compare(PlaceInfo lhs, PlaceInfo rhs) {
+                            double distanceLhs = distanceToFromCurrentLocation(lhs.getLatLng(), CONTEXT);
+                            double distanceRhs = distanceToFromCurrentLocation(rhs.getLatLng(), CONTEXT);
+
+                            return Double.compare(distanceLhs, distanceRhs);
+                        }
+                    });
+                    mRecyclerView = binding.poiListPopupWindow.nearbyPlacesRecyclerView;
+                    mPlacesRecyclerAdapter = new PlacesRecyclerAdapter(getActivity(), overpassApiPlacesInfo, this);
+                    mRecyclerView.setAdapter(mPlacesRecyclerAdapter);
+                    mRecyclerView.setLayoutManager(new LinearLayoutManager(CONTEXT));
+
+                    //Clusters
+                    RadiusMarkerClusterer poiMarkerCluster = new RadiusMarkerClusterer(CONTEXT);
+                    if (POIs.size() > 1) {
+                        Bitmap clusterIcon = getBitmapFromVectorDrawable(CONTEXT, R.drawable.marker_cluster);
+                        poiMarkerCluster.setIcon(clusterIcon);
+
+                        // CLuster Design
+                        poiMarkerCluster.getTextPaint().setColor(Color.DKGRAY);
+                        poiMarkerCluster.getTextPaint().setTextSize(12 * getResources().getDisplayMetrics().density); //taking into account the screen density
+                        poiMarkerCluster.mAnchorU = Marker.ANCHOR_RIGHT;
+                        poiMarkerCluster.mAnchorV = Marker.ANCHOR_BOTTOM;
+                        poiMarkerCluster.mTextAnchorV = 0.40f;
+                        poiMarkerCluster.setMaxClusteringZoomLevel(15);
+                        map.getOverlays().add(poiMarkerCluster);
+                    }
+
+                    //Drop Pins
+                    Drawable poiIcon = ResourcesCompat.getDrawable(getResources(), R.drawable.ic_place, null);
+                    for (POI poi : POIs){
+                        Marker poiMarker = new Marker(map);
+                        poiMarker.setInfoWindow(null);
+                        poiMarker.setIcon(poiIcon);
+                        poiMarker.setPosition(poi.mLocation);
+                        poiMarker.setOnMarkerClickListener(new Marker.OnMarkerClickListener() {
+                            @Override
+                            public boolean onMarkerClick(Marker marker, MapView mapView) {
+                                zoomToLocation(map, marker.getPosition());
+                                binding.poiListPopupWindow.poiListPopupWindow.setVisibility(View.VISIBLE);
+                                return false;
+                            }
+                        });
+
+
+                        poiMarker.setTitle(poi.mType != null ? poi.mType : "No Name");
+                        poiMarker.setSnippet(poi.mDescription != null ? poi.mDescription : "No Description");
+                        poiMarker.setPosition(poi.mLocation);
+                        poiMarker.setIcon(poiIcon);
+                        if (poi.mThumbnail != null){
+                            poiMarker.setImage(new BitmapDrawable(poi.mThumbnail));
+                        }
+
+                        //Here is where we set the custom Window
+                        poiMarker.setInfoWindow(new CustomInfoWindow(map));
+                        poiMarker.setRelatedObject(poi);
+                        poiMarkerCluster.add(poiMarker);
+                    }
+
+                    IMapController mapController = map.getController();
+                    map.zoomToBoundingBox(poIsBoundingBox, true);
+                    map.invalidate();
+
+                    binding.progressCircularCheckInPlaceList.setVisibility(View.GONE);
+                    binding.poiListPopupWindow.poiListPopupWindow.setVisibility(View.VISIBLE);
                 });
-            }
         });
+
     }
 
-    private void openStreetMapInit(){
+    private void openStreetMapInit() {
+        // Needs extrenal storage to write tiles
+        IConfigurationProvider osmConfig = org.osmdroid.config.Configuration.getInstance();
+        File basePath = new File(CONTEXT.getCacheDir().getAbsolutePath(), "osmdroid");
+        File tileCache = new File(osmConfig.getOsmdroidBasePath().getAbsolutePath(), "tile");
+        osmConfig.setOsmdroidBasePath(basePath);
+        osmConfig.setOsmdroidTileCache(tileCache);
         ExecutorService executorService = Executors.newSingleThreadExecutor();
         Handler handler = new Handler(Looper.getMainLooper());
-
         executorService.execute(() -> {
             //Set user agent
-            final Context context = getActivity();
-            Configuration.getInstance().load(context, PreferenceManager.getDefaultSharedPreferences(context));
-            Configuration.getInstance().setUserAgentValue(MY_USER_AGENT);
+            osmConfig.load(CONTEXT, PreferenceManager.getDefaultSharedPreferences(CONTEXT));
+            osmConfig.setUserAgentValue(MY_USER_AGENT);
 
+            //UI thread here, after osmInit
             handler.post(() -> {
-                map = binding.mapCheckIn;
                 map.setTileSource(TileSourceFactory.MAPNIK);
                 map.setMultiTouchControls(true);
+                map.getZoomController().setVisibility(CustomZoomButtonsController.Visibility.NEVER); // removing default zoom controllers
 
                 MyLocationNewOverlay myLocationNewOverlay = new MyLocationNewOverlay(new GpsMyLocationProvider(CONTEXT), map);
                 myLocationNewOverlay.enableMyLocation();
+
+                Bitmap bitmapNotMoving = getBitmapFromVectorDrawable(CONTEXT, R.drawable.ic_marker_man);
+                Bitmap bitmapMoving = getBitmapFromVectorDrawable(CONTEXT, R.drawable.ic_current_location_circle);
+                myLocationNewOverlay.setDirectionArrow( bitmapNotMoving, bitmapMoving);
+                myLocationNewOverlay.enableMyLocation();
                 map.getOverlays().add(myLocationNewOverlay);
-
-                IMapController mapController = map.getController();
-                mapController.setZoom(17.0);
-
-                // The reason i am not using position from myLocationNewOverlay is because it returns 0,0.
-                // Maybe it is because of the sensors have not fired and the onPositionChangeUpdate listener have not be called
-                mapController.setCenter(new GeoPoint(location.getLatitude(), location.getLongitude()));
+                Location location = getLastKnownLocation(CONTEXT);
+                GeoPoint geoPoint = new GeoPoint(location.getLatitude(), location.getLongitude());
+                map.getController().setZoom(USER_ZOOM);
+                map.getController().animateTo(geoPoint);
+                //zoomToLocation(map, geoPoint);
                 map.invalidate();
             });
         });
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.check_in_menu, menu);
-        super.onCreateOptionsMenu(menu, inflater);
-
-        MenuItem searchItem = menu.findItem(R.id.nav_search);
-        SearchManager searchManager = (SearchManager) getActivity().getSystemService(Context.SEARCH_SERVICE);
-
-        if (searchItem != null) {
-            searchView = (SearchView) searchItem.getActionView();
-        }
-        if (searchView != null) {
-            searchView.setSearchableInfo(searchManager.getSearchableInfo(getActivity().getComponentName()));
-
-            queryTextListener = new SearchView.OnQueryTextListener() {
-                @Override
-                public boolean onQueryTextChange(String newText) {
-                    Log.i("onQueryTextChange: %s", newText);
-                    return true;
-                }
-                @Override
-                public boolean onQueryTextSubmit(String query) {
-                    Log.i("onQueryTextSubmit: %s", query);
-                    //clear all the markers from the map except myoverlay
-                    // TODO: Search for whatever the user is requesting
-                    searchNearby(query);
-                    searchView.clearFocus();
-                    return true;
-                }
-            };
-            searchView.setOnQueryTextListener(queryTextListener);
-        }
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.nav_search:
-                // Not implemented here
-                return false;
-            default:
-                break;
-        }
-        searchView.setOnQueryTextListener(queryTextListener);
-        return super.onOptionsItemSelected(item);
     }
 
     // This method is called when the fragment is no longer connected to the Activity
@@ -739,58 +659,150 @@ public class CheckInFragment extends Fragment implements RecyclerViewAdapter.Ite
     @Override
     public void onDetach() {
         super.onDetach();
-        this.listener = null;
+        //this.listener = null;
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
 
-        getActivity().findViewById(R.id.menu_button).setVisibility(View.VISIBLE);
         getActivity().findViewById(R.id.activity_base_tool_bar).setVisibility(View.VISIBLE);
 
-        removeListener();
+        //removeListener();
         binding = null;
     }
 
     @Override
-    public void onItemClick(View view, int position) {
+    public void onPlaceClick(View view, int position) {
+        binding.searchViewCheckIn.setVisibility(View.GONE);
         // open details of the poi
-        Log.d("TAG", "onItemClick: showing place detail popup window");
+        Log.d("TAG", "TK_onItemClick: showing place detail popup window");
 
-        // Also zoom to the marker after showing the popup window
-        LinearLayout linearLayout = binding.poiDetailPopupWindow.placeDetailsPopupWindow;
+        Collections.sort(POIs, new Comparator<POI>(){
+            @Override
+            public int compare(POI lhs, POI rhs) {
+                com.google.firebase.firestore.GeoPoint lhsGeoPoint = new com.google.firebase.firestore.GeoPoint(lhs.mLocation.getLatitude(), lhs.mLocation.getLongitude());
+                com.google.firebase.firestore.GeoPoint rhsGeoPoint = new com.google.firebase.firestore.GeoPoint(rhs.mLocation.getLatitude(), rhs.mLocation.getLongitude());
+                double distanceLhs = distanceToFromCurrentLocation(lhsGeoPoint, CONTEXT);
+                double distanceRhs = distanceToFromCurrentLocation(rhsGeoPoint, CONTEXT);
 
-        TextView nameView = linearLayout.findViewById(R.id.namePlaceDetail);
-        TextView addressView = linearLayout.findViewById(R.id.addressPlaceDetail);
-        TextView localVisitorsView = linearLayout.findViewById(R.id.localNumber);
-        TextView localLikesView = linearLayout.findViewById(R.id.localUpvotes);
-        TextView touristVisitorsView = linearLayout.findViewById(R.id.touristNumber);
-        TextView touristLikesView = linearLayout.findViewById(R.id.touristUpvotes);
+                return Double.compare(distanceLhs, distanceRhs);
+            }
+        });
 
         POI poi = POIs.get(position);
 
-        List<Address> addresses = null;
+        List<Address> addresses = new ArrayList<>();
         try {
             addresses = getAddresses(poi, CONTEXT);
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (IOException exception) {
+            exception.printStackTrace();
         }
 
-        String address = addresses.get(0).getAddressLine(0); // If any additional address line present than only, check with max available address lines by getMaxAddressLineIndex()
-//        String city = addresses.get(0).getLocality();
-//        String state = addresses.get(0).getAdminArea();
-//        String country = addresses.get(0).getCountryName();
-//        String postalCode = addresses.get(0).getPostalCode();
-        String knownName = addresses.get(0).getFeatureName(); // Only if available else return NULL
+        String address = "Not Known";
+        String knownName = "Unknown";
 
-        nameView.setText(poi.mType != null ? poi.mType : knownName);
-        addressView.setText(address);
+        if (addresses != null && addresses.size() > 0 && addresses.get(0).getAddressLine(0) != null) {
+            address = addresses.get(0).getAddressLine(0);
+            knownName = addresses.get(0).getFeatureName(); // Only if available else return NULL
+        }
 
-        //localVisitorsView.setText();
+        PlaceInfo placeInfoRequested = new PlaceInfo();
 
-        binding.poiListPopupWindow.poiListPopupWindow.setVisibility(View.INVISIBLE);
-        binding.poiDetailPopupWindow.placeDetailsPopupWindow.setVisibility(View.VISIBLE);
+        //check if the user picked a place where we have check ins already:
+        if (checkedInPlacesInfo != null) {
+            for (PlaceInfo placeInfo: checkedInPlacesInfo) {
+                if (poi.mType.equals(placeInfo.getName())) {
+                    placeInfoRequested = placeInfo;
+                }
+            }
+        }
+
+        String finalAddress = address;
+        String finalKnownName = poi.mType;
+        TextView placeName = poiDetailPopupWindow.findViewById(R.id.namePlaceDetail);
+        TextView placeAddress = poiDetailPopupWindow.findViewById(R.id.addressPlaceDetail);
+
+        if (null == placeInfoRequested.getName()) {
+            Log.i(TAG, "onPlaceClick: Following place is not checked in: " + poi.mType + ". Skipping find firebase check-ins");
+            placeName.setText(poi.mType);
+            placeAddress.setText(address);
+            poiDetailPopupWindow.setVisibility(View.VISIBLE);
+        }
+        else {
+            Log.i(TAG, "onPlaceClick: id is: " + placeInfoRequested.getId());
+            client.getCheckInForPlace(placeInfoRequested.getId(), new FirebaseCheckInsCallback() {
+                @Override
+                public void getCheckInsCallBack(ArrayList<CheckIn> checkIns) {
+
+                    int localVisits = 0;
+                    int touristVisits = 0;
+                    int localLikes = 0;
+                    int touristLikes = 0;
+                    int reviews = 0;
+                    for (CheckIn checkin : checkIns){
+                        if (checkin.isLocal()) {
+                            localVisits = localVisits + 1;
+                            if (checkin.isHearted()) {
+                                localLikes = localLikes + 1;
+                            }
+                        } else {
+                            touristVisits = touristVisits + 1;
+                            if (checkin.isHearted()) {
+                                touristLikes = touristLikes + 1;
+                            }
+                        }
+                        if (!checkin.getReview().equals("")) {
+                            reviews = reviews + 1;
+                        }
+                    }
+
+                    Collections.sort(checkIns, new Comparator<CheckIn>(){
+                        @Override
+                        public int compare(CheckIn lhs, CheckIn rhs) {
+                            String checkInDateLhs = lhs.getCheckInTime();
+                            String checkInDateRhs = rhs.getCheckInTime();
+
+                            Date rhsDate = new Date();
+                            Date lhsDate = new Date();
+                            if (checkInDateLhs != null && checkInDateRhs != null) {
+                                try {
+                                    rhsDate = new SimpleDateFormat("dd MMMM, yyyy hh:mm a").parse(checkInDateRhs);
+                                    lhsDate = new SimpleDateFormat("dd MMMM, yyyy hh:mm a").parse(checkInDateLhs);
+                                } catch (ParseException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                            int x = rhsDate.compareTo(lhsDate);
+                            return lhsDate.compareTo(rhsDate);
+                        }
+                    });
+
+                    RecyclerView commentsRecyclerView = binding.poiDetailPopupWindow.placeCommentsListPopupCheckIn.usersCommentsList;
+                    RecyclerViewReviewsAdapter recyclerViewReviewsAdapter = new RecyclerViewReviewsAdapter(CONTEXT, checkIns);
+                    commentsRecyclerView.setAdapter(recyclerViewReviewsAdapter);
+                    commentsRecyclerView.setLayoutManager(new LinearLayoutManager(CONTEXT));
+
+                    binding.poiDetailPopupWindow.namePlaceDetail.setText(finalKnownName);
+                    binding.poiDetailPopupWindow.addressPlaceDetail.setText(finalAddress);
+                    binding.poiDetailPopupWindow.localNumber.setText(String.valueOf(localVisits));
+                    binding.poiDetailPopupWindow.localUpvotes.setText(String.valueOf(localLikes));
+                    binding.poiDetailPopupWindow.touristNumber.setText(String.valueOf(touristVisits));
+                    binding.poiDetailPopupWindow.touristUpvotes.setText(String.valueOf(touristLikes));
+                    binding.poiDetailPopupWindow.reviewsCountCheckIn.setText(String.valueOf(reviews));
+
+                    poiDetailPopupWindow.setVisibility(View.VISIBLE);
+                }
+            });
+        }
+
+        IMapController controller = map.getController();
+        controller.setCenter(poi.mLocation);
+        controller.setZoom(USER_ZOOM);
+        controller.animateTo(poi.mLocation);
+        map.invalidate();
+
+        poiListPopupWindow.setVisibility(View.VISIBLE);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
@@ -806,7 +818,36 @@ public class CheckInFragment extends Fragment implements RecyclerViewAdapter.Ite
         String formattedCurrentDate = europeanDateFormatter.format(currentDate);
 
         return formattedCurrentDate;
-}
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Configuration.getInstance().load(CONTEXT,
+                PreferenceManager.getDefaultSharedPreferences(CONTEXT));
+        if (map != null) {
+            map.onResume();
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        Configuration.getInstance().save(CONTEXT,
+                PreferenceManager.getDefaultSharedPreferences(CONTEXT));
+        if (map != null) {
+            map.onPause();
+        }
+    }
+
+    private void switchFragment(OsmFragment fragment) {
+        FragmentManager fragmentManager = getChildFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.add(R.id.frameLayout, fragment);
+        fragmentTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+        fragmentTransaction.addToBackStack("CheckIn2OSM");
+        fragmentTransaction.commit();
+    }
 
     // Fragment setup reference: https://guides.codepath.com/android/creating-and-using-fragments
 }

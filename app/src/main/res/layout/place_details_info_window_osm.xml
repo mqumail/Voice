@@ -1,0 +1,270 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:id="@+id/place_custom_window_osm">
+
+    <LinearLayout
+        android:id="@+id/place_details_popup_window_osm"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/image_background"
+        android:focusable="true"
+        android:elevation="3dp"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <LinearLayout
+            android:id="@+id/marker_info_osm"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:elevation="1dp"
+            android:orientation="vertical"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0">
+
+            <ImageView
+                android:id="@+id/coloBar_place_details_osm"
+                android:layout_width="match_parent"
+                android:layout_height="10dp"
+                android:layout_margin="0dp"
+                android:contentDescription="@string/app_colors_bar"
+                android:scaleType="fitXY"
+                android:src="@drawable/ic_color_bar" />
+
+            <TextView
+                android:id="@+id/namePlaceDetail_osm"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:gravity="start"
+                android:maxLines="1"
+                android:paddingStart="16dp"
+                android:paddingTop="16dp"
+                android:paddingEnd="16dp"
+                android:textColor="@color/primary_text"
+                android:textSize="@dimen/titleTextSize" />
+
+            <TextView
+                android:id="@+id/addressPlaceDetail_osm"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:gravity="start"
+                android:maxLines="2"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:paddingBottom="16dp"
+                android:textColor="@color/secondary_text"
+                android:textSize="@dimen/bodyTextSize" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/local_info_osm"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:clickable="true"
+            android:elevation="1dp"
+            android:orientation="horizontal"
+            android:paddingStart="16dp"
+            android:paddingTop="16dp"
+            android:paddingEnd="16dp"
+            android:paddingBottom="16dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/marker_info"
+            app:layout_constraintVertical_bias="0">
+
+            <TextView
+                android:id="@+id/localNumber_osm"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="0"
+                android:textColor="@color/accent"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/localVisitors_osm_tag"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:text="@string/local_visitors_place_details"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/localUpvotes_osm"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:gravity="end"
+                android:text="0"
+                android:textColor="@color/accent"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_gravity="center"
+                android:layout_marginEnd="8dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/ic_favorite" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/tourist_info_osm"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:clickable="true"
+            android:elevation="1dp"
+            android:focusable="true"
+            android:orientation="horizontal"
+            android:paddingStart="16dp"
+            android:paddingTop="16dp"
+            android:paddingEnd="16dp"
+            android:paddingBottom="16dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/local_info"
+            app:layout_constraintVertical_bias="0">
+
+            <TextView
+                android:id="@+id/touristNumber_osm"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="0"
+                android:textColor="@color/accent"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tourist_visitors_osm_tag"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:text="@string/tourist_visitors_place_details"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/tourist_likes_osm"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:gravity="end"
+                android:text="0"
+                android:textColor="@color/accent"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_gravity="center"
+                android:layout_marginEnd="8dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/ic_favorite" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/reviews_osm_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:clickable="true"
+            android:orientation="horizontal"
+            android:padding="16dp"
+            >
+
+            <TextView
+                android:id="@+id/reviews_count_osm"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0"
+                android:textColor="@color/accent"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/reviews_osm"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:text="@string/title_comments_list_popoup"
+                android:textSize="16sp" />
+
+            <Button
+                android:id="@+id/reviews_osm_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:background="@drawable/button_get_started"
+                android:text="@string/view_comments_osm"
+                android:textColor="@color/primary_dark" />
+
+
+        </LinearLayout>
+        
+        <LinearLayout
+            android:id="@+id/button_area_place_details_osm"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:elevation="1dp"
+            android:gravity="end"
+            android:orientation="horizontal"
+            android:paddingStart="26dp"
+            android:paddingEnd="26dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/comment_info">
+
+            <Button
+                android:id="@+id/close_button_osm"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:layout_margin="8dp"
+                android:layout_weight="1"
+                android:background="@drawable/button_get_started"
+                android:text="@string/close_button"
+                android:textColor="@color/primary_dark" />
+
+            <Button
+                android:id="@+id/check_in_button_osm"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:layout_margin="8dp"
+                android:layout_weight="1"
+                android:background="@drawable/button_get_started"
+                android:text="@string/check_in_button"
+                android:textColor="@color/primary_dark" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <include
+        android:visibility="gone"
+        android:id="@+id/place_comments_list_popup"
+        layout="@layout/comments_list_popup_window"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom" />
+
+</LinearLayout>

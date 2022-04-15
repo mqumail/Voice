@@ -1,4 +1,7 @@
-package app.com.muhammad.voice.utils;
+package app.com.muhammad.voice.util;
+
+import static android.content.Context.LOCATION_SERVICE;
+import static app.com.muhammad.voice.util.Constants.CITY_ZOOM;
 
 import android.Manifest;
 import android.content.Context;
@@ -11,77 +14,46 @@ import android.location.LocationManager;
 import android.location.LocationProvider;
 import android.util.Log;
 
+import androidx.core.app.ActivityCompat;
+
 import com.google.firebase.firestore.GeoPoint;
 
+import org.osmdroid.api.IMapController;
 import org.osmdroid.bonuspack.location.POI;
 import org.osmdroid.util.BoundingBox;
+import org.osmdroid.views.MapView;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import androidx.core.app.ActivityCompat;
 import app.com.muhammad.voice.DTO.PlaceInfo;
 
-import static android.content.Context.LOCATION_SERVICE;
-
-//ref: https://stuff.mit.edu/afs/sipb/project/android/docs/training/basics/location/currentlocation.html
 public class LocationHelper
 {
     public static LocationManager locationManager;
     private static LocationProvider provider;
     private static List<String> providers;
     private static LocationListener listener;
-
-    private static Location currentLocation;
     Location bestLocation = null;
 
-    public static Location getCurrentUserLocation(Context activity)
-    {
-
-        locationManager = (LocationManager) activity.getSystemService(LOCATION_SERVICE);
-        provider = locationManager.getProvider(LocationManager.GPS_PROVIDER);
-        providers = locationManager.getProviders(true);
-
-        // A new location update is received.  Do something useful with it.  In this case,
-        // we're sending the update to a handler which then updates the UI with the new
-        // location.
-        listener = LocationHelper::setCurrentLocation;
-
-        if (ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                && ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            Log.i("Checking Permission LocationHandler", "No permission given, ask user for permissions.");
-        }
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 10000, 10, listener);
-
-        return currentLocation != null ? currentLocation : locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-    }
-
-    public static Location getLastKnownLocation(Context activity)
-    {
+    public static Location getLastKnownLocation(Context activity) {
         locationManager = (LocationManager) activity.getApplicationContext().getSystemService(LOCATION_SERVICE);
         List<String> providers = locationManager.getProviders(true);
         Location bestLocation = null;
 
         for (String provider : providers) {
-
             if (ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                     && ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 Log.i("Checking Permission LocationHandler", "No permission given, ask user for permissions.");
             }
             Location l = locationManager.getLastKnownLocation(provider);
-
-            if (l == null) {
-                continue;
-            }
-
+            if (l == null) { continue; }
             if (bestLocation == null || l.getAccuracy() < bestLocation.getAccuracy()) {
-                // Found best last known location: %s", l);
-                bestLocation = l;
+                bestLocation = l; // Found best last known location: %s", l);
             }
         }
-
         return bestLocation;
     }
 
@@ -111,16 +83,6 @@ public class LocationHelper
                 location.getLatitude() - 0.025, location.getLongitude() - 0.025);
     }
 
-    private static void setCurrentLocation(Location location) {
-        currentLocation = location;
-    }
-
-    public static void removeListener() {
-        if (locationManager != null ) {
-            locationManager.removeUpdates(listener);
-        }
-    }
-
     public static GeoPoint getLatLong(PlaceInfo place, Context context) throws IOException {
         double latitude;
         double longitude;
@@ -146,5 +108,38 @@ public class LocationHelper
         geocoder = new Geocoder(context, Locale.getDefault());
         addresses = geocoder.getFromLocation(place.mLocation.getLatitude(), place.mLocation.getLongitude(), 1); // Here 1 represent max location result to returned, by documents it recommended 1 to 5
         return addresses;
+    }
+
+    public static void zoomToLocation(MapView map, org.osmdroid.util.GeoPoint geoPoint) {
+        IMapController mapController = map.getController();
+        mapController.setCenter(geoPoint);
+        mapController.setZoom(CITY_ZOOM);
+        mapController.animateTo(geoPoint);
+        map.invalidate();
+    }
+
+    public static boolean allowedToCheckIn(String address, Context context) throws IOException {
+
+        PlaceInfo place = new PlaceInfo();
+        place.setAddress(address);
+        GeoPoint geoPointOfPlace = getLatLong(place, context);
+
+        Location placeLocation = new Location("Place");
+        placeLocation.setLatitude(geoPointOfPlace.getLatitude());
+        placeLocation.setLongitude(geoPointOfPlace.getLongitude());
+
+        Location userLocation = getLastKnownLocation(context);
+        double distance = userLocation.distanceTo(placeLocation);
+
+        return true;//!(distance > 10);
+    }
+
+    public static double distanceToFromCurrentLocation(GeoPoint geoPoint, Context context) {
+        Location userLocation = getLastKnownLocation(context);
+        Location placeLocation = new Location("Place");
+        placeLocation.setLatitude(geoPoint.getLatitude());
+        placeLocation.setLongitude(geoPoint.getLongitude());
+        double distance = userLocation.distanceTo(placeLocation);
+        return distance;
     }
 }

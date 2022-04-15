@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     tools:context=".BaseActivity">
 
         <androidx.appcompat.widget.Toolbar
@@ -17,10 +17,12 @@
             android:background="@drawable/button_get_started"
             android:elevation="1dp"
             android:ems="10"
+            app:menu="@menu/check_in_menu"
             app:title="@string/check_in_search_Title"
             app:titleTextColor="@color/secondary_text"
-            app:navigationIcon="@drawable/ic_drawer_menu"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/frameLayout" />
+
+
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

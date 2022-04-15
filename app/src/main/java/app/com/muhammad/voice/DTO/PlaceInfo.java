@@ -1,34 +1,29 @@
 package app.com.muhammad.voice.DTO;
 
-import android.net.Uri;
-
-import androidx.annotation.NonNull;
-
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class PlaceInfo
+public class PlaceInfo implements Serializable
 {
-    @NonNull
-    private String id;
-    private String name;
-    private String address;
-    private String phoneNumber;
-    private Uri websiteUri;
-    private double rating;
-    private String attributions;
-    private ArrayList<CheckIn> checkIns;
-
-    public PlaceInfo() { }
-
-    public PlaceInfo(String name, String address, String phoneNumber, String id, Uri websiteUri, double rating, String attributions, ArrayList<CheckIn> checkIns, boolean isIdentifiedCheckIn, boolean isHearted, boolean isLocalCheckIn) {
+    public PlaceInfo(String id, String name, String address, String phoneNumber, String websiteUri, com.google.firebase.firestore.GeoPoint latLng, double rating, String attributions, int markerIndex, ArrayList<CheckIn> checkIns) {
+        this.id = id;
         this.name = name;
         this.address = address;
         this.phoneNumber = phoneNumber;
-        this.id = id;
         this.websiteUri = websiteUri;
+        this.latLng = latLng;
         this.rating = rating;
         this.attributions = attributions;
+        this.markerIndex = markerIndex;
         this.checkIns = checkIns;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -55,20 +50,20 @@ public class PlaceInfo
         this.phoneNumber = phoneNumber;
     }
 
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public Uri getWebsiteUri() {
+    public String getWebsiteUri() {
         return websiteUri;
     }
 
-    public void setWebsiteUri(Uri websiteUri) {
+    public void setWebsiteUri(String websiteUri) {
         this.websiteUri = websiteUri;
+    }
+
+    public com.google.firebase.firestore.GeoPoint getLatLng() {
+        return latLng;
+    }
+
+    public void setLatLng(com.google.firebase.firestore.GeoPoint latLng) {
+        this.latLng = latLng;
     }
 
     public double getRating() {
@@ -87,6 +82,14 @@ public class PlaceInfo
         this.attributions = attributions;
     }
 
+    public int getMarkerIndex() {
+        return markerIndex;
+    }
+
+    public void setMarkerIndex(int markerIndex) {
+        this.markerIndex = markerIndex;
+    }
+
     public ArrayList<CheckIn> getCheckIns() {
         return checkIns;
     }
@@ -95,19 +98,32 @@ public class PlaceInfo
         this.checkIns = checkIns;
     }
 
-
-
     @Override
     public String toString() {
         return "PlaceInfo{" +
-                "name='" + name + '\'' +
+                "id='" + id + '\'' +
+                ", name='" + name + '\'' +
                 ", address='" + address + '\'' +
                 ", phoneNumber='" + phoneNumber + '\'' +
-                ", id='" + id + '\'' +
-                ", websiteUri=" + websiteUri +
+                ", websiteUri='" + websiteUri + '\'' +
+                ", latLng=" + latLng +
                 ", rating=" + rating +
                 ", attributions='" + attributions + '\'' +
+                ", markerIndex=" + markerIndex +
                 ", checkIns=" + checkIns +
                 '}';
     }
+
+    private String id;
+    private String name;
+    private String address;
+    private String phoneNumber;
+    private String websiteUri;
+    private com.google.firebase.firestore.GeoPoint latLng;
+    private double rating;
+    private String attributions;
+    private int markerIndex;
+    private ArrayList<CheckIn> checkIns;
+
+    public PlaceInfo() { }
 }

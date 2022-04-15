@@ -1,6 +1,9 @@
 package app.com.muhammad.voice;
 
-import android.content.Intent;
+import static android.content.ContentValues.TAG;
+import static app.com.muhammad.voice.util.Constants.MY_PREFERENCES;
+import static app.com.muhammad.voice.util.Constants.USER_INFO_KEY;
+
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
@@ -9,18 +12,18 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserProfileChangeRequest;
 
 import java.util.HashSet;
 import java.util.Set;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 import app.com.muhammad.voice.databinding.ActivitySignUpBinding;
 
 public class SignUpActivity extends AppCompatActivity  {
@@ -67,8 +70,6 @@ public class SignUpActivity extends AppCompatActivity  {
                 String password = passwordEditText.getText().toString();
                 String userName = userNameEditText.getText().toString();
                 signUp(email, password, userName);
-
-                continueHome();
             }
         });
     }
@@ -83,13 +84,14 @@ public class SignUpActivity extends AppCompatActivity  {
                             // Sign in success, update UI with the signed-in user's information
                             Log.d(ACTIVITY_TAG, "createUserWithEmail:success");
                             saveUserInfo(email, userName);
+                            finish();
                         }
                         else {
-                            FirebaseUser user = mAuth.getCurrentUser();
                             // If sign in fails, display a message to the user.
                             Log.w(ACTIVITY_TAG, "createUserWithEmail:failure", task.getException());
-                            Toast.makeText(SignUpActivity.this, "Authentication failed.",
+                            Toast.makeText(SignUpActivity.this, "We are unable to register you at this time. Please try again later.",
                                     Toast.LENGTH_SHORT).show();
+                            //TODO: Give user an option on what todo when they can not register
                         }
                     }
                 });
@@ -99,37 +101,24 @@ public class SignUpActivity extends AppCompatActivity  {
         Set<String> userInfo = new HashSet<>();
         userInfo.add(email);
         userInfo.add(userName);
-        SharedPreferences preferences = getSharedPreferences("my_preferences", MODE_PRIVATE);
-        preferences.edit().putStringSet("user-info",userInfo).apply();
-
-
-        //TODO: Let user know they have signed up successfully
-        // - small text: tell them what was stored (??)
-        // - Positive option, continue as 'USERNAME'
+        SharedPreferences preferences = getSharedPreferences(MY_PREFERENCES, MODE_PRIVATE);
+        preferences.edit().putStringSet(USER_INFO_KEY,userInfo).apply();
 
         Toast.makeText(this, "Registration Successful! Continuing as: " + userName,
-                Toast.LENGTH_SHORT).show();
+                Toast.LENGTH_LONG).show();
 
-        // TODO: Fix me bug with themes
-        //notifyUser(email, userName);
-    }
+        UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
+                .setDisplayName(userName)
+                .build();
 
-    private void notifyUser(String email, String userName) {
-        new MaterialAlertDialogBuilder(SignUpActivity.this)
-                .setTitle("You are registered!")
-                .setMessage("You signed up using: " + email)
-                .setPositiveButton("Continue as: " + userName, (dialogInterface, i) -> {
-
-                })
-                .setNegativeButton("Sign in as another user", (dialogInterface, i) -> {
-
-                })
-                .show();
-    }
-
-    public void continueHome()
-    {
-        Intent intent = new Intent(SignUpActivity.this, BaseActivity.class);
-        startActivity(intent);
+        mAuth.getCurrentUser().updateProfile(profileUpdates)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            Log.i(TAG, "User profile updated.");
+                        }
+                    }
+                });
     }
 }

@@ -6,7 +6,7 @@ android {
     compileSdkVersion 31
     defaultConfig {
         applicationId "app.com.muhammad.voice"
-        minSdkVersion 25
+        minSdkVersion 26
         targetSdkVersion 31
         versionCode 1
         versionName "1.0"
@@ -25,27 +25,28 @@ android {
     dataBinding{
         enabled true
     }
+    packagingOptions {
+        pickFirst 'META-INF/*'
+    }
+
 }
 
 dependencies {
-    implementation 'com.google.firebase:firebase-auth:21.0.1'
-    def fragment_version = "1.4.0"
-    def activity_version = "1.4.0"
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
     implementation 'androidx.appcompat:appcompat:1.4.1'
-    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.4.0'
-    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.0'
-    implementation 'androidx.navigation:navigation-fragment:2.3.5'
-    implementation 'androidx.navigation:navigation-ui:2.3.5'
-    implementation 'androidx.media:media:1.4.3'
+    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.4.1'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.1'
+    implementation 'androidx.navigation:navigation-fragment:2.4.1'
+    implementation 'androidx.navigation:navigation-ui:2.4.1'
+    implementation 'androidx.media:media:1.5.0'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.3'
     implementation 'androidx.multidex:multidex:2.0.1'
     implementation 'androidx.recyclerview:recyclerview:1.2.1'
-    implementation "androidx.activity:activity:$activity_version"
-    implementation "androidx.fragment:fragment:$fragment_version"
+    implementation "androidx.activity:activity:1.4.0"
+    implementation "androidx.fragment:fragment:1.4.1"
 
     // Google's Material Design
     implementation 'com.google.android.material:material:1.5.0'
@@ -57,7 +58,7 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
 
     //osm
-    implementation 'org.osmdroid:osmdroid-android:6.1.10'
+    implementation 'org.osmdroid:osmdroid-android:6.1.11'
     implementation 'org.osmdroid:osmdroid-wms:6.1.6'
     implementation 'org.osmdroid:osmdroid-mapsforge:6.1.6'
     implementation 'org.osmdroid:osmdroid-geopackage:6.1.6'
@@ -69,7 +70,10 @@ dependencies {
     implementation 'com.ogaclejapan.smarttablayout:library:1.2.1@aar'
 
     // Firebase BoM
-    implementation platform('com.google.firebase:firebase-bom:29.0.4')
+    implementation platform('com.google.firebase:firebase-bom:29.3.0')
+
+    implementation 'com.google.firebase:firebase-auth'
+    implementation 'com.google.firebase:firebase-database'
 
     implementation 'com.google.firebase:firebase-analytics'
 
@@ -78,19 +82,24 @@ dependencies {
     implementation 'com.google.firebase:firebase-firestore'
 
     // Firestore ApiFuture used instead of Task (Async calls)
-//    implementation('com.google.api-client:google-api-client:1.32.1') {
-//        exclude(group: "proto-google-common-protos", module: "com.google.api.Advice")
-//        exclude(group: "proto-google-common-protos", module: "com.google.api.AdviceOrBuilder")
-//        exclude group: "com.google.api.grpc", module: "proto-google-common-protos"
-//    }
-//
-//    //Google Cloud Firestore
-//    implementation('com.google.cloud:google-cloud-firestore:2.6.1') {
-//        exclude group: "com.google.firebase", module: "protolite-well-known-types"
-//    }
+    implementation('com.google.api-client:google-api-client:1.32.1') {
+        exclude group: "com.google.protobuf", module: "protobuf-javalite"
+        //exclude group: "com.google.protobuf", module: "protobuf-java"
+    }
+
+    // Firestore client SDK
+    implementation 'com.google.firebase:firebase-firestore'
+
+    // Declare the dependency for the Cloud Storage library
+    // When using the BoM, you don't specify versions in Firebase library dependencies
+    implementation 'com.google.firebase:firebase-storage'
+
+    //Lottie Animation
+    implementation 'com.airbnb.android:lottie:3.4.0'
+
+    implementation 'androidx.core:core-splashscreen:1.0.0-beta02'
 }
 
 repositories {
     mavenCentral()
-    //google()
 }

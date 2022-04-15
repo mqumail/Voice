@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    android:layout_height="match_parent">
 
     <FrameLayout
         android:id="@+id/frameLayout"
@@ -20,7 +20,7 @@
         <include
             android:id="@+id/poi_list_popup_window"
             layout="@layout/place_reveal_list_popup_window"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom" />
 
@@ -39,11 +39,53 @@
             android:layout_gravity="bottom"/>
     </FrameLayout>
 
-    <!--TOOLBAR HERE-->
-    <include
-        android:id="@+id/toolbar_check_in_layout"
-        layout="@layout/toolbar_check_in_layout"
+    <LinearLayout
+        android:id="@+id/linearLayout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <Button
+            android:id="@+id/menu_button_checkIn"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:layout_marginStart="25dp"
+            android:layout_marginTop="25dp"
+            android:background="@drawable/ic_drawer_menu"
+            app:layout_constraintStart_toStartOf="@+id/nav_host_fragment"
+            app:layout_constraintTop_toTopOf="@+id/nav_host_fragment" />
+
+        <androidx.appcompat.widget.SearchView
+            android:id="@+id/search_view_check_in"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_margin="25dp"
+            android:background="@color/semi_transparent"
+            android:elevation="4dp"
+            android:layoutDirection="rtl"
+            app:defaultQueryHint="Search nearby.."
+            app:layout_constraintEnd_toEndOf="@+id/frameLayout"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:queryHint="Search nearby..">
+
+        </androidx.appcompat.widget.SearchView>
+    </LinearLayout>
+
+    <ProgressBar
+        android:visibility="gone"
+        android:id="@+id/progress_circular_check_in_place_list"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center"
+        android:layout_marginVertical="150dp"
+        android:foregroundGravity="center_vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
