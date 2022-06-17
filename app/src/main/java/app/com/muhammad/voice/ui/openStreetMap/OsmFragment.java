@@ -299,11 +299,16 @@ public class OsmFragment extends Fragment implements ActivityCompat.OnRequestPer
                 if (ActivityCompat.checkSelfPermission(CONTEXT, Manifest.permission.ACCESS_FINE_LOCATION)
                         == PackageManager.PERMISSION_GRANTED) {
                     Location location = getLastKnownLocation(CONTEXT);
-                    GeoPoint geoPoint = new GeoPoint(location.getLatitude(), location.getLongitude());
-                    map.getController().setCenter(geoPoint);
-                    map.getController().setZoom(USER_ZOOM);
-                    map.getController().animateTo(geoPoint);
-                    map.invalidate();
+                    if (null != location) {
+                        GeoPoint geoPoint = new GeoPoint(location.getLatitude(), location.getLongitude());
+                        map.getController().setCenter(geoPoint);
+                        map.getController().setZoom(USER_ZOOM);
+                        map.getController().animateTo(geoPoint);
+                        map.invalidate();
+                    } else {
+                        Toast.makeText(CONTEXT, "Unable to get location. Please make sure your allow Location Permission and your have network coverage!", Toast.LENGTH_LONG).show();
+                    }
+
                 } else {
                     Log.i(TAG, "openStreetMapInit: No permission given for location. Setting location to EUROPE_BB.getCenterWithDateLine()");
                     IMapController controller = map.getController();
@@ -532,11 +537,15 @@ public class OsmFragment extends Fragment implements ActivityCompat.OnRequestPer
             if (ActivityCompat.checkSelfPermission(CONTEXT, Manifest.permission.ACCESS_FINE_LOCATION)
                     == PackageManager.PERMISSION_GRANTED) {
                 Location location = getLastKnownLocation(CONTEXT);
-                Log.i(TAG, "onResume: Location returned: " + location.getLongitude() + ", " + location.getLongitude());
-                GeoPoint geoPoint = new GeoPoint(location.getLatitude(), location.getLongitude());
-                IMapController controller = map.getController();
-                controller.setZoom(USER_ZOOM);
-                controller.animateTo(geoPoint);
+                if (null != location) {
+                    Log.i(TAG, "onResume: Location returned: " + location.getLongitude() + ", " + location.getLongitude());
+                    GeoPoint geoPoint = new GeoPoint(location.getLatitude(), location.getLongitude());
+                    IMapController controller = map.getController();
+                    controller.setZoom(USER_ZOOM);
+                    controller.animateTo(geoPoint);
+                } else {
+                    Toast.makeText(CONTEXT, "Unable to get location. Please make sure your allow Location Permission and your have network coverage!", Toast.LENGTH_LONG).show();
+                }
             } else {
                 IMapController mapController = map.getController();
                 mapController.setCenter(EUROPE_BB.getCenterWithDateLine());
